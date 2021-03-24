@@ -40,19 +40,3 @@ $ npm run start:dev
 # unit tests | testing unitario
 $ npm run test
 ```
-
-## Support | Soporte
-
-Coming soon | Pronto (;
-
-</br>
-
-## Stay in touch | Contacto
-
-- Bot Author - <b>Ignacio Miranda</b> (i.miranda.f99@gmail.com)
-
-</br>
-
-## License | Licencia
-
-[MIT licensed](LICENSE)
