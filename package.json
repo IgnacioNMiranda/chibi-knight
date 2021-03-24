@@ -1,6 +1,6 @@
 {
   "name": "chibi-knight",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "A multipurpose discord bot",
   "main": "main.js",
   "scripts": {
@@ -14,11 +14,11 @@
     "url": "git+https://github.com/IgnacioNMiranda/Chibi-Knight.git"
   },
   "author": "Ignacio Miranda F. (N)",
-  "license": "MIT",
   "bugs": {
     "url": "https://github.com/IgnacioNMiranda/Chibi-Knight/issues"
   },
   "homepage": "https://github.com/IgnacioNMiranda/Chibi-Knight#readme",
+  "private": "true",
   "dependencies": {
     "discord.js": "^12.4.0",
     "discord.js-commando": "github:discordjs/Commando",
