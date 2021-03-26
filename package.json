@@ -1,6 +1,6 @@
 {
   "name": "chibi-knight",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "description": "A multipurpose discord bot",
   "main": "main.js",
   "scripts": {

@@ -17,7 +17,7 @@ class App {
   async initClient() {
     this.client = new CommandoClient({
       commandPrefix: configuration.prefix,
-      owner: '768272679051591691',
+      owner: configuration.clientId,
       invite: '',
     });
 
@@ -42,15 +42,11 @@ class App {
       console.log(`${this.client.user.username} is online n.n`);
     });
 
-    while (true) {
-      console.log('Logging in...');
-      try {
-        await this.client.login(configuration.token);
-        break;
-      } catch (error) {
-        const { code, method, path } = error;
-        console.error(`Error ${code} trying to ${method} to ${path} path`);
-      }
+    try {
+      await this.client.login(configuration.token);
+    } catch (error) {
+      const { code, method, path } = error;
+      console.error(`Error ${code} trying to ${method} to ${path} path`);
     }
   }
 }
