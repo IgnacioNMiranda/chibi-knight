@@ -2,7 +2,7 @@
 import { Command, CommandoClient, CommandoMessage } from 'discord.js-commando';
 import { Message, MessageEmbed } from 'discord.js';
 import { groupsDescriptions } from './resources/groupsDescriptions';
-import configuration from '../../../config/configuration';
+import configuration from '../../config/configuration';
 
 /**
  * Sends an embed message with information of every existing command.
@@ -32,7 +32,10 @@ export default class HelpCommand extends Command {
 
     const commandName = message.content.split(' ')[1];
     if (commandName) {
-      const command = this.client.registry.findCommands(commandName, true)[0];
+      const command: Command = this.client.registry.findCommands(
+        commandName,
+        true,
+      )[0];
 
       if (command) {
         let cmdArgs = 'none';
