@@ -8,7 +8,7 @@
 
 <p align="center">
   <img src="https://img.shields.io/badge/License-MIT-green.svg" alt="Project license"/></a>
-  <img src="https://img.shields.io/badge/npm-12.20.2-blue.svg" alt="Npm version">
+  <img src="https://img.shields.io/badge/npm-15.8.0-blue.svg" alt="Npm version">
 </p>
 
 # Chibi Knight
