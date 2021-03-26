@@ -6,10 +6,20 @@
     "emitDecoratorMetadata": true,
     "experimentalDecorators": true,
     "allowSyntheticDefaultImports": true,
-    "target": "es2017",
+    "target": "es6",
+    "allowJs": true,
     "sourceMap": true,
     "outDir": "./dist",
-    "baseUrl": "./",
+    "baseUrl": ".",
     "incremental": true,
-  }
+    "moduleResolution": "node",
+    "esModuleInterop": true,
+    "paths": {
+      "*": ["node_modules/*"]
+    },
+    "lib": [
+      "es6"
+    ]
+  },
+  "include": ["src/**/*"]
 }

@@ -1,6 +1,5 @@
-// eslint-disable-next-line prettier/prettier
-const pathlib = require('path');
-import configuration from '../config/configuration';
+import pathlib from 'path';
+import configuration from './config/configuration';
 import { CommandoClient } from 'discord.js-commando';
 
 class App {
@@ -29,13 +28,13 @@ class App {
         ['music', 'Music commands'],
       ])
       .registerCommandsIn({
-        filter: /^([^.].*)\.(js|ts)$/,
+        filter: /^([^.].*)\.js$/,
         dirname: pathlib.join(__dirname, './commands'),
       });
 
     this.client.on('error', console.error).on('warn', console.warn);
 
-    // When Chibi Knight is login.
+    // When Chibi Knight has login.
     this.client.once('ready', () => {
       this.client.user.setActivity('>help');
       this.gameInstanceActive = false;
@@ -43,6 +42,7 @@ class App {
     });
 
     try {
+      console.log('Logging in...');
       await this.client.login(configuration.token);
     } catch (error) {
       const { code, method, path } = error;
