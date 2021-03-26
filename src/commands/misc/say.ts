@@ -29,9 +29,9 @@ export default class SayCommand extends Command {
     try {
       await message.say(args.receivedMessage);
       await message.delete();
-    } catch (e) {
+    } catch (error) {
       // If bot cannot delete messages.
-      console.log(e);
+      console.log(error);
     }
     return;
   }

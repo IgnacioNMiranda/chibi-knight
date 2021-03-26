@@ -1,9 +1,8 @@
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
 import { Command, CommandoClient, CommandoMessage } from 'discord.js-commando';
 import { MessageEmbed, User, Message } from 'discord.js';
 import { QandA } from './resources/QandA';
 import { app } from '../../main';
-import configuration from '../../../config/configuration';
+import configuration from '../../config/configuration';
 
 /**
  * Starts a tic-tac-toe game.
@@ -35,20 +34,17 @@ export default class TicTacToeCommand extends Command {
   /**
    * It executes when someone types the "tictactoe" command.
    */
-  async run(
-    message: CommandoMessage,
-    args: { player2: User },
-  ): Promise<Message> {
+  async run(message: CommandoMessage, args: { player2: User }): Promise<null> {
     // This obtains the challenging player instance.
     const player1 = message.author;
 
     // If there's already a game in course or a player challenged Chibi Knight or themself, the game cannot be executed.
     if (app.gameInstanceActive) {
-      return await message.say(`There's already a game in course ${player1}!`);
+      await message.say(`There's already a game in course ${player1}!`);
     } else if (player1.id === args.player2.id) {
-      return await message.say('You cannot challenge yourself ¬¬ ...');
+      await message.say('You cannot challenge yourself ¬¬ ...');
     } else if (args.player2.bot) {
-      return await message.say(
+      await message.say(
         "You cannot challenge me :anger: I'm a superior being... I would destroy you n.n :purple_heart:",
       );
     }
@@ -74,7 +70,7 @@ export default class TicTacToeCommand extends Command {
     if (collectedMessages?.first()) {
       const receivedMsg = collectedMessages.first().content;
       if (receivedMsg === 'no' || receivedMsg === 'n') {
-        return await message.say(
+        await message.say(
           `Game cancelled ): You aren't strong enough ${args.player2}.`,
         );
       } else if (receivedMsg === 'yes' || receivedMsg === 'y') {
@@ -82,10 +78,12 @@ export default class TicTacToeCommand extends Command {
         this.ticTacToeInstance(message, player1, args.player2, QandAGames);
       }
     } else {
-      return await message.say(
+      await message.say(
         `Time's up! ${args.player2.username} dont want to play ):`,
       );
     }
+
+    return null;
   }
 
   /**
