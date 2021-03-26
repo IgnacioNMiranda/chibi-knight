@@ -42,10 +42,7 @@ class App {
     });
 
     try {
-<<<<<<< HEAD
-=======
       console.log('Logging in...');
->>>>>>> fix: heroku config, scripts and dependencies
       await this.client.login(configuration.token);
     } catch (error) {
       const { code, method, path } = error;
