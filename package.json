@@ -1,10 +1,10 @@
 {
   "name": "chibi-knight",
-  "version": "1.1.0",
+  "version": "1.2.0",
   "description": "A multipurpose discord bot",
   "main": "dist/main.js",
   "scripts": {
-    "start": "npm run build && node dist/main.js",
+    "start": "node dist/main.js",
     "start:dev": "ts-node-dev --respawn --transpile-only ./src/main.ts",
     "build": "rm -rf ./dist && tsc",
     "test": "echo \"Error: no test specified\" && exit 1",
@@ -28,7 +28,8 @@
     "dotenv": "^8.2.0",
     "eslint": "^7.20.0",
     "eslint-config-prettier": "^8.1.0",
-    "eslint-plugin-prettier": "^3.3.1"
+    "eslint-plugin-prettier": "^3.3.1",
+    "winston": "^3.3.3"
   },
   "devDependencies": {
     "@types/node": "^14.14.35",

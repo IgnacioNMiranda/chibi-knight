@@ -1,5 +1,6 @@
 import { Message } from 'discord.js';
 import { Command, CommandoClient, CommandoMessage } from 'discord.js-commando';
+import logger from '../../logger';
 
 /**
  * Replies the receives message on command.
@@ -31,7 +32,9 @@ export default class SayCommand extends Command {
       await message.delete();
     } catch (error) {
       // If bot cannot delete messages.
-      console.log(error);
+      logger.error(error, {
+        context: this.constructor.name,
+      });
     }
     return;
   }
