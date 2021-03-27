@@ -21,23 +21,29 @@ class App {
       invite: '',
     });
 
-    this.client.registry
-      .registerDefaultTypes()
-      .registerGroups([
-        ['games', 'Games commands'],
-        ['misc', 'Miscellaneous commands'],
-        ['music', 'Music commands'],
-      ])
-      .registerCommandsIn({
+    this.client.registry.registerDefaultTypes().registerGroups([
+      ['games', 'Games commands'],
+      ['misc', 'Miscellaneous commands'],
+      ['music', 'Music commands'],
+    ]);
+
+    if (configuration.env === 'development') {
+      this.client.registry.registerCommandsIn({
+        filter: /^([^.].*)\.ts$/,
+        dirname: pathlib.join(__dirname, './commands'),
+      });
+    } else {
+      this.client.registry.registerCommandsIn({
         filter: /^([^.].*)\.js$/,
         dirname: pathlib.join(__dirname, './commands'),
       });
+    }
 
     this.client.on('error', console.error).on('warn', console.warn);
 
     // When Chibi Knight has login.
     this.client.once('ready', () => {
-      this.client.user.setActivity('>help');
+      this.client.user.setActivity(`${configuration.prefix}help`);
       this.gameInstanceActive = false;
       logger.info(`${this.client.user.username} is online n.n`, {
         context: this.constructor.name,
