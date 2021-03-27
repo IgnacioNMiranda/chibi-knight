@@ -28,20 +28,26 @@ class App {
                 owner: configuration_1.default.clientId,
                 invite: '',
             });
-            this.client.registry
-                .registerDefaultTypes()
-                .registerGroups([
+            this.client.registry.registerDefaultTypes().registerGroups([
                 ['games', 'Games commands'],
                 ['misc', 'Miscellaneous commands'],
                 ['music', 'Music commands'],
-            ])
-                .registerCommandsIn({
-                filter: /^([^.].*)\.js$/,
-                dirname: path_1.default.join(__dirname, './commands'),
-            });
+            ]);
+            if (configuration_1.default.env == 'development') {
+                this.client.registry.registerCommandsIn({
+                    filter: /^([^.].*)\.ts$/,
+                    dirname: path_1.default.join(__dirname, './commands'),
+                });
+            }
+            else {
+                this.client.registry.registerCommandsIn({
+                    filter: /^([^.].*)\.js$/,
+                    dirname: path_1.default.join(__dirname, './commands'),
+                });
+            }
             this.client.on('error', console.error).on('warn', console.warn);
             this.client.once('ready', () => {
-                this.client.user.setActivity('>help');
+                this.client.user.setActivity(`${configuration_1.default.prefix}help`);
                 this.gameInstanceActive = false;
                 logger_1.default.info(`${this.client.user.username} is online n.n`, {
                     context: this.constructor.name,
