@@ -3,6 +3,7 @@ import { MessageEmbed, User, Message } from 'discord.js';
 import { QandA } from './resources/QandA';
 import { app } from '../../main';
 import configuration from '../../config/configuration';
+import logger from '../../logger';
 
 /**
  * Starts a tic-tac-toe game.
@@ -241,7 +242,9 @@ export default class TicTacToeCommand extends Command {
     collector.on('end', (collected: any, reason: any) => {
       // Unlocks the game instance.
       app.gameInstanceActive = false;
-      console.log(reason);
+      logger.info(reason, {
+        context: this.constructor.name,
+      });
     });
   }
 

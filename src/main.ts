@@ -1,6 +1,7 @@
 import pathlib from 'path';
 import configuration from './config/configuration';
 import { CommandoClient } from 'discord.js-commando';
+import logger from './logger';
 
 class App {
   // Instance of the bot client.
@@ -38,11 +39,15 @@ class App {
     this.client.once('ready', () => {
       this.client.user.setActivity('>help');
       this.gameInstanceActive = false;
-      console.log(`${this.client.user.username} is online n.n`);
+      logger.info(`${this.client.user.username} is online n.n`, {
+        context: this.constructor.name,
+      });
     });
 
     try {
-      console.log('Logging in...');
+      logger.info('Logging in...', {
+        context: this.constructor.name,
+      });
       await this.client.login(configuration.token);
     } catch (error) {
       const { code, method, path } = error;

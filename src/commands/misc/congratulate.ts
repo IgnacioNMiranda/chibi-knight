@@ -2,6 +2,7 @@ import { Command, CommandoClient, CommandoMessage } from 'discord.js-commando';
 import { Message, MessageEmbed, User } from 'discord.js';
 import { links } from './resources/links';
 import configuration from '../../config/configuration';
+import logger from '../../logger';
 
 /**
  * Sends an embed message with congratulations to certain User and a celebration image.
@@ -44,7 +45,9 @@ export default class CongratulateCommand extends Command {
       await message.say(embedMessage);
       await message.delete();
     } catch (error) {
-      console.log(error);
+      logger.error(error, {
+        context: this.constructor.name,
+      });
     }
     return;
   }

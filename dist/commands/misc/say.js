@@ -8,8 +8,12 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
 Object.defineProperty(exports, "__esModule", { value: true });
 const discord_js_commando_1 = require("discord.js-commando");
+const logger_1 = __importDefault(require("../../logger"));
 class SayCommand extends discord_js_commando_1.Command {
     constructor(client) {
         super(client, {
@@ -34,7 +38,9 @@ class SayCommand extends discord_js_commando_1.Command {
                 yield message.delete();
             }
             catch (error) {
-                console.log(error);
+                logger_1.default.error(error, {
+                    context: this.constructor.name,
+                });
             }
             return;
         });
