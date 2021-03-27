@@ -17,6 +17,7 @@ const discord_js_1 = require("discord.js");
 const QandA_1 = require("./resources/QandA");
 const main_1 = require("../../main");
 const configuration_1 = __importDefault(require("../../config/configuration"));
+const logger_1 = __importDefault(require("../../logger"));
 class TicTacToeCommand extends discord_js_commando_1.Command {
     constructor(client) {
         super(client, {
@@ -149,7 +150,9 @@ class TicTacToeCommand extends discord_js_commando_1.Command {
             }));
             collector.on('end', (collected, reason) => {
                 main_1.app.gameInstanceActive = false;
-                console.log(reason);
+                logger_1.default.info(reason, {
+                    context: this.constructor.name,
+                });
             });
         });
     }

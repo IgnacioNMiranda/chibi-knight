@@ -16,6 +16,7 @@ exports.app = void 0;
 const path_1 = __importDefault(require("path"));
 const configuration_1 = __importDefault(require("./config/configuration"));
 const discord_js_commando_1 = require("discord.js-commando");
+const logger_1 = __importDefault(require("./logger"));
 class App {
     constructor() {
         this.initClient();
@@ -42,10 +43,14 @@ class App {
             this.client.once('ready', () => {
                 this.client.user.setActivity('>help');
                 this.gameInstanceActive = false;
-                console.log(`${this.client.user.username} is online n.n`);
+                logger_1.default.info(`${this.client.user.username} is online n.n`, {
+                    context: this.constructor.name,
+                });
             });
             try {
-                console.log('Logging in...');
+                logger_1.default.info('Logging in...', {
+                    context: this.constructor.name,
+                });
                 yield this.client.login(configuration_1.default.token);
             }
             catch (error) {

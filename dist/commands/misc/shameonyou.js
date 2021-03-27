@@ -16,6 +16,7 @@ const discord_js_commando_1 = require("discord.js-commando");
 const discord_js_1 = require("discord.js");
 const links_1 = require("./resources/links");
 const configuration_1 = __importDefault(require("../../config/configuration"));
+const logger_1 = __importDefault(require("../../logger"));
 class ShameOnYouCommand extends discord_js_commando_1.Command {
     constructor(client) {
         super(client, {
@@ -46,7 +47,9 @@ class ShameOnYouCommand extends discord_js_commando_1.Command {
                 yield message.delete();
             }
             catch (error) {
-                console.log(error);
+                logger_1.default.error(error, {
+                    context: this.constructor.name,
+                });
             }
             return;
         });
