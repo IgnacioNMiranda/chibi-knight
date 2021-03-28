@@ -33,7 +33,7 @@ export default class CongratulateCommand extends Command {
     args: { congratulatedPerson: User },
   ): Promise<Message> {
     // Obtains the congratulation gif's urls.
-    const gifs = links[0].gifs;
+    const gifs = links.congratulate.gifs;
     const randIndex = Math.floor(Math.random() * gifs.length);
 
     const embedMessage = new MessageEmbed()

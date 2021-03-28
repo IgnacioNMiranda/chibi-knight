@@ -56,11 +56,11 @@ export default class TicTacToeCommand extends Command {
 
     // If there's already a game in course or a player challenged Chibi Knight or themself, the game cannot be executed.
     if (app.gameInstanceActive) {
-      return await message.say(`There's already a game in course ${player1}!`);
+      return message.say(`There's already a game in course ${player1}!`);
     } else if (player1.id === player2.id) {
-      return await message.say('You cannot challenge yourself ¬¬ ...');
+      return message.say('You cannot challenge yourself ¬¬ ...');
     } else if (player2.bot) {
-      return await message.say(
+      return message.say(
         "You cannot challenge me :anger: I'm a superior being... I would destroy you n.n :purple_heart:",
       );
     }

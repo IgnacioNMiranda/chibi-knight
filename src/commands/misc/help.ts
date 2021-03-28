@@ -23,7 +23,7 @@ export default class HelpCommand extends Command {
   /**
    * It executes when someone types the "help" command.
    */
-  async run(message: CommandoMessage): Promise<Message> {
+  run(message: CommandoMessage): Promise<Message> {
     const embedMessage = new MessageEmbed()
       .attachFiles(['./public/img/chibiKnightLogo.png'])
       .setAuthor('Chibi Knight', 'attachment://chibiKnightLogo.png')
@@ -58,9 +58,9 @@ export default class HelpCommand extends Command {
         embedMessage.setFooter(
           `Type ${configuration.prefix}help to see a list with every available command.`,
         );
-        await message.say(embedMessage);
+        return message.say(embedMessage);
       } else {
-        await message.say(
+        return message.say(
           `Unknown command!! There are no commands with that name ):`,
         );
       }
@@ -99,9 +99,7 @@ export default class HelpCommand extends Command {
       embedMessage.setFooter(
         `Type ${configuration.prefix}help {command} to see information about an specific command.`,
       );
-      await message.say(embedMessage);
+      return message.say(embedMessage);
     }
-
-    return;
   }
 }

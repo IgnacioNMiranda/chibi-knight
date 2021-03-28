@@ -20,13 +20,11 @@ export default class CancelGameCommand extends Command {
   /**
    * It executes when someone types the "say" command.
    */
-  async run(message: CommandoMessage): Promise<Message> {
+  run(message: CommandoMessage): Promise<Message> {
     if (app.gameInstanceActive) {
       app.gameInstanceActive = false;
-      await message.say('Game cancelled.');
-    } else {
-      await message.say("There's no active game.");
+      return message.say('Game cancelled.');
     }
-    return;
+    return message.say("There's no active game.");
   }
 }
