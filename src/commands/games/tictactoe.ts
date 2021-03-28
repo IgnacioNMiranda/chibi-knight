@@ -4,6 +4,14 @@ import { QandA } from './resources/QandA';
 import { app } from '../../main';
 import configuration from '../../config/configuration';
 import logger from '../../logger';
+import mongoose from 'mongoose';
+import {
+  DocumentType,
+  getModelForClass,
+  ReturnModelType,
+} from '@typegoose/typegoose';
+import DbUser from '../../database/models/user.model';
+import { links } from './resources/links';
 
 /**
  * Starts a tic-tac-toe game.
@@ -11,6 +19,7 @@ import logger from '../../logger';
 export default class TicTacToeCommand extends Command {
   defaultSymbol: string;
   tictactoeBoard: string[];
+  private readonly userRepository: ReturnModelType<typeof DbUser>;
 
   constructor(client: CommandoClient) {
     super(client, {
@@ -30,22 +39,28 @@ export default class TicTacToeCommand extends Command {
 
     // Default symbol of the board.
     this.defaultSymbol = ':purple_square:';
+
+    this.userRepository = getModelForClass(DbUser);
   }
 
   /**
    * It executes when someone types the "tictactoe" command.
    */
-  async run(message: CommandoMessage, args: { player2: User }): Promise<null> {
-    // This obtains the challenging player instance.
+  async run(
+    message: CommandoMessage,
+    args: { player2: User },
+  ): Promise<Message> {
+    // Obtains the challenging player instance.
     const player1 = message.author;
+    const { player2 } = args;
 
     // If there's already a game in course or a player challenged Chibi Knight or themself, the game cannot be executed.
     if (app.gameInstanceActive) {
-      await message.say(`There's already a game in course ${player1}!`);
-    } else if (player1.id === args.player2.id) {
-      await message.say('You cannot challenge yourself ¬¬ ...');
-    } else if (args.player2.bot) {
-      await message.say(
+      return await message.say(`There's already a game in course ${player1}!`);
+    } else if (player1.id === player2.id) {
+      return await message.say('You cannot challenge yourself ¬¬ ...');
+    } else if (player2.bot) {
+      return await message.say(
         "You cannot challenge me :anger: I'm a superior being... I would destroy you n.n :purple_heart:",
       );
     }
@@ -54,12 +69,12 @@ export default class TicTacToeCommand extends Command {
     const filter = (response: any) => {
       return QandAGames.answers.some(
         (answer: string) =>
-          answer === response.content && response.author.id === args.player2.id,
+          answer === response.content && response.author.id === player2.id,
       );
     };
 
     await message.say(
-      `${args.player2} has been challenged by ${player1} to play #. Do you accept the challenge? (yes/y/no/n)`,
+      `${player2} has been challenged by ${player1} to play #. Do you accept the challenge? (yes/y/no/n)`,
     );
 
     // Waits 15 seconds while player2 types a valid answer (yes/y/no/n).
@@ -72,16 +87,14 @@ export default class TicTacToeCommand extends Command {
       const receivedMsg = collectedMessages.first().content;
       if (receivedMsg === 'no' || receivedMsg === 'n') {
         await message.say(
-          `Game cancelled ): You aren't strong enough ${args.player2}.`,
+          `Game cancelled ): Come back when you are brave enough, ${player2}.`,
         );
       } else if (receivedMsg === 'yes' || receivedMsg === 'y') {
         app.gameInstanceActive = true;
-        this.ticTacToeInstance(message, player1, args.player2, QandAGames);
+        this.ticTacToeInstance(message, player1, player2, QandAGames);
       }
     } else {
-      await message.say(
-        `Time's up! ${args.player2.username} dont want to play ):`,
-      );
+      await message.say(`Time's up! ${player2.username} dont want to play ):`);
     }
 
     return null;
@@ -132,10 +145,12 @@ export default class TicTacToeCommand extends Command {
         }
 
         // if the receivedMsg is the cancel game command, passes the filter for later collector ends.
-        const possibleCancelledGame = receivedMsg.content.split(' ')[0];
+        const possibleCancelledGame = receivedMsg.content
+          .split(' ')[0]
+          .split(configuration.prefix)[1];
         if (
-          possibleCancelledGame === '>cancelgame' ||
-          possibleCancelledGame === '>cg'
+          possibleCancelledGame === 'cancelgame' ||
+          possibleCancelledGame === 'cg'
         ) {
           collector.stop('Cancel game command executed.');
         }
@@ -176,8 +191,10 @@ export default class TicTacToeCommand extends Command {
 
       if (gameState != -1) {
         // Game was tied or a player won.
-        let result = '';
-        let stopReason = '';
+        let result: string;
+        let stopReason: string;
+        let winner: User;
+        let loser: User;
         switch (gameState) {
           case 0:
             result = 'The game was a tie! :confetti_ball: Thanks for play (:';
@@ -186,13 +203,64 @@ export default class TicTacToeCommand extends Command {
           case 1:
             result = `:tada: CONGRATULATIONS ${player1}! You have won! :tada:`;
             stopReason = `${player1.username} won on TicTacToe against ${player2.username}!`;
+            winner = player1;
+            loser = player2;
             break;
           case 2:
             result = `:tada: CONGRATULATIONS ${player2}! You have won! :tada:`;
             stopReason = `${player2.username} won on TicTacToe against ${player1.username}!`;
+            winner = player2;
+            loser = player1;
             break;
         }
+
+        if (winner) {
+          try {
+            logger.info(
+              `Registering ${winner.username}'s tictactoe victory...`,
+              {
+                context: this.constructor.name,
+              },
+            );
+
+            await mongoose.connect(configuration.mongodb.connection_url, {
+              useNewUrlParser: true,
+              useUnifiedTopology: true,
+              useCreateIndex: true,
+            });
+
+            const user: DocumentType<DbUser> = await this.userRepository
+              .findOne({ discordId: winner.id })
+              .exec();
+            if (user) {
+              user.name = winner.username;
+              user.tictactoeWins += 1;
+              await user.save();
+            } else {
+              const newUser: DbUser = new DbUser(winner.id, winner.username, 1);
+              await this.userRepository.create(newUser);
+            }
+
+            await mongoose.disconnect();
+            logger.info('Victory registered successfully', {
+              context: this.constructor.name,
+            });
+          } catch (error) {
+            logger.error(
+              `MongoDB Connection error. Could not register ${winner.username}'s tictactoe victory`,
+              {
+                context: this.constructor.name,
+              },
+            );
+          }
+        }
+
         newEmbedMessage.addField('Result :trophy:', result, false);
+        newEmbedMessage.addField(
+          'Consolation prize :second_place:',
+          `Don't worry ${loser}, this is for you:`,
+        );
+        newEmbedMessage.setImage(links.tictactoe.gifs[0]);
 
         /* sentEmbedMessage.channel.messages.fetch({limit: 5})
                     .then(messagesCollection => {
@@ -253,7 +321,7 @@ export default class TicTacToeCommand extends Command {
    */
   embedDefaultTicTacToeBoard(player1: User, player2: User): MessageEmbed {
     return new MessageEmbed()
-      .setTitle(`❌⭕ Gato:3 ❌⭕`)
+      .setTitle(`:x::o: Gato:3 :x::o:`)
       .setColor(configuration.embedMessageColor)
       .setDescription(
         'Tres en raya | Michi | Triqui | Gato | Cuadritos | Tictactoe | Whatever',
