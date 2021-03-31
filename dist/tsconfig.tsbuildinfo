@@ -522,8 +522,8 @@
         "affectsGlobalScope": false
       },
       "../src/database/models/user.model.ts": {
-        "version": "2b0691cb78f833c189ee1c25a2a8d770358ffd24b27aa0102af87a9b47aaa824",
-        "signature": "0727ddaa70e5d76db603dbf2779a4b22e9b863ed7d80937cf2dc362615ad2c3e",
+        "version": "68fb39ffa8efae11d5943387d9a6eace918a6b17320332506b2ba167168633bd",
+        "signature": "f0b2d26b7490c6ea117247603d22bbbd595823449680f54253630829f2f9b1a4",
         "affectsGlobalScope": false
       },
       "../src/utils/resources/links.ts": {
@@ -532,38 +532,53 @@
         "affectsGlobalScope": false
       },
       "../src/utils/roles.utils.ts": {
-        "version": "e9a78fd1713b4e993a3838ecdf60e2b79b3a23da8d9d6acd4e13b31bf54abbf5",
+        "version": "27ff2302005c02da6ff45ded74a810da1b34ebee43eefc9f67928cfeb7df54bd",
         "signature": "f8579a7ce5a1941735d36affa5c68bb0c3f1e6448ff4131780ebba4a199eff3a",
         "affectsGlobalScope": false
       },
-      "../src/database/models/server.model.ts": {
-        "version": "2e27036f99b415040c73ac1496d6e30c35958878478dcd2c7bcb507a6622cbd6",
-        "signature": "20b7ed33b76e915dfde7438c9c21ed622ca80193310802a6c8f61f235b750a6a",
+      "../src/database/models/guild.model.ts": {
+        "version": "b8819af812023d97c7debce17134c1169aaab09ce7686568e136038bffce989f",
+        "signature": "09ef62e79f5fe93de828dd46617dbd71a992d2c2f2e2719d187977b2f7332a1f",
         "affectsGlobalScope": false
       },
-      "../src/database/dto/server.dto.ts": {
-        "version": "3d0bdbff8ef89f816be4d35149ab361ecd5d17134a51fe6633b7bd5639cb33ec",
-        "signature": "dd67dc7df6517d78413c12b5b3552e9ebbba6b591aa0ed95d3cdf52a4a0a43c5",
-        "affectsGlobalScope": false
-      },
-      "../src/database/mongo.ts": {
-        "version": "6161fe04b4d6728667712a74ae33f9d464d29665924e37f2ed82920df95214e6",
-        "signature": "b9ae4347dca3db707da0cd1784a3faad22f2afee5cc21a62104c5c771905a7b2",
+      "../src/database/models/index.ts": {
+        "version": "7a0189f9a994d357638caf2982d2d5d9cd81202007f71c235ec2f61b6a71b45e",
+        "signature": "34f230faec7a6988b4e40a5e811e8ac7d45268e72e0c3414bf266596ab7e30f8",
         "affectsGlobalScope": false
       },
       "../src/database/Cache.ts": {
-        "version": "510fd549a4135302457a76c52ace412c8f38e2490fcb4075443c5643f9560388",
-        "signature": "960d717e3dcddf556c0fc8b7d6a92181b1a6f8c0bca05f3c5703408b8a9c310b",
+        "version": "f0d655c270607fc50b60f5fdd9d2bd8f1dbce749a0b1e6b533fa2f15a0ebc3d6",
+        "signature": "08cbde2bb5be0225be6a8615f86674031452a9d82f4ba836cad922d6bd78b875",
+        "affectsGlobalScope": false
+      },
+      "../src/database/mongo.ts": {
+        "version": "9f9bf1a510bcdb2f785cdc7e54844815f4086b00515a0bf414f0bf868b052c5e",
+        "signature": "8e3d7fff5f932b8a0577c524fc28528d71fafacc2c0474716cb5c70ac4d44fda",
+        "affectsGlobalScope": false
+      },
+      "../src/database/services/guild.service.ts": {
+        "version": "b81cfbc7a9489083bceaddb785f9a63e6398a1dc0cf635d78e625fc26f0fc5e6",
+        "signature": "65dd9c500f899ad93d50143046552378371b2e4d11e04d58feaa16e0069110e6",
+        "affectsGlobalScope": false
+      },
+      "../src/database/services/user.service.ts": {
+        "version": "4886f38cf27891ccc08562769e8fe1ce604637a66ccf1baeec587c24bc0a5a78",
+        "signature": "b99261e3afa6dca262e823b67ceee791eeae540839f8d706f17af983cac563d1",
+        "affectsGlobalScope": false
+      },
+      "../src/database/services/index.ts": {
+        "version": "b419e2329751c9c3a8857b3caa51c22bfaa6ef97a8e2a1dc36f29a8ffc2dbbed",
+        "signature": "7e6249a23d7b930b74baa9ce143b6a3f99ced221d6714a898c574e54a368312a",
         "affectsGlobalScope": false
       },
       "../src/main.ts": {
-        "version": "db06c95217b1cf4c82f75aaa0a7f91187a1d003d7152793484bd757413dc4601",
-        "signature": "2130d3b72b94705ef012afc1f4d54ce8a4d2b443afd2c0f7d4e960872b5dafc7",
+        "version": "ab9e2c6ed4a531a5b15f50ccdf4e22df79aa267f82711da852e4cba459eee3ae",
+        "signature": "435ea346d891abfea4c3f176a5263adc5484c2312a342d7b37a614aef0c1060e",
         "affectsGlobalScope": false
       },
       "../src/commands/games/cancelGame.ts": {
-        "version": "92cfbb9855d5eab0dee10fb74e4aca72e068a9d98b9b6db1455e02eb833ead63",
-        "signature": "0d4db6668545a6713781fa71e94aadf571c030c47bef890190cd651adcb041ed",
+        "version": "93d317fc43c1d5d318f29495736a5388a6f821acf8bd83f5914b1a7ec53397d4",
+        "signature": "cbd656c2c69745ff2359323c70fc0b5094f33827a2c871bc0532a317517ab4f7",
         "affectsGlobalScope": false
       },
       "../src/commands/games/resources/QandA.ts": {
@@ -577,13 +592,13 @@
         "affectsGlobalScope": false
       },
       "../src/commands/games/tictactoe.ts": {
-        "version": "d516d02fdf50780bb07c1e0eab3651fbf2d15dabc19104928a193bf61ea35b5e",
-        "signature": "35809b25d3352d6e9997208975aec1727f6176b30d550580e4d54fc02c3c0040",
+        "version": "e5011a2affe0e9d11c8767933ded8e860134362c743f157673b22b8c85c3679a",
+        "signature": "75911b98bad5c249fe0b6965291c06a935798c692f8905ce04eb06e432fdbe8f",
         "affectsGlobalScope": false
       },
       "../src/commands/games/tictactoeleaderboard.ts": {
-        "version": "fdda64156b12e07033b6a859f145b433e2ae657b8fab78758eb07ad49ff6998b",
-        "signature": "0579549fc0938d6fb641104d8c98b96cd310a3dce743afc01456459c67ceae83",
+        "version": "9fddd2af6d4090df9e31ccb5ed7acd0b63f2d9820755cdd1fa75767e58e7ba2d",
+        "signature": "53ffd5bd142b7ded257f620f03a53869df6c8a103ae655367fea4d5b062e0318",
         "affectsGlobalScope": false
       },
       "../src/commands/misc/resources/links.ts": {
@@ -607,8 +622,8 @@
         "affectsGlobalScope": false
       },
       "../src/commands/misc/initChibiKnight.ts": {
-        "version": "0fe49789fc12a1be514a0c9b911ce309f2a304b248357522188a39252ade379d",
-        "signature": "964ae1c5d30f0695f43bd264b49814dee44428928a133ae77d2078999b1e030a",
+        "version": "e794b6802c43061f6d352cec03eab8a2c5c8c984345727e3e7b16446ef77b011",
+        "signature": "ef9f091c487ad979349947ec42dde92a27b35df13e703d46a23b691db9a067ff",
         "affectsGlobalScope": false
       },
       "../src/commands/misc/say.ts": {
@@ -622,28 +637,18 @@
         "affectsGlobalScope": false
       },
       "../src/commands/roles/activateRoles.ts": {
-        "version": "3f06514f68ef41e5ec4607395b734b389f56f60fa2b0dd5dfff96f008797c581",
-        "signature": "40122ccc69ea474f192402ff78ff4e08d14b13a0821119b7ee54138b933358b4",
+        "version": "f5de32b335095ee3182d6290b836eabe1f38ca071098b3a58d4433ba50a12329",
+        "signature": "87d2dcf23ae5af153c7e6aa2d9fd1534fccd9648ce6aec1c69bf30df9b08e05f",
         "affectsGlobalScope": false
       },
       "../src/commands/roles/myRoles.ts": {
-        "version": "4e5b5dbc6594a72a945dc9af9ec5d12da1f9f2a58fda6d1987067c858af6ba7f",
-        "signature": "b1c84a0d4892409366d8865c23f6f8621126af298be3a88d5212e5831a1f98cb",
+        "version": "8fd585dc1e3b9e162c4920a4cdcc428681eddcbf1a7e7b7c18baa695b63bdb3f",
+        "signature": "fea6f6f551c5bbbd18e9f2f298a82b9bc5a00ff709d832c8f62ad2875689ada7",
         "affectsGlobalScope": false
       },
       "../src/commands/roles/roles.ts": {
-        "version": "7e3fc746de4aa0d309d4897d42fdd1a5d6d1dcac104b1453d4fa8a328eb2b39e",
-        "signature": "8a0eb44c32e80fc512ac5e228bca4c41ac3bfab70b644df714a0db27b8d86bad",
-        "affectsGlobalScope": false
-      },
-      "../src/database/dto/user.dto.ts": {
-        "version": "d35c978d72e9a1cc00ffc0e2ba430d0d9350c805ca619686c62e776f208f10fe",
-        "signature": "195d98996c968efb94672d6597301f6270c0647e7ab6e2902172827a59517bc0",
-        "affectsGlobalScope": false
-      },
-      "../src/database/dto/index.ts": {
-        "version": "bd80455a587bd925c55e9e51f1d41c754d47adffdb6f682c3409e77629cc0f26",
-        "signature": "b6ac5087582c6cb27f28cb25e556242a07068ad2b886d405fd41128bda075eab",
+        "version": "cd67bd8e13d18cf093ab1381371d9d3a81a4b0d6ab1d69067654c540b2a2124b",
+        "signature": "91222fc0e9e5c47b878afbf5e13a3b66929cb6d02e6f2b91784e85fff2e00090",
         "affectsGlobalScope": false
       },
       "../node_modules/@types/eslint/helpers.d.ts": {
@@ -1067,11 +1072,9 @@
         "../node_modules/winston-transport/index.d.ts"
       ],
       "../src/commands/games/cancelGame.ts": [
-        "../node_modules/@typegoose/typegoose/lib/typegoose.d.ts",
         "../node_modules/discord.js-commando/typings/index.d.ts",
         "../node_modules/discord.js/typings/index.d.ts",
-        "../src/database/models/server.model.ts",
-        "../src/database/mongo.ts",
+        "../src/database/models/guild.model.ts",
         "../src/logger.ts",
         "../src/main.ts"
       ],
@@ -1082,21 +1085,18 @@
         "../src/commands/games/resources/QandA.ts",
         "../src/commands/games/resources/links.ts",
         "../src/config/configuration.ts",
-        "../src/database/models/server.model.ts",
+        "../src/database/models/guild.model.ts",
         "../src/database/models/user.model.ts",
-        "../src/database/mongo.ts",
         "../src/logger.ts",
         "../src/main.ts",
         "../src/utils/roles.utils.ts"
       ],
       "../src/commands/games/tictactoeleaderboard.ts": [
-        "../node_modules/@typegoose/typegoose/lib/typegoose.d.ts",
         "../node_modules/discord.js-commando/typings/index.d.ts",
         "../node_modules/discord.js/typings/index.d.ts",
         "../src/config/configuration.ts",
-        "../src/database/models/user.model.ts",
-        "../src/database/mongo.ts",
-        "../src/logger.ts"
+        "../src/logger.ts",
+        "../src/main.ts"
       ],
       "../src/commands/misc/congratulate.ts": [
         "../node_modules/discord.js-commando/typings/index.d.ts",
@@ -1112,13 +1112,12 @@
         "../src/config/configuration.ts"
       ],
       "../src/commands/misc/initChibiKnight.ts": [
-        "../node_modules/@typegoose/typegoose/lib/typegoose.d.ts",
         "../node_modules/discord.js-commando/typings/index.d.ts",
         "../node_modules/discord.js/typings/index.d.ts",
         "../src/config/configuration.ts",
-        "../src/database/models/server.model.ts",
-        "../src/database/mongo.ts",
-        "../src/logger.ts"
+        "../src/database/models/index.ts",
+        "../src/logger.ts",
+        "../src/main.ts"
       ],
       "../src/commands/misc/say.ts": [
         "../node_modules/discord.js-commando/typings/index.d.ts",
@@ -1133,35 +1132,25 @@
         "../src/logger.ts"
       ],
       "../src/commands/roles/activateRoles.ts": [
-        "../node_modules/@typegoose/typegoose/lib/typegoose.d.ts",
         "../node_modules/discord.js-commando/typings/index.d.ts",
         "../node_modules/discord.js/typings/index.d.ts",
         "../src/config/configuration.ts",
-        "../src/database/dto/server.dto.ts",
-        "../src/database/models/server.model.ts",
-        "../src/database/mongo.ts",
+        "../src/database/models/index.ts",
         "../src/logger.ts",
         "../src/main.ts",
         "../src/utils/roles.utils.ts"
       ],
       "../src/commands/roles/myRoles.ts": [
-        "../node_modules/@typegoose/typegoose/lib/typegoose.d.ts",
         "../node_modules/discord.js-commando/typings/index.d.ts",
         "../node_modules/discord.js/typings/index.d.ts",
         "../src/config/configuration.ts",
-        "../src/database/models/server.model.ts",
-        "../src/database/models/user.model.ts",
-        "../src/database/mongo.ts",
         "../src/main.ts",
         "../src/utils/roles.utils.ts"
       ],
       "../src/commands/roles/roles.ts": [
-        "../node_modules/@typegoose/typegoose/lib/typegoose.d.ts",
         "../node_modules/discord.js-commando/typings/index.d.ts",
         "../node_modules/discord.js/typings/index.d.ts",
         "../src/config/configuration.ts",
-        "../src/database/models/server.model.ts",
-        "../src/database/mongo.ts",
         "../src/main.ts",
         "../src/utils/roles.utils.ts"
       ],
@@ -1169,19 +1158,17 @@
         "../node_modules/dotenv/types/index.d.ts"
       ],
       "../src/database/Cache.ts": [
-        "../node_modules/@typegoose/typegoose/lib/typegoose.d.ts",
         "../node_modules/discord.js-commando/typings/index.d.ts",
-        "../src/database/dto/server.dto.ts",
-        "../src/database/models/server.model.ts",
-        "../src/database/mongo.ts",
-        "../src/logger.ts"
+        "../src/database/models/index.ts",
+        "../src/logger.ts",
+        "../src/main.ts"
       ],
-      "../src/database/dto/index.ts": [
-        "../src/database/dto/server.dto.ts",
-        "../src/database/dto/user.dto.ts"
-      ],
-      "../src/database/models/server.model.ts": [
+      "../src/database/models/guild.model.ts": [
         "../node_modules/@typegoose/typegoose/lib/typegoose.d.ts"
+      ],
+      "../src/database/models/index.ts": [
+        "../src/database/models/guild.model.ts",
+        "../src/database/models/user.model.ts"
       ],
       "../src/database/models/user.model.ts": [
         "../node_modules/@typegoose/typegoose/lib/typegoose.d.ts"
@@ -1189,6 +1176,20 @@
       "../src/database/mongo.ts": [
         "../node_modules/@typegoose/typegoose/lib/typegoose.d.ts",
         "../src/config/configuration.ts"
+      ],
+      "../src/database/services/guild.service.ts": [
+        "../node_modules/@typegoose/typegoose/lib/typegoose.d.ts",
+        "../src/database/models/index.ts",
+        "../src/main.ts"
+      ],
+      "../src/database/services/index.ts": [
+        "../src/database/services/guild.service.ts",
+        "../src/database/services/user.service.ts"
+      ],
+      "../src/database/services/user.service.ts": [
+        "../node_modules/@typegoose/typegoose/lib/typegoose.d.ts",
+        "../src/database/models/index.ts",
+        "../src/main.ts"
       ],
       "../src/logger.ts": [
         "../node_modules/winston/index.d.ts"
@@ -1200,9 +1201,9 @@
         "../node_modules/discord.js/typings/index.d.ts",
         "../src/config/configuration.ts",
         "../src/database/Cache.ts",
-        "../src/database/models/server.model.ts",
         "../src/database/models/user.model.ts",
         "../src/database/mongo.ts",
+        "../src/database/services/index.ts",
         "../src/logger.ts",
         "../src/utils/roles.utils.ts"
       ],
@@ -1613,21 +1614,35 @@
       ],
       "../src/database/Cache.ts": [
         "../node_modules/discord.js-commando/typings/index.d.ts",
-        "../src/database/dto/server.dto.ts"
+        "../src/database/models/index.ts"
       ],
-      "../src/database/dto/index.ts": [
-        "../src/database/dto/server.dto.ts",
-        "../src/database/dto/user.dto.ts"
+      "../src/database/models/index.ts": [
+        "../src/database/models/guild.model.ts",
+        "../src/database/models/user.model.ts"
       ],
       "../src/database/mongo.ts": [
         "../node_modules/@typegoose/typegoose/lib/typegoose.d.ts"
+      ],
+      "../src/database/services/guild.service.ts": [
+        "../node_modules/@typegoose/typegoose/lib/typegoose.d.ts",
+        "../src/database/models/index.ts"
+      ],
+      "../src/database/services/index.ts": [
+        "../src/database/services/guild.service.ts",
+        "../src/database/services/user.service.ts"
+      ],
+      "../src/database/services/user.service.ts": [
+        "../node_modules/@typegoose/typegoose/lib/typegoose.d.ts",
+        "../src/database/models/index.ts"
       ],
       "../src/logger.ts": [
         "../node_modules/winston/index.d.ts"
       ],
       "../src/main.ts": [
         "../node_modules/discord.js-commando/typings/index.d.ts",
-        "../src/database/Cache.ts"
+        "../src/database/Cache.ts",
+        "../src/database/mongo.ts",
+        "../src/database/services/index.ts"
       ],
       "../src/utils/roles.utils.ts": [
         "../node_modules/discord.js-commando/typings/index.d.ts",
@@ -1762,12 +1777,13 @@
       "../src/commands/roles/roles.ts",
       "../src/config/configuration.ts",
       "../src/database/Cache.ts",
-      "../src/database/dto/index.ts",
-      "../src/database/dto/server.dto.ts",
-      "../src/database/dto/user.dto.ts",
-      "../src/database/models/server.model.ts",
+      "../src/database/models/guild.model.ts",
+      "../src/database/models/index.ts",
       "../src/database/models/user.model.ts",
       "../src/database/mongo.ts",
+      "../src/database/services/guild.service.ts",
+      "../src/database/services/index.ts",
+      "../src/database/services/user.service.ts",
       "../src/logger.ts",
       "../src/main.ts",
       "../src/utils/resources/links.ts",

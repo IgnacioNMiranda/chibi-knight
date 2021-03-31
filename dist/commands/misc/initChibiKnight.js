@@ -15,9 +15,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const discord_js_commando_1 = require("discord.js-commando");
 const configuration_1 = __importDefault(require("../../config/configuration"));
 const logger_1 = __importDefault(require("../../logger"));
-const server_model_1 = __importDefault(require("../../database/models/server.model"));
-const typegoose_1 = require("@typegoose/typegoose");
-const mongo_1 = require("../../database/mongo");
+const main_1 = require("../../main");
 class InitChibiKnightCommand extends discord_js_commando_1.Command {
     constructor(client) {
         super(client, {
@@ -28,23 +26,46 @@ class InitChibiKnightCommand extends discord_js_commando_1.Command {
             description: 'Initialize Chibi Knight funcionalities.',
             hidden: true,
         });
-        this.serverRepository = typegoose_1.getModelForClass(server_model_1.default);
     }
     run(message) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
-                const mongoose = yield mongo_1.openMongoConnection();
-                const server = yield this.serverRepository.findOne({
-                    guildId: message.guild.id,
-                });
-                if (!server) {
-                    logger_1.default.info(`Trying to register new server ${message.guild.name}...`, {
+                const user = yield message.guild.members.fetch(message.author.id);
+                if (!user.hasPermission('ADMINISTRATOR')) {
+                    return message.say(`You don't have permissions to run this command. Contact with an Administrator :sweat:`);
+                }
+                const { id: guildId, members } = message.guild;
+                const guild = yield main_1.app.guildService.getById(guildId);
+                if (!guild) {
+                    logger_1.default.info(`Trying to register new server '${message.guild.name}'...`, {
                         context: this.constructor.name,
                     });
-                    const newServer = { guildId: message.guild.id };
-                    yield this.serverRepository.create(newServer);
-                    yield mongoose.connection.close();
-                    logger_1.default.info(`${message.guild.name} registered succesfully`, {
+                    const newGuild = { guildId };
+                    yield main_1.app.guildService.create(newGuild);
+                    logger_1.default.info(`'${message.guild.name}' guild registered succesfully`, {
+                        context: this.constructor.name,
+                    });
+                    const guildMembers = yield members.fetch();
+                    guildMembers.forEach(({ user }) => __awaiter(this, void 0, void 0, function* () {
+                        if (!user.bot) {
+                            const bdUser = yield main_1.app.userService.getById(user.id);
+                            if (bdUser) {
+                                if (!bdUser.guilds.find((id) => id === guildId)) {
+                                    bdUser.guilds.push(guildId);
+                                    yield bdUser.save();
+                                }
+                            }
+                            else {
+                                const newUser = {
+                                    discordId: user.id,
+                                    name: user.username,
+                                    guilds: [guildId],
+                                };
+                                yield main_1.app.userService.create(newUser);
+                            }
+                        }
+                    }));
+                    logger_1.default.info(`'${message.guild.name}' users has been registered succesfully`, {
                         context: this.constructor.name,
                     });
                     return message.say(`${configuration_1.default.appName} has been initialize successfully :purple_heart: check out the commands with ${configuration_1.default.prefix}help :smile:`);
@@ -54,6 +75,7 @@ class InitChibiKnightCommand extends discord_js_commando_1.Command {
                 }
             }
             catch (error) {
+                logger_1.default.error(error, { context: this.constructor.name });
                 return message.say(`It occured an unexpected error while trying to initialize ${configuration_1.default.appName} :sweat: try again later.`);
             }
         });

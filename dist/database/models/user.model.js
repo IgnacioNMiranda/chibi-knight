@@ -11,9 +11,10 @@ var __metadata = (this && this.__metadata) || function (k, v) {
 Object.defineProperty(exports, "__esModule", { value: true });
 const typegoose_1 = require("@typegoose/typegoose");
 let User = class User {
-    constructor(discordId, name, tictactoeWins, participationScore) {
+    constructor(discordId, name, guilds, tictactoeWins, participationScore) {
         this.discordId = discordId;
         this.name = name;
+        this.guilds = guilds;
         this.tictactoeWins = tictactoeWins;
         this.participationScore = participationScore;
     }
@@ -40,9 +41,15 @@ __decorate([
     }),
     __metadata("design:type", Number)
 ], User.prototype, "participationScore", void 0);
+__decorate([
+    typegoose_1.prop({
+        type: [String],
+    }),
+    __metadata("design:type", Array)
+], User.prototype, "guilds", void 0);
 User = __decorate([
     typegoose_1.index({ discordId: 'text' }, { weights: { discordId: 1 } }),
-    __metadata("design:paramtypes", [String, String, Number, Number])
+    __metadata("design:paramtypes", [String, String, Array, Number, Number])
 ], User);
 exports.default = User;
 //# sourceMappingURL=user.model.js.map

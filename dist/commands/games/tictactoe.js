@@ -18,12 +18,9 @@ const QandA_1 = require("./resources/QandA");
 const main_1 = require("../../main");
 const configuration_1 = __importDefault(require("../../config/configuration"));
 const logger_1 = __importDefault(require("../../logger"));
-const typegoose_1 = require("@typegoose/typegoose");
 const user_model_1 = __importDefault(require("../../database/models/user.model"));
 const links_1 = require("./resources/links");
 const roles_utils_1 = require("../../utils/roles.utils");
-const mongo_1 = require("../../database/mongo");
-const server_model_1 = __importDefault(require("../../database/models/server.model"));
 class TicTacToeCommand extends discord_js_commando_1.Command {
     constructor(client) {
         super(client, {
@@ -41,8 +38,6 @@ class TicTacToeCommand extends discord_js_commando_1.Command {
             ],
         });
         this.defaultSymbol = ':purple_square:';
-        this.userRepository = typegoose_1.getModelForClass(user_model_1.default);
-        this.serverRepository = typegoose_1.getModelForClass(server_model_1.default);
     }
     run(message, args) {
         return __awaiter(this, void 0, void 0, function* () {
@@ -53,7 +48,7 @@ class TicTacToeCommand extends discord_js_commando_1.Command {
                 gameInstanceActive = yield main_1.app.cache.getGameInstanceActive(message);
             }
             catch (error) {
-                return message.say('Error ): could not start game. Try again later :purple_heart:');
+                return message.say('Error ): could not start game. Try again later :sweat:');
             }
             if (gameInstanceActive) {
                 return message.say(`There's already a game in course ${player1}!`);
@@ -80,17 +75,23 @@ class TicTacToeCommand extends discord_js_commando_1.Command {
                 }
                 else if (receivedMsg === 'yes' || receivedMsg === 'y') {
                     try {
-                        const mongoose = yield mongo_1.openMongoConnection();
-                        const server = yield this.serverRepository.findOne({
-                            guildId: message.guild.id,
-                        });
-                        server.gameInstanceActive = true;
-                        yield server.save();
-                        yield mongoose.connection.close();
-                        const cachedServer = main_1.app.cache.cache.get(message.guild.id);
-                        if (cachedServer) {
-                            cachedServer.gameInstanceActive = true;
-                            main_1.app.cache.cache.set(message.guild.id, cachedServer);
+                        const { id } = message.guild;
+                        const guild = yield main_1.app.guildService.getById(id);
+                        guild.gameInstanceActive = true;
+                        yield guild.save();
+                        const cachedGuild = main_1.app.cache.getGuildById(id);
+                        if (cachedGuild) {
+                            cachedGuild.gameInstanceActive = true;
+                            main_1.app.cache.setGuildById(id, cachedGuild);
+                        }
+                        else {
+                            const { guildId, rolesActivated, gameInstanceActive } = guild;
+                            const cached = {
+                                guildId,
+                                rolesActivated,
+                                gameInstanceActive,
+                            };
+                            main_1.app.cache.setGuildById(guildId, cached);
                         }
                         this.ticTacToeInstance(message, player1, player2, QandAGames);
                     }
@@ -120,6 +121,7 @@ class TicTacToeCommand extends discord_js_commando_1.Command {
                 this.defaultSymbol,
                 this.defaultSymbol,
             ];
+            const { id: guildId } = message.guild;
             const random = Math.random() < 0.5;
             let activePlayer = random ? player1 : player2;
             let otherPlayer = random ? player2 : player1;
@@ -184,21 +186,17 @@ class TicTacToeCommand extends discord_js_commando_1.Command {
                             logger_1.default.info(`Registering ${winner.username}'s tictactoe victory...`, {
                                 context: this.constructor.name,
                             });
-                            const mongoose = yield mongo_1.openMongoConnection();
                             const score = 20;
-                            const user = yield this.userRepository
-                                .findOne({ discordId: winner.id })
-                                .exec();
+                            const user = yield main_1.app.userService.getById(winner.id);
                             if (user) {
                                 user.tictactoeWins += 1;
                                 user.participationScore += score;
                                 yield user.save();
                             }
                             else {
-                                const newUser = new user_model_1.default(winner.id, winner.username, 1, score);
-                                yield this.userRepository.create(newUser);
+                                const newUser = new user_model_1.default(winner.id, winner.username, [guildId], 1, score);
+                                yield main_1.app.userService.create(newUser);
                             }
-                            yield mongoose.connection.close();
                             const authorGuildMember = yield message.guild.members.fetch(winner.id);
                             roles_utils_1.defineRoles(user.participationScore, authorGuildMember, message);
                             logger_1.default.info('Victory registered successfully', {
@@ -228,23 +226,19 @@ class TicTacToeCommand extends discord_js_commando_1.Command {
             }));
             collector.on('end', (collected, reason) => __awaiter(this, void 0, void 0, function* () {
                 try {
-                    const mongoose = yield mongo_1.openMongoConnection();
-                    const server = yield this.serverRepository.findOne({
-                        guildId: message.guild.id,
-                    });
-                    server.gameInstanceActive = false;
-                    yield server.save();
-                    yield mongoose.connection.close();
+                    const guild = yield main_1.app.guildService.getById(guildId);
+                    guild.gameInstanceActive = false;
+                    yield guild.save();
                 }
                 catch (error) {
                     logger_1.default.error(`MongoDB Connection error. Could not change game instance active for ${message.guild.name} server`, {
                         context: this.constructor.name,
                     });
                 }
-                const cachedServer = main_1.app.cache.cache.get(message.guild.id);
-                if (cachedServer) {
-                    cachedServer.gameInstanceActive = false;
-                    main_1.app.cache.cache.set(message.guild.id, cachedServer);
+                const cachedGuild = main_1.app.cache.getGuildById(guildId);
+                if (cachedGuild) {
+                    cachedGuild.gameInstanceActive = false;
+                    main_1.app.cache.setGuildById(guildId, cachedGuild);
                 }
                 logger_1.default.info(reason, {
                     context: this.constructor.name,

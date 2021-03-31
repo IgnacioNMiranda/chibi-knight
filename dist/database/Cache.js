@@ -12,36 +12,38 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-const typegoose_1 = require("@typegoose/typegoose");
+const main_1 = require("../main");
 const logger_1 = __importDefault(require("../logger"));
-const server_model_1 = __importDefault(require("./models/server.model"));
-const mongo_1 = require("./mongo");
 class Cache {
     constructor() {
-        this.serverRepository = typegoose_1.getModelForClass(server_model_1.default);
         this.cache = new Map();
-        this.initCache();
     }
     initCache() {
         return __awaiter(this, void 0, void 0, function* () {
+            if (this.cache) {
+                return this.cache;
+            }
             try {
-                const mongoose = yield mongo_1.openMongoConnection();
-                const servers = yield this.serverRepository.find();
-                servers.forEach((server) => {
-                    const serverDto = {
-                        guildId: server.guildId,
-                        rolesActivated: server.rolesActivated,
-                        gameInstanceActive: server.gameInstanceActive,
-                    };
-                    this.cache.set(server.guildId, serverDto);
+                logger_1.default.info('Trying to init cache...', {
+                    context: this.constructor.name,
                 });
-                yield mongoose.connection.close();
+                const guilds = yield main_1.app.guildService.getAll();
+                guilds.forEach((guild) => {
+                    const { guildId, rolesActivated, gameInstanceActive } = guild;
+                    const cachedGuild = {
+                        guildId,
+                        rolesActivated,
+                        gameInstanceActive,
+                    };
+                    this.setGuildById(guildId, cachedGuild);
+                });
             }
             catch (error) {
                 logger_1.default.error(`MongoDB Connection error. Could not init cache from database`, {
                     context: this.constructor.name,
                 });
             }
+            return this.cache;
         });
     }
     refresh() {
@@ -49,26 +51,29 @@ class Cache {
             this.cache = new Map();
         });
     }
+    getGuildById(guildId) {
+        return this.cache.get(guildId);
+    }
+    setGuildById(guildId, guild) {
+        return this.cache.set(guildId, guild);
+    }
     getGameInstanceActive(message) {
         return __awaiter(this, void 0, void 0, function* () {
-            const cachedServerInstance = this.cache.get(message.guild.id);
-            if (cachedServerInstance) {
-                return cachedServerInstance.gameInstanceActive;
+            const { id: guildId } = message.guild;
+            const cachedGuild = this.getGuildById(guildId);
+            if (cachedGuild) {
+                return cachedGuild.gameInstanceActive;
             }
             else {
                 try {
-                    const mongoose = yield mongo_1.openMongoConnection();
-                    const server = yield this.serverRepository.findOne({
-                        guildId: message.guild.id,
-                    });
-                    yield mongoose.connection.close();
-                    return server.gameInstanceActive;
+                    const guild = yield main_1.app.guildService.getById(guildId);
+                    return guild.gameInstanceActive;
                 }
                 catch (error) {
                     logger_1.default.error(`MongoDB Connection error. Could not retrieve gameInstanceActive for '${message.guild.name}' server`, {
                         context: this.constructor.name,
                     });
-                    throw new Error(error);
+                    throw error;
                 }
             }
         });

@@ -6,11 +6,13 @@ export default class User {
   constructor(
     discordId: string,
     name: string,
+    guilds: string[],
     tictactoeWins?: number,
     participationScore?: number,
   ) {
     this.discordId = discordId;
     this.name = name;
+    this.guilds = guilds;
     this.tictactoeWins = tictactoeWins;
     this.participationScore = participationScore;
   }
@@ -32,4 +34,9 @@ export default class User {
     default: 0,
   })
   public participationScore?: number;
+
+  @prop({
+    type: [String],
+  })
+  public guilds: string[];
 }
