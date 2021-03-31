@@ -12,11 +12,8 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-const typegoose_1 = require("@typegoose/typegoose");
 const discord_js_commando_1 = require("discord.js-commando");
 const logger_1 = __importDefault(require("../../logger"));
-const server_model_1 = __importDefault(require("../../database/models/server.model"));
-const mongo_1 = require("../../database/mongo");
 const main_1 = require("../../main");
 class CancelGameCommand extends discord_js_commando_1.Command {
     constructor(client) {
@@ -28,39 +25,47 @@ class CancelGameCommand extends discord_js_commando_1.Command {
             description: 'Cancels the active game.',
             args: [],
         });
-        this.serverRepository = typegoose_1.getModelForClass(server_model_1.default);
     }
     run(message) {
         return __awaiter(this, void 0, void 0, function* () {
+            const { id } = message.guild;
+            const cachedGuild = main_1.app.cache.getGuildById(id);
+            if (cachedGuild) {
+                if (!cachedGuild.gameInstanceActive) {
+                    return message.say("There's no active game.");
+                }
+                cachedGuild.gameInstanceActive = false;
+                main_1.app.cache.setGuildById(id, cachedGuild);
+            }
             try {
-                const mongoose = yield mongo_1.openMongoConnection();
-                const server = yield this.serverRepository.findOne({
-                    guildId: message.guild.id,
-                });
-                if (!server.gameInstanceActive) {
-                    yield mongoose.connection.close();
+                const guild = yield main_1.app.guildService.getById(id);
+                if (!guild.gameInstanceActive) {
                     return message.say("There's no active game.");
                 }
                 else {
-                    server.gameInstanceActive = false;
-                    yield server.save();
-                    yield mongoose.connection.close();
+                    guild.gameInstanceActive = false;
+                    yield guild.save();
+                    const { guildId, rolesActivated, gameInstanceActive } = guild;
+                    const cached = {
+                        guildId,
+                        rolesActivated,
+                        gameInstanceActive,
+                    };
+                    main_1.app.cache.setGuildById(guildId, cached);
+                    return message.say('Game cancelled.');
                 }
             }
             catch (error) {
-                logger_1.default.error(`MongoDB Connection error. Could not change game instance active for '${message.guild.name}' server`, {
+                logger_1.default.error(`MongoDB Connection error. Could not change game instance state for '${message.guild.name}' server`, {
                     context: this.constructor.name,
                 });
             }
-            const cachedServer = main_1.app.cache.cache.get(message.guild.id);
-            if (cachedServer) {
-                if (!cachedServer.gameInstanceActive) {
-                    return message.say("There's no active game.");
-                }
-                cachedServer.gameInstanceActive = false;
-                main_1.app.cache.cache.set(message.guild.id, cachedServer);
+            if (cachedGuild) {
+                return message.say('Game cancelled.');
             }
-            return message.say('Game cancelled.');
+            else {
+                return message.say('It occured an unexpected error :sweat: try again later.');
+            }
         });
     }
 }

@@ -12,13 +12,11 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-const typegoose_1 = require("@typegoose/typegoose");
 const discord_js_1 = require("discord.js");
 const discord_js_commando_1 = require("discord.js-commando");
+const main_1 = require("../../main");
 const configuration_1 = __importDefault(require("../../config/configuration"));
-const user_model_1 = __importDefault(require("../../database/models/user.model"));
 const logger_1 = __importDefault(require("../../logger"));
-const mongo_1 = require("../../database/mongo");
 class TicTacToeLeaderBoardCommand extends discord_js_commando_1.Command {
     constructor(client) {
         super(client, {
@@ -28,20 +26,14 @@ class TicTacToeLeaderBoardCommand extends discord_js_commando_1.Command {
             memberName: 'tttleaderboard',
             description: 'Displays the tictactoe leaderboard.',
         });
-        this.userRepository = typegoose_1.getModelForClass(user_model_1.default);
     }
     run(message) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
-                const mongoose = yield mongo_1.openMongoConnection();
-                const topUsers = yield this.userRepository
-                    .find({
+                const topUsers = yield main_1.app.userService.getByFilter({
                     tictactoeWins: { $exists: true },
-                })
-                    .limit(10)
-                    .sort({ tictactoeWins: -1 })
-                    .exec();
-                yield mongoose.connection.close();
+                    guilds: message.guild.id,
+                }, 10, { tictactoeWins: -1 });
                 const leaderboard = new discord_js_1.MessageEmbed()
                     .setTitle(`❌⭕ TicTacToe Leaderboard ❌⭕`)
                     .setColor(configuration_1.default.embedMessageColor)
@@ -71,10 +63,11 @@ class TicTacToeLeaderBoardCommand extends discord_js_commando_1.Command {
                 return message.embed(leaderboard);
             }
             catch (error) {
-                logger_1.default.error(`MongoDB Connection error. Could not retrieve tictactoe leaderboard`, {
+                logger_1.default.error(error);
+                logger_1.default.error(`MongoDB Connection error. Could not retrieve tictactoe leaderboard for '${message.guild.name}' server`, {
                     context: this.constructor.name,
                 });
-                return message.say('Sorry ): Could not retrieve tictactoe leaderboard. I failed you :sweat:');
+                return message.say(`Sorry ): I couldn't retrieve tictactoe leaderboard. I failed you :sweat:`);
             }
         });
     }
