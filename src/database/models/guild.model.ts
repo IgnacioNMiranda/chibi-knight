@@ -1,7 +1,7 @@
 import { index, prop } from '@typegoose/typegoose';
 
 @index({ guildId: 'text' }, { weights: { guildId: 1 } })
-export default class Server {
+export default class Guild {
   constructor(
     guildId: string,
     rolesActivated?: boolean,

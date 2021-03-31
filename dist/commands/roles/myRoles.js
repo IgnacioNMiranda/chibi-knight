@@ -12,15 +12,11 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-const typegoose_1 = require("@typegoose/typegoose");
 const discord_js_1 = require("discord.js");
 const discord_js_commando_1 = require("discord.js-commando");
-const mongo_1 = require("../../database/mongo");
 const configuration_1 = __importDefault(require("../../config/configuration"));
 const roles_utils_1 = require("../../utils/roles.utils");
-const user_model_1 = __importDefault(require("../../database/models/user.model"));
 const main_1 = require("../../main");
-const server_model_1 = __importDefault(require("../../database/models/server.model"));
 class MyRolesCommand extends discord_js_commando_1.Command {
     constructor(client) {
         super(client, {
@@ -31,23 +27,18 @@ class MyRolesCommand extends discord_js_commando_1.Command {
             description: `Shows user's roles and their score.`,
             args: [],
         });
-        this.userRepository = typegoose_1.getModelForClass(user_model_1.default);
-        this.serverRepository = typegoose_1.getModelForClass(server_model_1.default);
     }
     run(message) {
         return __awaiter(this, void 0, void 0, function* () {
-            const activatedRolesError = `You have not activated ${configuration_1.default.appName}'s roles. First, you have to run ${configuration_1.default.prefix}activateroles.`;
-            const cachedServer = main_1.app.cache.cache.get(message.guild.id);
-            if (!(cachedServer === null || cachedServer === void 0 ? void 0 : cachedServer.rolesActivated)) {
+            const activatedRolesError = `${configuration_1.default.appName}'s roles are not activated. First, you have to run ${configuration_1.default.prefix}activateroles.`;
+            const { id: guildId } = message.guild;
+            const cachedGuild = main_1.app.cache.getGuildById(guildId);
+            if (!(cachedGuild === null || cachedGuild === void 0 ? void 0 : cachedGuild.rolesActivated)) {
                 return message.say(activatedRolesError);
             }
             try {
-                const mongoose = yield mongo_1.openMongoConnection();
-                const server = yield this.serverRepository.findOne({
-                    guildId: message.guild.id,
-                });
-                yield mongoose.connection.close();
-                if (server === null || server === void 0 ? void 0 : server.rolesActivated) {
+                const guild = yield main_1.app.guildService.getById(guildId);
+                if (!(guild === null || guild === void 0 ? void 0 : guild.rolesActivated)) {
                     return message.say(activatedRolesError);
                 }
             }
@@ -69,9 +60,7 @@ class MyRolesCommand extends discord_js_commando_1.Command {
             });
             let score = 'Who knows D:';
             try {
-                const mongoose = yield mongo_1.openMongoConnection();
-                const user = yield this.userRepository.findOne({ discordId: id });
-                yield mongoose.connection.close();
+                const user = yield main_1.app.userService.getById(id);
                 score = user.participationScore.toString();
             }
             catch (error) { }

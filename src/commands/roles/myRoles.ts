@@ -1,20 +1,13 @@
-import { ReturnModelType, getModelForClass } from '@typegoose/typegoose';
 import { Message, MessageEmbed } from 'discord.js';
 import { Command, CommandoClient, CommandoMessage } from 'discord.js-commando';
-import { openMongoConnection } from '../../database/mongo';
 import configuration from '../../config/configuration';
 import { roles } from '../../utils/roles.utils';
-import DbUser from '../../database/models/user.model';
 import { app } from '../../main';
-import Server from '../../database/models/server.model';
 
 /**
  * Displays information about the roles and score of an specific User.
  */
 export default class MyRolesCommand extends Command {
-  private readonly userRepository: ReturnModelType<typeof DbUser>;
-  private readonly serverRepository: ReturnModelType<typeof Server>;
-
   constructor(client: CommandoClient) {
     super(client, {
       name: 'myroles',
@@ -24,29 +17,23 @@ export default class MyRolesCommand extends Command {
       description: `Shows user's roles and their score.`,
       args: [],
     });
-
-    this.userRepository = getModelForClass(DbUser);
-    this.serverRepository = getModelForClass(Server);
   }
 
   /**
    * It executes when someone types the "roles" command.
    */
   async run(message: CommandoMessage): Promise<Message> {
-    const activatedRolesError = `You have not activated ${configuration.appName}'s roles. First, you have to run ${configuration.prefix}activateroles.`;
+    const activatedRolesError = `${configuration.appName}'s roles are not activated. First, you have to run ${configuration.prefix}activateroles.`;
 
-    const cachedServer = app.cache.cache.get(message.guild.id);
-    if (!cachedServer?.rolesActivated) {
+    const { id: guildId } = message.guild;
+    const cachedGuild = app.cache.getGuildById(guildId);
+    if (!cachedGuild?.rolesActivated) {
       return message.say(activatedRolesError);
     }
 
     try {
-      const mongoose = await openMongoConnection();
-      const server = await this.serverRepository.findOne({
-        guildId: message.guild.id,
-      });
-      await mongoose.connection.close();
-      if (server?.rolesActivated) {
+      const guild = await app.guildService.getById(guildId);
+      if (!guild?.rolesActivated) {
         return message.say(activatedRolesError);
       }
     } catch (error) {
@@ -76,10 +63,7 @@ export default class MyRolesCommand extends Command {
 
     let score = 'Who knows D:';
     try {
-      const mongoose = await openMongoConnection();
-      const user = await this.userRepository.findOne({ discordId: id });
-      await mongoose.connection.close();
-
+      const user = await app.userService.getById(id);
       score = user.participationScore.toString();
     } catch (error) {}
 

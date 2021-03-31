@@ -3,16 +3,11 @@ import { Command, CommandoClient, CommandoMessage } from 'discord.js-commando';
 import { app } from '../../main';
 import configuration from '../../config/configuration';
 import { roles } from '../../utils/roles.utils';
-import { openMongoConnection } from '../../database/mongo';
-import Server from '../../database/models/server.model';
-import { ReturnModelType, getModelForClass } from '@typegoose/typegoose';
 
 /**
  * Displays information about roles and their respective scores.
  */
 export default class RolesCommand extends Command {
-  private readonly serverRepository: ReturnModelType<typeof Server>;
-
   constructor(client: CommandoClient) {
     super(client, {
       name: 'roles',
@@ -22,28 +17,23 @@ export default class RolesCommand extends Command {
       description: `Shows every registered ${configuration.appName}'s roles`,
       args: [],
     });
-
-    this.serverRepository = getModelForClass(Server);
   }
 
   /**
    * It executes when someone types the "roles" command.
    */
   async run(message: CommandoMessage): Promise<Message> {
-    const activatedRolesError = `You have not activated ${configuration.appName}'s roles. First, you have to run ${configuration.prefix}activateroles.`;
+    const activatedRolesError = `${configuration.appName}'s roles are not activated. First, you have to run ${configuration.prefix}activateroles.`;
 
-    const cachedServer = app.cache.cache.get(message.guild.id);
-    if (!cachedServer?.rolesActivated) {
+    const { id } = message.guild;
+    const cachedGuild = app.cache.getGuildById(id);
+    if (!cachedGuild?.rolesActivated) {
       return message.say(activatedRolesError);
     }
 
     try {
-      const mongoose = await openMongoConnection();
-      const server = await this.serverRepository.findOne({
-        guildId: message.guild.id,
-      });
-      mongoose.connection.close();
-      if (server.rolesActivated) {
+      const guild = await app.guildService.getById(id);
+      if (!guild?.rolesActivated) {
         return message.say(activatedRolesError);
       }
     } catch (error) {

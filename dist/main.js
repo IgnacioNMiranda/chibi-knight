@@ -17,20 +17,53 @@ const path_1 = __importDefault(require("path"));
 const configuration_1 = __importDefault(require("./config/configuration"));
 const discord_js_commando_1 = require("discord.js-commando");
 const logger_1 = __importDefault(require("./logger"));
-const typegoose_1 = require("@typegoose/typegoose");
 const user_model_1 = __importDefault(require("./database/models/user.model"));
 const roles_utils_1 = require("./utils/roles.utils");
-const server_model_1 = __importDefault(require("./database/models/server.model"));
 const Cache_1 = __importDefault(require("./database/Cache"));
 const mongo_1 = require("./database/mongo");
+const index_1 = require("./database/services/index");
 class App {
     constructor() {
-        this.userRepository = typegoose_1.getModelForClass(user_model_1.default);
-        this.serverRepository = typegoose_1.getModelForClass(server_model_1.default);
-        this.initClient();
+        this.initApplication();
+    }
+    initApplication() {
+        return __awaiter(this, void 0, void 0, function* () {
+            logger_1.default.info('Initializing application...', {
+                context: this.constructor.name,
+            });
+            yield this.initMongoConnection();
+            this.initServices();
+            yield this.initClient();
+        });
+    }
+    initMongoConnection() {
+        return __awaiter(this, void 0, void 0, function* () {
+            logger_1.default.info('Trying to connect to mongo database...', {
+                context: this.constructor.name,
+            });
+            this.mongoConnection = new mongo_1.MongoConnection();
+            try {
+                this.cache = new Cache_1.default();
+                yield this.mongoConnection.connect();
+                yield this.cache.initCache();
+                setTimeout(this.cache.refresh, 1000 * 60 * 60);
+            }
+            catch (error) {
+                logger_1.default.error(`MongoDB Connection error. Could not connect to database`, {
+                    context: this.constructor.name,
+                });
+            }
+        });
+    }
+    initServices() {
+        this.guildService = new index_1.GuildService();
+        this.userService = new index_1.UserService();
     }
     initClient() {
         return __awaiter(this, void 0, void 0, function* () {
+            logger_1.default.info('Trying to initialize client...', {
+                context: this.constructor.name,
+            });
             this.client = new discord_js_commando_1.CommandoClient({
                 commandPrefix: configuration_1.default.prefix,
                 owner: configuration_1.default.clientId,
@@ -60,8 +93,6 @@ class App {
                     context: this.constructor.name,
                 });
                 yield this.client.login(configuration_1.default.token);
-                this.cache = new Cache_1.default();
-                setTimeout(this.cache.refresh, 1000 * 60 * 60);
             }
             catch (error) {
                 const { code, method, path } = error;
@@ -78,24 +109,20 @@ class App {
         });
         this.client.on('error', console.error).on('warn', console.warn);
         this.client.on('message', (message) => __awaiter(this, void 0, void 0, function* () {
-            if (!message.author.bot) {
+            const { id: guildId } = message.guild;
+            if (!message.author.bot &&
+                !message.content.startsWith(configuration_1.default.prefix)) {
                 let rolesActivated = false;
-                const cachedServer = this.cache.cache.get(message.guild.id);
-                if (cachedServer) {
-                    rolesActivated = cachedServer.rolesActivated;
+                const cachedGuild = this.cache.getGuildById(guildId);
+                if (cachedGuild) {
+                    rolesActivated = cachedGuild.rolesActivated;
                 }
                 else {
                     try {
-                        const mongoose = yield mongo_1.openMongoConnection();
-                        const server = yield this.serverRepository.findOne({
-                            guildId: message.guild.id,
-                        });
-                        mongoose.connection.close();
-                        rolesActivated = server.rolesActivated;
+                        const guild = yield this.guildService.getById(guildId);
+                        rolesActivated = guild.rolesActivated;
                     }
-                    catch (error) {
-                        return;
-                    }
+                    catch (error) { }
                 }
                 if (rolesActivated) {
                     const notAllowedPrefix = ['>', '#', '$', '!', ';', 'rpg'];
@@ -127,19 +154,15 @@ class App {
                             }
                         }
                         try {
-                            const mongoose = yield mongo_1.openMongoConnection();
-                            const user = yield this.userRepository
-                                .findOne({ discordId: author.id })
-                                .exec();
+                            const user = yield this.userService.getById(author.id);
                             if (user) {
                                 user.participationScore += score;
                                 yield user.save();
                             }
                             else {
-                                const newUser = new user_model_1.default(author.id, author.username, 0, score);
-                                yield this.userRepository.create(newUser);
+                                const newUser = new user_model_1.default(author.id, author.username, [guildId], 0, score);
+                                yield this.userService.create(newUser);
                             }
-                            yield mongoose.connection.close();
                             const authorGuildMember = yield message.guild.members.fetch(author.id);
                             roles_utils_1.defineRoles(user.participationScore, authorGuildMember, message);
                         }
@@ -160,14 +183,12 @@ class App {
             }
         });
         this.client.on('guildDelete', (guild) => __awaiter(this, void 0, void 0, function* () {
-            const { id } = guild;
+            const { id: guildId } = guild;
             try {
                 logger_1.default.info(`Trying to leave '${guild.name}' server and delete from DB...`, {
                     context: this.constructor.name,
                 });
-                const mongoose = yield mongo_1.openMongoConnection();
-                yield this.serverRepository.deleteOne({ guildId: id });
-                yield mongoose.connection.close();
+                yield this.guildService.deleteById(guildId);
                 logger_1.default.info(`${guild.name} leaved and deleted succesfully`, {
                     context: this.constructor.name,
                 });

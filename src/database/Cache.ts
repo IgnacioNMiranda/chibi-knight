@@ -1,33 +1,34 @@
-import { getModelForClass, ReturnModelType } from '@typegoose/typegoose';
 import { CommandoMessage } from 'discord.js-commando';
+import { app } from '../main';
 import logger from '../logger';
-import ServerDTO from './dto/server.dto';
-import Server from './models/server.model';
-import { openMongoConnection } from './mongo';
+import { Guild } from './models';
 
 export default class Cache {
-  cache: Map<string, ServerDTO>;
-  private readonly serverRepository: ReturnModelType<typeof Server>;
+  cache: Map<string, Guild>;
 
   constructor() {
-    this.serverRepository = getModelForClass(Server);
-    this.cache = new Map<string, ServerDTO>();
-    this.initCache();
+    this.cache = new Map<string, Guild>();
   }
 
-  private async initCache() {
+  async initCache() {
+    if (this.cache) {
+      return this.cache;
+    }
+
     try {
-      const mongoose = await openMongoConnection();
-      const servers = await this.serverRepository.find();
-      servers.forEach((server) => {
-        const serverDto: ServerDTO = {
-          guildId: server.guildId,
-          rolesActivated: server.rolesActivated,
-          gameInstanceActive: server.gameInstanceActive,
-        };
-        this.cache.set(server.guildId, serverDto);
+      logger.info('Trying to init cache...', {
+        context: this.constructor.name,
       });
-      await mongoose.connection.close();
+      const guilds = await app.guildService.getAll();
+      guilds.forEach((guild) => {
+        const { guildId, rolesActivated, gameInstanceActive } = guild;
+        const cachedGuild: Guild = {
+          guildId,
+          rolesActivated,
+          gameInstanceActive,
+        };
+        this.setGuildById(guildId, cachedGuild);
+      });
     } catch (error) {
       logger.error(
         `MongoDB Connection error. Could not init cache from database`,
@@ -36,24 +37,30 @@ export default class Cache {
         },
       );
     }
+    return this.cache;
   }
 
   async refresh() {
-    this.cache = new Map<string, ServerDTO>();
+    this.cache = new Map<string, Guild>();
+  }
+
+  getGuildById(guildId: string): Guild {
+    return this.cache.get(guildId);
+  }
+
+  setGuildById(guildId: string, guild: Guild) {
+    return this.cache.set(guildId, guild);
   }
 
   async getGameInstanceActive(message: CommandoMessage): Promise<any> {
-    const cachedServerInstance = this.cache.get(message.guild.id);
-    if (cachedServerInstance) {
-      return cachedServerInstance.gameInstanceActive;
+    const { id: guildId } = message.guild;
+    const cachedGuild = this.getGuildById(guildId);
+    if (cachedGuild) {
+      return cachedGuild.gameInstanceActive;
     } else {
       try {
-        const mongoose = await openMongoConnection();
-        const server = await this.serverRepository.findOne({
-          guildId: message.guild.id,
-        });
-        await mongoose.connection.close();
-        return server.gameInstanceActive;
+        const guild = await app.guildService.getById(guildId);
+        return guild.gameInstanceActive;
       } catch (error) {
         logger.error(
           `MongoDB Connection error. Could not retrieve gameInstanceActive for '${message.guild.name}' server`,
@@ -61,7 +68,7 @@ export default class Cache {
             context: this.constructor.name,
           },
         );
-        throw new Error(error);
+        throw error;
       }
     }
   }

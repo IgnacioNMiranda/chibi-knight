@@ -4,16 +4,11 @@ import { QandA } from './resources/QandA';
 import { app } from '../../main';
 import configuration from '../../config/configuration';
 import logger from '../../logger';
-import {
-  DocumentType,
-  getModelForClass,
-  ReturnModelType,
-} from '@typegoose/typegoose';
+import { DocumentType } from '@typegoose/typegoose';
 import DbUser from '../../database/models/user.model';
 import { links } from './resources/links';
 import { defineRoles } from '../../utils/roles.utils';
-import { openMongoConnection } from '../../database/mongo';
-import Server from '../../database/models/server.model';
+import Server from '../../database/models/guild.model';
 
 /**
  * Starts a tic-tac-toe game.
@@ -21,8 +16,6 @@ import Server from '../../database/models/server.model';
 export default class TicTacToeCommand extends Command {
   defaultSymbol: string;
   tictactoeBoard: string[];
-  private readonly userRepository: ReturnModelType<typeof DbUser>;
-  private readonly serverRepository: ReturnModelType<typeof Server>;
 
   constructor(client: CommandoClient) {
     super(client, {
@@ -42,9 +35,6 @@ export default class TicTacToeCommand extends Command {
 
     // Default symbol of the board.
     this.defaultSymbol = ':purple_square:';
-
-    this.userRepository = getModelForClass(DbUser);
-    this.serverRepository = getModelForClass(Server);
   }
 
   /**
@@ -63,7 +53,7 @@ export default class TicTacToeCommand extends Command {
       gameInstanceActive = await app.cache.getGameInstanceActive(message);
     } catch (error) {
       return message.say(
-        'Error ): could not start game. Try again later :purple_heart:',
+        'Error ): could not start game. Try again later :sweat:',
       );
     }
 
@@ -104,18 +94,23 @@ export default class TicTacToeCommand extends Command {
         );
       } else if (receivedMsg === 'yes' || receivedMsg === 'y') {
         try {
-          const mongoose = await openMongoConnection();
-          const server = await this.serverRepository.findOne({
-            guildId: message.guild.id,
-          });
-          server.gameInstanceActive = true;
-          await server.save();
-          await mongoose.connection.close();
+          const { id } = message.guild;
+          const guild = await app.guildService.getById(id);
+          guild.gameInstanceActive = true;
+          await guild.save();
 
-          const cachedServer = app.cache.cache.get(message.guild.id);
-          if (cachedServer) {
-            cachedServer.gameInstanceActive = true;
-            app.cache.cache.set(message.guild.id, cachedServer);
+          const cachedGuild = app.cache.getGuildById(id);
+          if (cachedGuild) {
+            cachedGuild.gameInstanceActive = true;
+            app.cache.setGuildById(id, cachedGuild);
+          } else {
+            const { guildId, rolesActivated, gameInstanceActive } = guild;
+            const cached: Server = {
+              guildId,
+              rolesActivated,
+              gameInstanceActive,
+            };
+            app.cache.setGuildById(guildId, cached);
           }
 
           this.ticTacToeInstance(message, player1, player2, QandAGames);
@@ -160,6 +155,7 @@ export default class TicTacToeCommand extends Command {
       this.defaultSymbol,
       this.defaultSymbol,
     ];
+    const { id: guildId } = message.guild;
 
     const random = Math.random() < 0.5;
     let activePlayer = random ? player1 : player2;
@@ -259,11 +255,10 @@ export default class TicTacToeCommand extends Command {
               },
             );
 
-            const mongoose = await openMongoConnection();
             const score = 20;
-            const user: DocumentType<DbUser> = await this.userRepository
-              .findOne({ discordId: winner.id })
-              .exec();
+            const user: DocumentType<DbUser> = await app.userService.getById(
+              winner.id,
+            );
             if (user) {
               user.tictactoeWins += 1;
               user.participationScore += score;
@@ -272,12 +267,12 @@ export default class TicTacToeCommand extends Command {
               const newUser: DbUser = new DbUser(
                 winner.id,
                 winner.username,
+                [guildId],
                 1,
                 score,
               );
-              await this.userRepository.create(newUser);
+              await app.userService.create(newUser);
             }
-            await mongoose.connection.close();
 
             const authorGuildMember = await message.guild.members.fetch(
               winner.id,
@@ -353,13 +348,9 @@ export default class TicTacToeCommand extends Command {
     collector.on('end', async (collected: any, reason: any) => {
       // Unlocks the game instance.
       try {
-        const mongoose = await openMongoConnection();
-        const server = await this.serverRepository.findOne({
-          guildId: message.guild.id,
-        });
-        server.gameInstanceActive = false;
-        await server.save();
-        await mongoose.connection.close();
+        const guild = await app.guildService.getById(guildId);
+        guild.gameInstanceActive = false;
+        await guild.save();
       } catch (error) {
         logger.error(
           `MongoDB Connection error. Could not change game instance active for ${message.guild.name} server`,
@@ -369,10 +360,10 @@ export default class TicTacToeCommand extends Command {
         );
       }
 
-      const cachedServer = app.cache.cache.get(message.guild.id);
-      if (cachedServer) {
-        cachedServer.gameInstanceActive = false;
-        app.cache.cache.set(message.guild.id, cachedServer);
+      const cachedGuild = app.cache.getGuildById(guildId);
+      if (cachedGuild) {
+        cachedGuild.gameInstanceActive = false;
+        app.cache.setGuildById(guildId, cachedGuild);
       }
 
       logger.info(reason, {

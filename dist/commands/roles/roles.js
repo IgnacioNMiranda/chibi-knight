@@ -17,9 +17,6 @@ const discord_js_commando_1 = require("discord.js-commando");
 const main_1 = require("../../main");
 const configuration_1 = __importDefault(require("../../config/configuration"));
 const roles_utils_1 = require("../../utils/roles.utils");
-const mongo_1 = require("../../database/mongo");
-const server_model_1 = __importDefault(require("../../database/models/server.model"));
-const typegoose_1 = require("@typegoose/typegoose");
 class RolesCommand extends discord_js_commando_1.Command {
     constructor(client) {
         super(client, {
@@ -30,22 +27,18 @@ class RolesCommand extends discord_js_commando_1.Command {
             description: `Shows every registered ${configuration_1.default.appName}'s roles`,
             args: [],
         });
-        this.serverRepository = typegoose_1.getModelForClass(server_model_1.default);
     }
     run(message) {
         return __awaiter(this, void 0, void 0, function* () {
-            const activatedRolesError = `You have not activated ${configuration_1.default.appName}'s roles. First, you have to run ${configuration_1.default.prefix}activateroles.`;
-            const cachedServer = main_1.app.cache.cache.get(message.guild.id);
-            if (!(cachedServer === null || cachedServer === void 0 ? void 0 : cachedServer.rolesActivated)) {
+            const activatedRolesError = `${configuration_1.default.appName}'s roles are not activated. First, you have to run ${configuration_1.default.prefix}activateroles.`;
+            const { id } = message.guild;
+            const cachedGuild = main_1.app.cache.getGuildById(id);
+            if (!(cachedGuild === null || cachedGuild === void 0 ? void 0 : cachedGuild.rolesActivated)) {
                 return message.say(activatedRolesError);
             }
             try {
-                const mongoose = yield mongo_1.openMongoConnection();
-                const server = yield this.serverRepository.findOne({
-                    guildId: message.guild.id,
-                });
-                mongoose.connection.close();
-                if (server.rolesActivated) {
+                const guild = yield main_1.app.guildService.getById(id);
+                if (!(guild === null || guild === void 0 ? void 0 : guild.rolesActivated)) {
                     return message.say(activatedRolesError);
                 }
             }

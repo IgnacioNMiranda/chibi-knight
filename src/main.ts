@@ -2,35 +2,67 @@ import pathlib from 'path';
 import configuration from './config/configuration';
 import { CommandoClient } from 'discord.js-commando';
 import logger from './logger';
-import {
-  DocumentType,
-  getModelForClass,
-  ReturnModelType,
-} from '@typegoose/typegoose';
+import { DocumentType } from '@typegoose/typegoose';
 import DbUser from './database/models/user.model';
 import { defineRoles } from './utils/roles.utils';
-import Server from './database/models/server.model';
 import Cache from './database/Cache';
-import { openMongoConnection } from './database/mongo';
+import { MongoConnection } from './database/mongo';
 import { TextChannel } from 'discord.js';
+import { GuildService, UserService } from './database/services/index';
 
 class App {
   // Instance of the bot client.
   client: CommandoClient;
 
-  // MongoDB Repositories.
-  private readonly serverRepository: ReturnModelType<typeof Server>;
-  private readonly userRepository: ReturnModelType<typeof DbUser>;
+  // MongoDB connection instance.
+  mongoConnection: MongoConnection;
+
+  // Services.
+  guildService: GuildService;
+  userService: UserService;
 
   cache: Cache;
 
   constructor() {
-    this.userRepository = getModelForClass(DbUser);
-    this.serverRepository = getModelForClass(Server);
-    this.initClient();
+    this.initApplication();
+  }
+
+  async initApplication() {
+    logger.info('Initializing application...', {
+      context: this.constructor.name,
+    });
+    await this.initMongoConnection();
+    this.initServices();
+    await this.initClient();
+  }
+
+  async initMongoConnection() {
+    logger.info('Trying to connect to mongo database...', {
+      context: this.constructor.name,
+    });
+    this.mongoConnection = new MongoConnection();
+    try {
+      this.cache = new Cache();
+      await this.mongoConnection.connect();
+
+      await this.cache.initCache();
+      setTimeout(this.cache.refresh, 1000 * 60 * 60);
+    } catch (error) {
+      logger.error(`MongoDB Connection error. Could not connect to database`, {
+        context: this.constructor.name,
+      });
+    }
+  }
+
+  initServices() {
+    this.guildService = new GuildService();
+    this.userService = new UserService();
   }
 
   async initClient() {
+    logger.info('Trying to initialize client...', {
+      context: this.constructor.name,
+    });
     this.client = new CommandoClient({
       commandPrefix: configuration.prefix,
       owner: configuration.clientId,
@@ -63,9 +95,6 @@ class App {
         context: this.constructor.name,
       });
       await this.client.login(configuration.token);
-
-      this.cache = new Cache();
-      setTimeout(this.cache.refresh, 1000 * 60 * 60);
     } catch (error) {
       const { code, method, path } = error;
       console.error(`Error ${code} trying to ${method} to ${path} path`);
@@ -84,22 +113,20 @@ class App {
     this.client.on('error', console.error).on('warn', console.warn);
 
     this.client.on('message', async (message) => {
-      if (!message.author.bot) {
+      const { id: guildId } = message.guild;
+      if (
+        !message.author.bot &&
+        !message.content.startsWith(configuration.prefix)
+      ) {
         let rolesActivated = false;
-        const cachedServer = this.cache.cache.get(message.guild.id);
-        if (cachedServer) {
-          rolesActivated = cachedServer.rolesActivated;
+        const cachedGuild = this.cache.getGuildById(guildId);
+        if (cachedGuild) {
+          rolesActivated = cachedGuild.rolesActivated;
         } else {
           try {
-            const mongoose = await openMongoConnection();
-            const server = await this.serverRepository.findOne({
-              guildId: message.guild.id,
-            });
-            mongoose.connection.close();
-            rolesActivated = server.rolesActivated;
-          } catch (error) {
-            return;
-          }
+            const guild = await this.guildService.getById(guildId);
+            rolesActivated = guild.rolesActivated;
+          } catch (error) {}
         }
 
         if (rolesActivated) {
@@ -147,10 +174,9 @@ class App {
             }
 
             try {
-              const mongoose = await openMongoConnection();
-              const user: DocumentType<DbUser> = await this.userRepository
-                .findOne({ discordId: author.id })
-                .exec();
+              const user: DocumentType<DbUser> = await this.userService.getById(
+                author.id,
+              );
               if (user) {
                 user.participationScore += score;
                 await user.save();
@@ -158,12 +184,12 @@ class App {
                 const newUser: DbUser = new DbUser(
                   author.id,
                   author.username,
+                  [guildId],
                   0,
                   score,
                 );
-                await this.userRepository.create(newUser);
+                await this.userService.create(newUser);
               }
-              await mongoose.connection.close();
 
               const authorGuildMember = await message.guild.members.fetch(
                 author.id,
@@ -196,7 +222,7 @@ class App {
     });
 
     this.client.on('guildDelete', async (guild) => {
-      const { id } = guild;
+      const { id: guildId } = guild;
       try {
         logger.info(
           `Trying to leave '${guild.name}' server and delete from DB...`,
@@ -204,9 +230,7 @@ class App {
             context: this.constructor.name,
           },
         );
-        const mongoose = await openMongoConnection();
-        await this.serverRepository.deleteOne({ guildId: id });
-        await mongoose.connection.close();
+        await this.guildService.deleteById(guildId);
         logger.info(`${guild.name} leaved and deleted succesfully`, {
           context: this.constructor.name,
         });
