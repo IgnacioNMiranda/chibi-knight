@@ -1,1 +1,1 @@
-{"version":3,"file":"groupsDescriptions.js","sourceRoot":"","sources":["../../../../src/commands/misc/resources/groupsDescriptions.ts"],"names":[],"mappings":";;;AAAa,QAAA,kBAAkB,GAAG;IAChC,KAAK,EAAE,6BAA6B;IACpC,IAAI,EAAE,mCAAmC;IACzC,KAAK,EAAE,EAAE;CACV,CAAC"}
+{"version":3,"file":"groupsDescriptions.js","sourceRoot":"","sources":["../../../../src/commands/misc/resources/groupsDescriptions.ts"],"names":[],"mappings":";;;AAAa,QAAA,kBAAkB,GAAG;IAChC,KAAK,EAAE,6BAA6B;IACpC,IAAI,EAAE,mCAAmC;IACzC,KAAK,EAAE,EAAE;IACT,KAAK,EAAE,0CAA0C;CAClD,CAAC"}

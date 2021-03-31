@@ -12,21 +12,21 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-const typegoose_1 = require("@typegoose/typegoose");
 const discord_js_commando_1 = require("discord.js-commando");
+const configuration_1 = __importDefault(require("../../config/configuration"));
 const logger_1 = __importDefault(require("../../logger"));
 const server_model_1 = __importDefault(require("../../database/models/server.model"));
+const typegoose_1 = require("@typegoose/typegoose");
 const mongo_1 = require("../../database/mongo");
-const main_1 = require("../../main");
-class CancelGameCommand extends discord_js_commando_1.Command {
+class InitChibiKnightCommand extends discord_js_commando_1.Command {
     constructor(client) {
         super(client, {
-            name: 'cancelgame',
-            aliases: ['cg'],
-            group: 'games',
-            memberName: 'cancelgame',
-            description: 'Cancels the active game.',
-            args: [],
+            name: 'initialize',
+            aliases: ['i'],
+            group: 'misc',
+            memberName: 'initialize',
+            description: 'Initialize Chibi Knight funcionalities.',
+            hidden: true,
         });
         this.serverRepository = typegoose_1.getModelForClass(server_model_1.default);
     }
@@ -37,32 +37,27 @@ class CancelGameCommand extends discord_js_commando_1.Command {
                 const server = yield this.serverRepository.findOne({
                     guildId: message.guild.id,
                 });
-                if (!server.gameInstanceActive) {
+                if (!server) {
+                    logger_1.default.info(`Trying to register new server ${message.guild.name}...`, {
+                        context: this.constructor.name,
+                    });
+                    const newServer = { guildId: message.guild.id };
+                    yield this.serverRepository.create(newServer);
                     yield mongoose.connection.close();
-                    return message.say("There's no active game.");
+                    logger_1.default.info(`${message.guild.name} registered succesfully`, {
+                        context: this.constructor.name,
+                    });
+                    return message.say(`${configuration_1.default.appName} has been initialize successfully :purple_heart: check out the commands with ${configuration_1.default.prefix}help :smile:`);
                 }
                 else {
-                    server.gameInstanceActive = false;
-                    yield server.save();
-                    yield mongoose.connection.close();
+                    return message.say(`${configuration_1.default.appName} has already been initialize n.n`);
                 }
             }
             catch (error) {
-                logger_1.default.error(`MongoDB Connection error. Could not change game instance active for '${message.guild.name}' server`, {
-                    context: this.constructor.name,
-                });
+                return message.say(`It occured an unexpected error while trying to initialize ${configuration_1.default.appName} :sweat: try again later.`);
             }
-            const cachedServer = main_1.app.cache.cache.get(message.guild.id);
-            if (cachedServer) {
-                if (!cachedServer.gameInstanceActive) {
-                    return message.say("There's no active game.");
-                }
-                cachedServer.gameInstanceActive = false;
-                main_1.app.cache.cache.set(message.guild.id, cachedServer);
-            }
-            return message.say('Game cancelled.');
         });
     }
 }
-exports.default = CancelGameCommand;
-//# sourceMappingURL=cancelGame.js.map
+exports.default = InitChibiKnightCommand;
+//# sourceMappingURL=initChibiKnight.js.map

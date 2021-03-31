@@ -36,7 +36,7 @@ class CongratulateCommand extends discord_js_commando_1.Command {
     }
     run(message, args) {
         return __awaiter(this, void 0, void 0, function* () {
-            const gifs = links_1.links[0].gifs;
+            const gifs = links_1.links.congratulate.gifs;
             const randIndex = Math.floor(Math.random() * gifs.length);
             const embedMessage = new discord_js_1.MessageEmbed()
                 .setDescription(`Congratulations ${args.congratulatedPerson.username} !!`)
