@@ -1,10 +1,4 @@
-import {
-  Collection,
-  GuildMember,
-  Message,
-  MessageEmbed,
-  Role,
-} from 'discord.js';
+import { GuildMember, Message, MessageEmbed, Role } from 'discord.js';
 import logger from '../logger';
 import configuration from '../config/configuration';
 import { links } from './resources/links';

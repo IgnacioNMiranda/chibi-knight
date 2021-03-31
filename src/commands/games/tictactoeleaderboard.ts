@@ -1,17 +1,13 @@
-import { getModelForClass, ReturnModelType } from '@typegoose/typegoose';
 import { Message, MessageEmbed } from 'discord.js';
 import { Command, CommandoClient, CommandoMessage } from 'discord.js-commando';
+import { app } from '../../main';
 import configuration from '../../config/configuration';
-import DbUser from '../../database/models/user.model';
 import logger from '../../logger';
-import { openMongoConnection } from '../../database/mongo';
 
 /**
  * Displays the tictactoe game leaderboard.
  */
 export default class TicTacToeLeaderBoardCommand extends Command {
-  private readonly userRepository: ReturnModelType<typeof DbUser>;
-
   constructor(client: CommandoClient) {
     super(client, {
       name: 'tttleaderboard',
@@ -20,8 +16,6 @@ export default class TicTacToeLeaderBoardCommand extends Command {
       memberName: 'tttleaderboard',
       description: 'Displays the tictactoe leaderboard.',
     });
-
-    this.userRepository = getModelForClass(DbUser);
   }
 
   /**
@@ -29,15 +23,14 @@ export default class TicTacToeLeaderBoardCommand extends Command {
    */
   async run(message: CommandoMessage): Promise<Message> {
     try {
-      const mongoose = await openMongoConnection();
-      const topUsers = await this.userRepository
-        .find({
+      const topUsers = await app.userService.getByFilter(
+        {
           tictactoeWins: { $exists: true },
-        })
-        .limit(10)
-        .sort({ tictactoeWins: -1 })
-        .exec();
-      await mongoose.connection.close();
+          guilds: message.guild.id,
+        },
+        10,
+        { tictactoeWins: -1 },
+      );
 
       const leaderboard = new MessageEmbed()
         .setTitle(`❌⭕ TicTacToe Leaderboard ❌⭕`)
@@ -69,14 +62,15 @@ export default class TicTacToeLeaderBoardCommand extends Command {
 
       return message.embed(leaderboard);
     } catch (error) {
+      logger.error(error);
       logger.error(
-        `MongoDB Connection error. Could not retrieve tictactoe leaderboard`,
+        `MongoDB Connection error. Could not retrieve tictactoe leaderboard for '${message.guild.name}' server`,
         {
           context: this.constructor.name,
         },
       );
       return message.say(
-        'Sorry ): Could not retrieve tictactoe leaderboard. I failed you :sweat:',
+        `Sorry ): I couldn't retrieve tictactoe leaderboard. I failed you :sweat:`,
       );
     }
   }
