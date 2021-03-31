@@ -38,7 +38,7 @@ export default class HelpCommand extends Command {
       )[0];
 
       if (command) {
-        let cmdArgs = 'none';
+        let cmdArgs = '';
         if (command.argsCollector) {
           const args = command.argsCollector.args;
           if (args[0].type.id == 'user') cmdArgs = '@User';

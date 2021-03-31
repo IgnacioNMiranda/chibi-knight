@@ -18,6 +18,12 @@ const QandA_1 = require("./resources/QandA");
 const main_1 = require("../../main");
 const configuration_1 = __importDefault(require("../../config/configuration"));
 const logger_1 = __importDefault(require("../../logger"));
+const typegoose_1 = require("@typegoose/typegoose");
+const user_model_1 = __importDefault(require("../../database/models/user.model"));
+const links_1 = require("./resources/links");
+const roles_utils_1 = require("../../utils/roles.utils");
+const mongo_1 = require("../../database/mongo");
+const server_model_1 = __importDefault(require("../../database/models/server.model"));
 class TicTacToeCommand extends discord_js_commando_1.Command {
     constructor(client) {
         super(client, {
@@ -35,24 +41,34 @@ class TicTacToeCommand extends discord_js_commando_1.Command {
             ],
         });
         this.defaultSymbol = ':purple_square:';
+        this.userRepository = typegoose_1.getModelForClass(user_model_1.default);
+        this.serverRepository = typegoose_1.getModelForClass(server_model_1.default);
     }
     run(message, args) {
         return __awaiter(this, void 0, void 0, function* () {
-            const player1 = message.author;
-            if (main_1.app.gameInstanceActive) {
-                yield message.say(`There's already a game in course ${player1}!`);
+            const { author: player1 } = message;
+            const { player2 } = args;
+            let gameInstanceActive;
+            try {
+                gameInstanceActive = yield main_1.app.cache.getGameInstanceActive(message);
             }
-            else if (player1.id === args.player2.id) {
-                yield message.say('You cannot challenge yourself ¬¬ ...');
+            catch (error) {
+                return message.say('Error ): could not start game. Try again later :purple_heart:');
             }
-            else if (args.player2.bot) {
-                yield message.say("You cannot challenge me :anger: I'm a superior being... I would destroy you n.n :purple_heart:");
+            if (gameInstanceActive) {
+                return message.say(`There's already a game in course ${player1}!`);
+            }
+            else if (player1.id === player2.id) {
+                return message.say('You cannot challenge yourself ¬¬ ...');
+            }
+            else if (player2.bot) {
+                return message.say("You cannot challenge me :anger: I'm a superior being... I would destroy you n.n :purple_heart:");
             }
             const QandAGames = QandA_1.QandA[0];
             const filter = (response) => {
-                return QandAGames.answers.some((answer) => answer === response.content && response.author.id === args.player2.id);
+                return QandAGames.answers.some((answer) => answer === response.content && response.author.id === player2.id);
             };
-            yield message.say(`${args.player2} has been challenged by ${player1} to play #. Do you accept the challenge? (yes/y/no/n)`);
+            yield message.say(`${player2} has been challenged by ${player1} to play #. Do you accept the challenge? (yes/y/no/n)`);
             const collectedMessages = yield message.channel.awaitMessages(filter, {
                 max: 1,
                 time: 15000,
@@ -60,17 +76,35 @@ class TicTacToeCommand extends discord_js_commando_1.Command {
             if (collectedMessages === null || collectedMessages === void 0 ? void 0 : collectedMessages.first()) {
                 const receivedMsg = collectedMessages.first().content;
                 if (receivedMsg === 'no' || receivedMsg === 'n') {
-                    yield message.say(`Game cancelled ): You aren't strong enough ${args.player2}.`);
+                    yield message.say(`Game cancelled ): Come back when you are brave enough, ${player2}.`);
                 }
                 else if (receivedMsg === 'yes' || receivedMsg === 'y') {
-                    main_1.app.gameInstanceActive = true;
-                    this.ticTacToeInstance(message, player1, args.player2, QandAGames);
+                    try {
+                        const mongoose = yield mongo_1.openMongoConnection();
+                        const server = yield this.serverRepository.findOne({
+                            guildId: message.guild.id,
+                        });
+                        server.gameInstanceActive = true;
+                        yield server.save();
+                        yield mongoose.connection.close();
+                        const cachedServer = main_1.app.cache.cache.get(message.guild.id);
+                        if (cachedServer) {
+                            cachedServer.gameInstanceActive = true;
+                            main_1.app.cache.cache.set(message.guild.id, cachedServer);
+                        }
+                        this.ticTacToeInstance(message, player1, player2, QandAGames);
+                    }
+                    catch (error) {
+                        logger_1.default.error(`MongoDB Connection error. Could not register change game instance active state for ${message.guild.name}`, {
+                            context: this.constructor.name,
+                        });
+                        return message.say('Error ): could not start game. Try again later :purple_heart:');
+                    }
                 }
             }
             else {
-                yield message.say(`Time's up! ${args.player2.username} dont want to play ):`);
+                return message.say(`Time's up! ${player2.username} dont want to play ):`);
             }
-            return null;
         });
     }
     ticTacToeInstance(message, player1, player2, QandAGames) {
@@ -97,9 +131,11 @@ class TicTacToeCommand extends discord_js_commando_1.Command {
                 if (receivedMsg.author.bot) {
                     return false;
                 }
-                const possibleCancelledGame = receivedMsg.content.split(' ')[0];
-                if (possibleCancelledGame === '>cancelgame' ||
-                    possibleCancelledGame === '>cg') {
+                const possibleCancelledGame = receivedMsg.content
+                    .split(' ')[0]
+                    .split(configuration_1.default.prefix)[1];
+                if (possibleCancelledGame === 'cancelgame' ||
+                    possibleCancelledGame === 'cg') {
                     collector.stop('Cancel game command executed.');
                 }
                 const playedPosition = receivedMsg.content;
@@ -121,8 +157,10 @@ class TicTacToeCommand extends discord_js_commando_1.Command {
                 const newEmbedMessage = this.embedDefaultTicTacToeBoard(player1, player2);
                 const gameState = this.obtainGameState(parseInt(playedNumber));
                 if (gameState != -1) {
-                    let result = '';
-                    let stopReason = '';
+                    let result;
+                    let stopReason;
+                    let winner;
+                    let loser;
                     switch (gameState) {
                         case 0:
                             result = 'The game was a tie! :confetti_ball: Thanks for play (:';
@@ -131,13 +169,53 @@ class TicTacToeCommand extends discord_js_commando_1.Command {
                         case 1:
                             result = `:tada: CONGRATULATIONS ${player1}! You have won! :tada:`;
                             stopReason = `${player1.username} won on TicTacToe against ${player2.username}!`;
+                            winner = player1;
+                            loser = player2;
                             break;
                         case 2:
                             result = `:tada: CONGRATULATIONS ${player2}! You have won! :tada:`;
                             stopReason = `${player2.username} won on TicTacToe against ${player1.username}!`;
+                            winner = player2;
+                            loser = player1;
                             break;
                     }
+                    if (winner) {
+                        try {
+                            logger_1.default.info(`Registering ${winner.username}'s tictactoe victory...`, {
+                                context: this.constructor.name,
+                            });
+                            const mongoose = yield mongo_1.openMongoConnection();
+                            const score = 20;
+                            const user = yield this.userRepository
+                                .findOne({ discordId: winner.id })
+                                .exec();
+                            if (user) {
+                                user.tictactoeWins += 1;
+                                user.participationScore += score;
+                                yield user.save();
+                            }
+                            else {
+                                const newUser = new user_model_1.default(winner.id, winner.username, 1, score);
+                                yield this.userRepository.create(newUser);
+                            }
+                            yield mongoose.connection.close();
+                            const authorGuildMember = yield message.guild.members.fetch(winner.id);
+                            roles_utils_1.defineRoles(user.participationScore, authorGuildMember, message);
+                            logger_1.default.info('Victory registered successfully', {
+                                context: this.constructor.name,
+                            });
+                        }
+                        catch (error) {
+                            logger_1.default.error(`MongoDB Connection error. Could not register ${winner.username}'s tictactoe victory`, {
+                                context: this.constructor.name,
+                            });
+                        }
+                    }
                     newEmbedMessage.addField('Result :trophy:', result, false);
+                    if (winner && loser) {
+                        newEmbedMessage.addField('Consolation prize :second_place:', `Don't worry ${loser}, this is for you:`);
+                        newEmbedMessage.setImage(links_1.links.tictactoe.gifs[0]);
+                    }
                     yield sentEmbedMessage.edit(newEmbedMessage);
                     collector.stop(stopReason);
                 }
@@ -148,17 +226,35 @@ class TicTacToeCommand extends discord_js_commando_1.Command {
                     yield sentEmbedMessage.edit(newEmbedMessage);
                 }
             }));
-            collector.on('end', (collected, reason) => {
-                main_1.app.gameInstanceActive = false;
+            collector.on('end', (collected, reason) => __awaiter(this, void 0, void 0, function* () {
+                try {
+                    const mongoose = yield mongo_1.openMongoConnection();
+                    const server = yield this.serverRepository.findOne({
+                        guildId: message.guild.id,
+                    });
+                    server.gameInstanceActive = false;
+                    yield server.save();
+                    yield mongoose.connection.close();
+                }
+                catch (error) {
+                    logger_1.default.error(`MongoDB Connection error. Could not change game instance active for ${message.guild.name} server`, {
+                        context: this.constructor.name,
+                    });
+                }
+                const cachedServer = main_1.app.cache.cache.get(message.guild.id);
+                if (cachedServer) {
+                    cachedServer.gameInstanceActive = false;
+                    main_1.app.cache.cache.set(message.guild.id, cachedServer);
+                }
                 logger_1.default.info(reason, {
                     context: this.constructor.name,
                 });
-            });
+            }));
         });
     }
     embedDefaultTicTacToeBoard(player1, player2) {
         return new discord_js_1.MessageEmbed()
-            .setTitle(`❌⭕ Gato:3 ❌⭕`)
+            .setTitle(`:x::o: Gato:3 :x::o:`)
             .setColor(configuration_1.default.embedMessageColor)
             .setDescription('Tres en raya | Michi | Triqui | Gato | Cuadritos | Tictactoe | Whatever')
             .addField('Challengers', `${player1.username} V/S ${player2.username}`, false)
