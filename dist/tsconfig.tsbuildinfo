@@ -402,8 +402,8 @@
         "affectsGlobalScope": false
       },
       "../src/config/configuration.ts": {
-        "version": "789e30cba3c0f5b1723564125425a8a6de9a7418b14e56fbceadf51058ed1391",
-        "signature": "3bad4f84966e6a09d846ee733b5e243491d370a2c038a1a470e80f06443b4d76",
+        "version": "2b91d364be606148d35535c6c0582055e350b904d8e6ff1edac8e2fe4c2bd85f",
+        "signature": "32652ef9738150f9ea9dd776c726848bb8fc4bef27e95d2f5fbfc060bffa8d21",
         "affectsGlobalScope": false
       },
       "../node_modules/@discordjs/collection/dist/index.d.ts": {
@@ -421,14 +421,149 @@
         "signature": "fa554450a9e011d65a1c58f5b447d4f7384e512e7495d48b780bbcd7bb4e8981",
         "affectsGlobalScope": false
       },
+      "../node_modules/@types/bson/index.d.ts": {
+        "version": "2d23edce1d4a3b33280970484e17ca87b03e2829d8677ae1501de18269f0498f",
+        "signature": "2d23edce1d4a3b33280970484e17ca87b03e2829d8677ae1501de18269f0498f",
+        "affectsGlobalScope": false
+      },
+      "../node_modules/@types/mongodb/index.d.ts": {
+        "version": "6ff75ec3cfe71ea4f33c75508e5620eb166fa94571100ee1c35344c18993c216",
+        "signature": "6ff75ec3cfe71ea4f33c75508e5620eb166fa94571100ee1c35344c18993c216",
+        "affectsGlobalScope": false
+      },
+      "../node_modules/@types/mongoose/index.d.ts": {
+        "version": "f84843d41e84794bcba963d489bf2f9385836658bcccf73c501754be09327d7f",
+        "signature": "f84843d41e84794bcba963d489bf2f9385836658bcccf73c501754be09327d7f",
+        "affectsGlobalScope": false
+      },
+      "../node_modules/reflect-metadata/index.d.ts": {
+        "version": "8d6d51a5118d000ed3bfe6e1dd1335bebfff3fef23cd2af2f84a24d30f90cc90",
+        "signature": "8d6d51a5118d000ed3bfe6e1dd1335bebfff3fef23cd2af2f84a24d30f90cc90",
+        "affectsGlobalScope": true
+      },
+      "../node_modules/@typegoose/typegoose/lib/defaultClasses.d.ts": {
+        "version": "6305fe0c7a636dee0bc805572c3b4434b15df48033bc8099ed97d0b586b9b411",
+        "signature": "6305fe0c7a636dee0bc805572c3b4434b15df48033bc8099ed97d0b586b9b411",
+        "affectsGlobalScope": false
+      },
+      "../node_modules/@typegoose/typegoose/lib/internal/constants.d.ts": {
+        "version": "4711268e3cadac5eda16fd4fc42664bb903e484e1f244977a1da1847020bf956",
+        "signature": "4711268e3cadac5eda16fd4fc42664bb903e484e1f244977a1da1847020bf956",
+        "affectsGlobalScope": false
+      },
+      "../node_modules/@typegoose/typegoose/lib/types.d.ts": {
+        "version": "4e4e2c36263f1ee039ef565a4d664b1708d9e58a3825ecfd2ada005b3398f4b1",
+        "signature": "4e4e2c36263f1ee039ef565a4d664b1708d9e58a3825ecfd2ada005b3398f4b1",
+        "affectsGlobalScope": false
+      },
+      "../node_modules/@typegoose/typegoose/lib/globalOptions.d.ts": {
+        "version": "d220f5b9cd1eb13f0ea8695d95b16a98bfeff1e1b6f08f59d6492f8c2f4c4a2d",
+        "signature": "d220f5b9cd1eb13f0ea8695d95b16a98bfeff1e1b6f08f59d6492f8c2f4c4a2d",
+        "affectsGlobalScope": false
+      },
+      "../node_modules/loglevel/index.d.ts": {
+        "version": "47b04bde9f716e25d2f38f9d5f1afe47395ac523f7e3caf50a8a37f4c3b00560",
+        "signature": "47b04bde9f716e25d2f38f9d5f1afe47395ac523f7e3caf50a8a37f4c3b00560",
+        "affectsGlobalScope": false
+      },
+      "../node_modules/@typegoose/typegoose/lib/logSettings.d.ts": {
+        "version": "a8073882d24e2c886bd020a24d713c0d5339a5ef02880fc6ac37a8fbd8249ded",
+        "signature": "a8073882d24e2c886bd020a24d713c0d5339a5ef02880fc6ac37a8fbd8249ded",
+        "affectsGlobalScope": false
+      },
+      "../node_modules/@typegoose/typegoose/lib/prop.d.ts": {
+        "version": "48aaa855d0c941de5ba6b7137531edeaeb1d103d010916f104ba9c6a87e4ddd7",
+        "signature": "48aaa855d0c941de5ba6b7137531edeaeb1d103d010916f104ba9c6a87e4ddd7",
+        "affectsGlobalScope": false
+      },
+      "../node_modules/@typegoose/typegoose/lib/hooks.d.ts": {
+        "version": "c5705afb1d7ae6f76cd213f56a00105246c3f82acacfbdee6cef26611b6f4fd3",
+        "signature": "c5705afb1d7ae6f76cd213f56a00105246c3f82acacfbdee6cef26611b6f4fd3",
+        "affectsGlobalScope": false
+      },
+      "../node_modules/@typegoose/typegoose/lib/plugin.d.ts": {
+        "version": "67a323d2326c788a964e3eddb499a3127e9f40a117fd31b83efca14c56fdb54b",
+        "signature": "67a323d2326c788a964e3eddb499a3127e9f40a117fd31b83efca14c56fdb54b",
+        "affectsGlobalScope": false
+      },
+      "../node_modules/@typegoose/typegoose/lib/index.d.ts": {
+        "version": "32ab983dab85afb74c52dcfe63cac9bed9a97e68b374b7c0cad196b8dea41c44",
+        "signature": "32ab983dab85afb74c52dcfe63cac9bed9a97e68b374b7c0cad196b8dea41c44",
+        "affectsGlobalScope": false
+      },
+      "../node_modules/@typegoose/typegoose/lib/modelOptions.d.ts": {
+        "version": "3ffd867f0c22237ef2bd6d0d1a179381b5b9356f8b917817b7b1d6f731e5afb8",
+        "signature": "3ffd867f0c22237ef2bd6d0d1a179381b5b9356f8b917817b7b1d6f731e5afb8",
+        "affectsGlobalScope": false
+      },
+      "../node_modules/@typegoose/typegoose/lib/queryMethod.d.ts": {
+        "version": "e8428d240ffdf90e4f5db89456f101d23f4a2f6f3d18fa1264847ced73e6320a",
+        "signature": "e8428d240ffdf90e4f5db89456f101d23f4a2f6f3d18fa1264847ced73e6320a",
+        "affectsGlobalScope": false
+      },
+      "../node_modules/@typegoose/typegoose/lib/typeguards.d.ts": {
+        "version": "974f15c8b4d0d6b5f28591b4c19a4f0f0adcc3a771080f92bcb1ac9cbb64dc55",
+        "signature": "974f15c8b4d0d6b5f28591b4c19a4f0f0adcc3a771080f92bcb1ac9cbb64dc55",
+        "affectsGlobalScope": false
+      },
+      "../node_modules/@typegoose/typegoose/lib/internal/errors.d.ts": {
+        "version": "03906c066b497472c7931db3dd68b88d08b39b6ff1b37dce29847d153d6098f7",
+        "signature": "03906c066b497472c7931db3dd68b88d08b39b6ff1b37dce29847d153d6098f7",
+        "affectsGlobalScope": false
+      },
+      "../node_modules/@typegoose/typegoose/lib/internal/utils.d.ts": {
+        "version": "bf28c44eb934ce06cf4435ff97eee8bcf26190e9410ff4a93fc09e1c765e3ff5",
+        "signature": "bf28c44eb934ce06cf4435ff97eee8bcf26190e9410ff4a93fc09e1c765e3ff5",
+        "affectsGlobalScope": false
+      },
+      "../node_modules/@typegoose/typegoose/lib/typegoose.d.ts": {
+        "version": "c72271b2c6263f09f517606089c3fdd3569c6fafbb7e2c17ff03b22924cf0bed",
+        "signature": "c72271b2c6263f09f517606089c3fdd3569c6fafbb7e2c17ff03b22924cf0bed",
+        "affectsGlobalScope": false
+      },
+      "../src/database/models/user.model.ts": {
+        "version": "2b0691cb78f833c189ee1c25a2a8d770358ffd24b27aa0102af87a9b47aaa824",
+        "signature": "0727ddaa70e5d76db603dbf2779a4b22e9b863ed7d80937cf2dc362615ad2c3e",
+        "affectsGlobalScope": false
+      },
+      "../src/utils/resources/links.ts": {
+        "version": "ab5852f90bda7be221eb82b3955a723d2e1f50f930e315c8211d290ebd2deb12",
+        "signature": "f90340dac253b7d4f38e21cc718a2f45f77b7fe4dd12b962b67c01d18a487469",
+        "affectsGlobalScope": false
+      },
+      "../src/utils/roles.utils.ts": {
+        "version": "e9a78fd1713b4e993a3838ecdf60e2b79b3a23da8d9d6acd4e13b31bf54abbf5",
+        "signature": "f8579a7ce5a1941735d36affa5c68bb0c3f1e6448ff4131780ebba4a199eff3a",
+        "affectsGlobalScope": false
+      },
+      "../src/database/models/server.model.ts": {
+        "version": "2e27036f99b415040c73ac1496d6e30c35958878478dcd2c7bcb507a6622cbd6",
+        "signature": "20b7ed33b76e915dfde7438c9c21ed622ca80193310802a6c8f61f235b750a6a",
+        "affectsGlobalScope": false
+      },
+      "../src/database/dto/server.dto.ts": {
+        "version": "3d0bdbff8ef89f816be4d35149ab361ecd5d17134a51fe6633b7bd5639cb33ec",
+        "signature": "dd67dc7df6517d78413c12b5b3552e9ebbba6b591aa0ed95d3cdf52a4a0a43c5",
+        "affectsGlobalScope": false
+      },
+      "../src/database/mongo.ts": {
+        "version": "6161fe04b4d6728667712a74ae33f9d464d29665924e37f2ed82920df95214e6",
+        "signature": "b9ae4347dca3db707da0cd1784a3faad22f2afee5cc21a62104c5c771905a7b2",
+        "affectsGlobalScope": false
+      },
+      "../src/database/Cache.ts": {
+        "version": "510fd549a4135302457a76c52ace412c8f38e2490fcb4075443c5643f9560388",
+        "signature": "960d717e3dcddf556c0fc8b7d6a92181b1a6f8c0bca05f3c5703408b8a9c310b",
+        "affectsGlobalScope": false
+      },
       "../src/main.ts": {
-        "version": "e4151253c477dd8e58b637b4a1ce8a0cc50ae1a0a663592116ea6a6979c0ff7a",
-        "signature": "61101245bb9d6a5baf6076c910e362c1a617d9813414a5ec869324f6e0202b20",
+        "version": "db06c95217b1cf4c82f75aaa0a7f91187a1d003d7152793484bd757413dc4601",
+        "signature": "2130d3b72b94705ef012afc1f4d54ce8a4d2b443afd2c0f7d4e960872b5dafc7",
         "affectsGlobalScope": false
       },
       "../src/commands/games/cancelGame.ts": {
-        "version": "d19ee4323ba840ddfa99ff543a3b4ae13570f21c7639af8a21f17bab8dd0ea15",
-        "signature": "cbd656c2c69745ff2359323c70fc0b5094f33827a2c871bc0532a317517ab4f7",
+        "version": "92cfbb9855d5eab0dee10fb74e4aca72e068a9d98b9b6db1455e02eb833ead63",
+        "signature": "0d4db6668545a6713781fa71e94aadf571c030c47bef890190cd651adcb041ed",
         "affectsGlobalScope": false
       },
       "../src/commands/games/resources/QandA.ts": {
@@ -436,29 +571,44 @@
         "signature": "5b1228cd81d0a0f2c32246db65bce7611f6a649f6f6d2f01f99876d8510720aa",
         "affectsGlobalScope": false
       },
+      "../src/commands/games/resources/links.ts": {
+        "version": "7555e36638d8abecdc0283bae7b6ad36a4faabe9fdbc485e91319cf42c0413d4",
+        "signature": "4163568d6fb6b5d83c6ae7af51a20d684b3ae7523d3216f74546f50c81bf9a7c",
+        "affectsGlobalScope": false
+      },
       "../src/commands/games/tictactoe.ts": {
-        "version": "9cc1f0173371cfa47f296a341ae0cd41fb7d4d14ae27e8eff6ba4c9862d8e733",
-        "signature": "8bd90159859711c658f45dc92833aaaf9770d803c793247a2dde9b9541569d69",
+        "version": "d516d02fdf50780bb07c1e0eab3651fbf2d15dabc19104928a193bf61ea35b5e",
+        "signature": "35809b25d3352d6e9997208975aec1727f6176b30d550580e4d54fc02c3c0040",
+        "affectsGlobalScope": false
+      },
+      "../src/commands/games/tictactoeleaderboard.ts": {
+        "version": "fdda64156b12e07033b6a859f145b433e2ae657b8fab78758eb07ad49ff6998b",
+        "signature": "0579549fc0938d6fb641104d8c98b96cd310a3dce743afc01456459c67ceae83",
         "affectsGlobalScope": false
       },
       "../src/commands/misc/resources/links.ts": {
-        "version": "3de1786d75cf87eb25153cbedd34d2459a940272b988b70b6fd0bc8f637e5547",
-        "signature": "7695ea42d3275829bdd92a8b09598b61daf2606a48e0fcfeffcce3645e772a51",
+        "version": "ec5a5c66a43b60584d9522a01223c07bc0712ddb709ae65179b4b218a88f9487",
+        "signature": "dad3001ed3b93dd8c3f4ecd6667ae48866623c6bb40a3c364ed1186e539b97a6",
         "affectsGlobalScope": false
       },
       "../src/commands/misc/congratulate.ts": {
-        "version": "a6709cfc5d229a6e2e75853b621cc33eff9f6bb18230bc2d2ced73dff7f57568",
+        "version": "a903848dd52354472c97dcc265310bc82f9ae12edefa96ccea935dea40458851",
         "signature": "ccf70ed992c06de5b2a007d8dd3233fefecb785c9490746ccffff674ac9caf60",
         "affectsGlobalScope": false
       },
       "../src/commands/misc/resources/groupsDescriptions.ts": {
-        "version": "eb3c733ea712a49de8575a2e8e68f4679837b02c271b8d48962714b895914afe",
-        "signature": "4ee8f95b880eb1a56e778e17c6f6992accb3bd9f31c9c937b73b7b0386ac1fd3",
+        "version": "4fd6e0d7b9dd87a5c8eeffd0794b87e588467f9a4f7bd12b9f233f9fd5ce0f67",
+        "signature": "5454fcd7454c358d5fdd1a1c6e9ad71bb50ec04e11e07f2ed677a16f5c00b387",
         "affectsGlobalScope": false
       },
       "../src/commands/misc/help.ts": {
-        "version": "e36cb2d25155ed59a291c5cd6bc6fbb8fa8ea7c67ec02366fb532690789e4165",
+        "version": "54e05b6cc6f4c668e2862aa164998810cf10da4940e9b2907980459e60bfc8c4",
         "signature": "28190025a3b4b35bfcc1e0bb418b15ae80862d8f6f9f62dd34309de8979983e8",
+        "affectsGlobalScope": false
+      },
+      "../src/commands/misc/initChibiKnight.ts": {
+        "version": "0fe49789fc12a1be514a0c9b911ce309f2a304b248357522188a39252ade379d",
+        "signature": "964ae1c5d30f0695f43bd264b49814dee44428928a133ae77d2078999b1e030a",
         "affectsGlobalScope": false
       },
       "../src/commands/misc/say.ts": {
@@ -467,8 +617,33 @@
         "affectsGlobalScope": false
       },
       "../src/commands/misc/shameonyou.ts": {
-        "version": "afe1aefe9186e7a8a232df64d7dd5bebe050f2e2b2d23a53835b931f620479a0",
+        "version": "b538acaa48bf14ce3c9ba86d21bc5818993b3ad57284839e5f5a3b382ac7e1ae",
         "signature": "351c07a50bd9d40e020b3741b3bd0c715434b043d51d9fef678435231a1eee10",
+        "affectsGlobalScope": false
+      },
+      "../src/commands/roles/activateRoles.ts": {
+        "version": "3f06514f68ef41e5ec4607395b734b389f56f60fa2b0dd5dfff96f008797c581",
+        "signature": "40122ccc69ea474f192402ff78ff4e08d14b13a0821119b7ee54138b933358b4",
+        "affectsGlobalScope": false
+      },
+      "../src/commands/roles/myRoles.ts": {
+        "version": "4e5b5dbc6594a72a945dc9af9ec5d12da1f9f2a58fda6d1987067c858af6ba7f",
+        "signature": "b1c84a0d4892409366d8865c23f6f8621126af298be3a88d5212e5831a1f98cb",
+        "affectsGlobalScope": false
+      },
+      "../src/commands/roles/roles.ts": {
+        "version": "7e3fc746de4aa0d309d4897d42fdd1a5d6d1dcac104b1453d4fa8a328eb2b39e",
+        "signature": "8a0eb44c32e80fc512ac5e228bca4c41ac3bfab70b644df714a0db27b8d86bad",
+        "affectsGlobalScope": false
+      },
+      "../src/database/dto/user.dto.ts": {
+        "version": "d35c978d72e9a1cc00ffc0e2ba430d0d9350c805ca619686c62e776f208f10fe",
+        "signature": "195d98996c968efb94672d6597301f6270c0647e7ab6e2902172827a59517bc0",
+        "affectsGlobalScope": false
+      },
+      "../src/database/dto/index.ts": {
+        "version": "bd80455a587bd925c55e9e51f1d41c754d47adffdb6f682c3409e77629cc0f26",
+        "signature": "b6ac5087582c6cb27f28cb25e556242a07068ad2b886d405fd41128bda075eab",
         "affectsGlobalScope": false
       },
       "../node_modules/@types/eslint/helpers.d.ts": {
@@ -539,6 +714,73 @@
       "configFilePath": "../tsconfig.json"
     },
     "referencedMap": {
+      "../node_modules/@typegoose/typegoose/lib/defaultClasses.d.ts": [
+        "../node_modules/@typegoose/typegoose/lib/types.d.ts",
+        "../node_modules/@types/mongoose/index.d.ts"
+      ],
+      "../node_modules/@typegoose/typegoose/lib/globalOptions.d.ts": [
+        "../node_modules/@typegoose/typegoose/lib/types.d.ts"
+      ],
+      "../node_modules/@typegoose/typegoose/lib/hooks.d.ts": [
+        "../node_modules/@typegoose/typegoose/lib/types.d.ts",
+        "../node_modules/@types/mongoose/index.d.ts"
+      ],
+      "../node_modules/@typegoose/typegoose/lib/index.d.ts": [
+        "../node_modules/@typegoose/typegoose/lib/types.d.ts"
+      ],
+      "../node_modules/@typegoose/typegoose/lib/internal/utils.d.ts": [
+        "../node_modules/@typegoose/typegoose/lib/internal/constants.d.ts",
+        "../node_modules/@typegoose/typegoose/lib/types.d.ts",
+        "../node_modules/@types/mongoose/index.d.ts"
+      ],
+      "../node_modules/@typegoose/typegoose/lib/logSettings.d.ts": [
+        "../node_modules/loglevel/index.d.ts"
+      ],
+      "../node_modules/@typegoose/typegoose/lib/modelOptions.d.ts": [
+        "../node_modules/@typegoose/typegoose/lib/types.d.ts"
+      ],
+      "../node_modules/@typegoose/typegoose/lib/plugin.d.ts": [
+        "../node_modules/@typegoose/typegoose/lib/types.d.ts"
+      ],
+      "../node_modules/@typegoose/typegoose/lib/prop.d.ts": [
+        "../node_modules/@typegoose/typegoose/lib/internal/constants.d.ts",
+        "../node_modules/@typegoose/typegoose/lib/types.d.ts"
+      ],
+      "../node_modules/@typegoose/typegoose/lib/queryMethod.d.ts": [
+        "../node_modules/@typegoose/typegoose/lib/types.d.ts",
+        "../node_modules/@types/mongoose/index.d.ts"
+      ],
+      "../node_modules/@typegoose/typegoose/lib/typegoose.d.ts": [
+        "../node_modules/@typegoose/typegoose/lib/defaultClasses.d.ts",
+        "../node_modules/@typegoose/typegoose/lib/globalOptions.d.ts",
+        "../node_modules/@typegoose/typegoose/lib/hooks.d.ts",
+        "../node_modules/@typegoose/typegoose/lib/index.d.ts",
+        "../node_modules/@typegoose/typegoose/lib/internal/constants.d.ts",
+        "../node_modules/@typegoose/typegoose/lib/internal/errors.d.ts",
+        "../node_modules/@typegoose/typegoose/lib/internal/utils.d.ts",
+        "../node_modules/@typegoose/typegoose/lib/logSettings.d.ts",
+        "../node_modules/@typegoose/typegoose/lib/modelOptions.d.ts",
+        "../node_modules/@typegoose/typegoose/lib/plugin.d.ts",
+        "../node_modules/@typegoose/typegoose/lib/prop.d.ts",
+        "../node_modules/@typegoose/typegoose/lib/queryMethod.d.ts",
+        "../node_modules/@typegoose/typegoose/lib/typeguards.d.ts",
+        "../node_modules/@typegoose/typegoose/lib/types.d.ts",
+        "../node_modules/@types/mongoose/index.d.ts",
+        "../node_modules/reflect-metadata/index.d.ts"
+      ],
+      "../node_modules/@typegoose/typegoose/lib/typeguards.d.ts": [
+        "../node_modules/@typegoose/typegoose/lib/types.d.ts",
+        "../node_modules/@types/mongoose/index.d.ts"
+      ],
+      "../node_modules/@typegoose/typegoose/lib/types.d.ts": [
+        "../node_modules/@typegoose/typegoose/lib/defaultClasses.d.ts",
+        "../node_modules/@typegoose/typegoose/lib/internal/constants.d.ts",
+        "../node_modules/@types/mongoose/index.d.ts",
+        "../node_modules/@types/node/index.d.ts"
+      ],
+      "../node_modules/@types/bson/index.d.ts": [
+        "../node_modules/@types/node/index.d.ts"
+      ],
       "../node_modules/@types/eslint-scope/index.d.ts": [
         "../node_modules/@types/eslint/index.d.ts",
         "../node_modules/@types/estree/index.d.ts"
@@ -547,6 +789,20 @@
         "../node_modules/@types/eslint/helpers.d.ts",
         "../node_modules/@types/estree/index.d.ts",
         "../node_modules/@types/json-schema/index.d.ts"
+      ],
+      "../node_modules/@types/mongodb/index.d.ts": [
+        "../node_modules/@types/bson/index.d.ts",
+        "../node_modules/@types/node/events.d.ts",
+        "../node_modules/@types/node/index.d.ts",
+        "../node_modules/@types/node/stream.d.ts",
+        "../node_modules/@types/node/tls.d.ts"
+      ],
+      "../node_modules/@types/mongoose/index.d.ts": [
+        "../node_modules/@types/mongodb/index.d.ts",
+        "../node_modules/@types/mongoose/index.d.ts",
+        "../node_modules/@types/node/events.d.ts",
+        "../node_modules/@types/node/index.d.ts",
+        "../node_modules/@types/node/stream.d.ts"
       ],
       "../node_modules/@types/node/assert.d.ts": [
         "../node_modules/@types/node/assert.d.ts"
@@ -811,17 +1067,36 @@
         "../node_modules/winston-transport/index.d.ts"
       ],
       "../src/commands/games/cancelGame.ts": [
+        "../node_modules/@typegoose/typegoose/lib/typegoose.d.ts",
         "../node_modules/discord.js-commando/typings/index.d.ts",
         "../node_modules/discord.js/typings/index.d.ts",
+        "../src/database/models/server.model.ts",
+        "../src/database/mongo.ts",
+        "../src/logger.ts",
         "../src/main.ts"
       ],
       "../src/commands/games/tictactoe.ts": [
+        "../node_modules/@typegoose/typegoose/lib/typegoose.d.ts",
         "../node_modules/discord.js-commando/typings/index.d.ts",
         "../node_modules/discord.js/typings/index.d.ts",
         "../src/commands/games/resources/QandA.ts",
+        "../src/commands/games/resources/links.ts",
         "../src/config/configuration.ts",
+        "../src/database/models/server.model.ts",
+        "../src/database/models/user.model.ts",
+        "../src/database/mongo.ts",
         "../src/logger.ts",
-        "../src/main.ts"
+        "../src/main.ts",
+        "../src/utils/roles.utils.ts"
+      ],
+      "../src/commands/games/tictactoeleaderboard.ts": [
+        "../node_modules/@typegoose/typegoose/lib/typegoose.d.ts",
+        "../node_modules/discord.js-commando/typings/index.d.ts",
+        "../node_modules/discord.js/typings/index.d.ts",
+        "../src/config/configuration.ts",
+        "../src/database/models/user.model.ts",
+        "../src/database/mongo.ts",
+        "../src/logger.ts"
       ],
       "../src/commands/misc/congratulate.ts": [
         "../node_modules/discord.js-commando/typings/index.d.ts",
@@ -836,6 +1111,15 @@
         "../src/commands/misc/resources/groupsDescriptions.ts",
         "../src/config/configuration.ts"
       ],
+      "../src/commands/misc/initChibiKnight.ts": [
+        "../node_modules/@typegoose/typegoose/lib/typegoose.d.ts",
+        "../node_modules/discord.js-commando/typings/index.d.ts",
+        "../node_modules/discord.js/typings/index.d.ts",
+        "../src/config/configuration.ts",
+        "../src/database/models/server.model.ts",
+        "../src/database/mongo.ts",
+        "../src/logger.ts"
+      ],
       "../src/commands/misc/say.ts": [
         "../node_modules/discord.js-commando/typings/index.d.ts",
         "../node_modules/discord.js/typings/index.d.ts",
@@ -848,20 +1132,156 @@
         "../src/config/configuration.ts",
         "../src/logger.ts"
       ],
+      "../src/commands/roles/activateRoles.ts": [
+        "../node_modules/@typegoose/typegoose/lib/typegoose.d.ts",
+        "../node_modules/discord.js-commando/typings/index.d.ts",
+        "../node_modules/discord.js/typings/index.d.ts",
+        "../src/config/configuration.ts",
+        "../src/database/dto/server.dto.ts",
+        "../src/database/models/server.model.ts",
+        "../src/database/mongo.ts",
+        "../src/logger.ts",
+        "../src/main.ts",
+        "../src/utils/roles.utils.ts"
+      ],
+      "../src/commands/roles/myRoles.ts": [
+        "../node_modules/@typegoose/typegoose/lib/typegoose.d.ts",
+        "../node_modules/discord.js-commando/typings/index.d.ts",
+        "../node_modules/discord.js/typings/index.d.ts",
+        "../src/config/configuration.ts",
+        "../src/database/models/server.model.ts",
+        "../src/database/models/user.model.ts",
+        "../src/database/mongo.ts",
+        "../src/main.ts",
+        "../src/utils/roles.utils.ts"
+      ],
+      "../src/commands/roles/roles.ts": [
+        "../node_modules/@typegoose/typegoose/lib/typegoose.d.ts",
+        "../node_modules/discord.js-commando/typings/index.d.ts",
+        "../node_modules/discord.js/typings/index.d.ts",
+        "../src/config/configuration.ts",
+        "../src/database/models/server.model.ts",
+        "../src/database/mongo.ts",
+        "../src/main.ts",
+        "../src/utils/roles.utils.ts"
+      ],
       "../src/config/configuration.ts": [
         "../node_modules/dotenv/types/index.d.ts"
+      ],
+      "../src/database/Cache.ts": [
+        "../node_modules/@typegoose/typegoose/lib/typegoose.d.ts",
+        "../node_modules/discord.js-commando/typings/index.d.ts",
+        "../src/database/dto/server.dto.ts",
+        "../src/database/models/server.model.ts",
+        "../src/database/mongo.ts",
+        "../src/logger.ts"
+      ],
+      "../src/database/dto/index.ts": [
+        "../src/database/dto/server.dto.ts",
+        "../src/database/dto/user.dto.ts"
+      ],
+      "../src/database/models/server.model.ts": [
+        "../node_modules/@typegoose/typegoose/lib/typegoose.d.ts"
+      ],
+      "../src/database/models/user.model.ts": [
+        "../node_modules/@typegoose/typegoose/lib/typegoose.d.ts"
+      ],
+      "../src/database/mongo.ts": [
+        "../node_modules/@typegoose/typegoose/lib/typegoose.d.ts",
+        "../src/config/configuration.ts"
       ],
       "../src/logger.ts": [
         "../node_modules/winston/index.d.ts"
       ],
       "../src/main.ts": [
+        "../node_modules/@typegoose/typegoose/lib/typegoose.d.ts",
         "../node_modules/@types/node/path.d.ts",
         "../node_modules/discord.js-commando/typings/index.d.ts",
+        "../node_modules/discord.js/typings/index.d.ts",
         "../src/config/configuration.ts",
-        "../src/logger.ts"
+        "../src/database/Cache.ts",
+        "../src/database/models/server.model.ts",
+        "../src/database/models/user.model.ts",
+        "../src/database/mongo.ts",
+        "../src/logger.ts",
+        "../src/utils/roles.utils.ts"
+      ],
+      "../src/utils/roles.utils.ts": [
+        "../node_modules/discord.js-commando/typings/index.d.ts",
+        "../node_modules/discord.js/typings/index.d.ts",
+        "../src/config/configuration.ts",
+        "../src/logger.ts",
+        "../src/utils/resources/links.ts"
       ]
     },
     "exportedModulesMap": {
+      "../node_modules/@typegoose/typegoose/lib/defaultClasses.d.ts": [
+        "../node_modules/@typegoose/typegoose/lib/types.d.ts",
+        "../node_modules/@types/mongoose/index.d.ts"
+      ],
+      "../node_modules/@typegoose/typegoose/lib/globalOptions.d.ts": [
+        "../node_modules/@typegoose/typegoose/lib/types.d.ts"
+      ],
+      "../node_modules/@typegoose/typegoose/lib/hooks.d.ts": [
+        "../node_modules/@typegoose/typegoose/lib/types.d.ts",
+        "../node_modules/@types/mongoose/index.d.ts"
+      ],
+      "../node_modules/@typegoose/typegoose/lib/index.d.ts": [
+        "../node_modules/@typegoose/typegoose/lib/types.d.ts"
+      ],
+      "../node_modules/@typegoose/typegoose/lib/internal/utils.d.ts": [
+        "../node_modules/@typegoose/typegoose/lib/internal/constants.d.ts",
+        "../node_modules/@typegoose/typegoose/lib/types.d.ts",
+        "../node_modules/@types/mongoose/index.d.ts"
+      ],
+      "../node_modules/@typegoose/typegoose/lib/logSettings.d.ts": [
+        "../node_modules/loglevel/index.d.ts"
+      ],
+      "../node_modules/@typegoose/typegoose/lib/modelOptions.d.ts": [
+        "../node_modules/@typegoose/typegoose/lib/types.d.ts"
+      ],
+      "../node_modules/@typegoose/typegoose/lib/plugin.d.ts": [
+        "../node_modules/@typegoose/typegoose/lib/types.d.ts"
+      ],
+      "../node_modules/@typegoose/typegoose/lib/prop.d.ts": [
+        "../node_modules/@typegoose/typegoose/lib/internal/constants.d.ts",
+        "../node_modules/@typegoose/typegoose/lib/types.d.ts"
+      ],
+      "../node_modules/@typegoose/typegoose/lib/queryMethod.d.ts": [
+        "../node_modules/@typegoose/typegoose/lib/types.d.ts",
+        "../node_modules/@types/mongoose/index.d.ts"
+      ],
+      "../node_modules/@typegoose/typegoose/lib/typegoose.d.ts": [
+        "../node_modules/@typegoose/typegoose/lib/defaultClasses.d.ts",
+        "../node_modules/@typegoose/typegoose/lib/globalOptions.d.ts",
+        "../node_modules/@typegoose/typegoose/lib/hooks.d.ts",
+        "../node_modules/@typegoose/typegoose/lib/index.d.ts",
+        "../node_modules/@typegoose/typegoose/lib/internal/constants.d.ts",
+        "../node_modules/@typegoose/typegoose/lib/internal/errors.d.ts",
+        "../node_modules/@typegoose/typegoose/lib/internal/utils.d.ts",
+        "../node_modules/@typegoose/typegoose/lib/logSettings.d.ts",
+        "../node_modules/@typegoose/typegoose/lib/modelOptions.d.ts",
+        "../node_modules/@typegoose/typegoose/lib/plugin.d.ts",
+        "../node_modules/@typegoose/typegoose/lib/prop.d.ts",
+        "../node_modules/@typegoose/typegoose/lib/queryMethod.d.ts",
+        "../node_modules/@typegoose/typegoose/lib/typeguards.d.ts",
+        "../node_modules/@typegoose/typegoose/lib/types.d.ts",
+        "../node_modules/@types/mongoose/index.d.ts",
+        "../node_modules/reflect-metadata/index.d.ts"
+      ],
+      "../node_modules/@typegoose/typegoose/lib/typeguards.d.ts": [
+        "../node_modules/@typegoose/typegoose/lib/types.d.ts",
+        "../node_modules/@types/mongoose/index.d.ts"
+      ],
+      "../node_modules/@typegoose/typegoose/lib/types.d.ts": [
+        "../node_modules/@typegoose/typegoose/lib/defaultClasses.d.ts",
+        "../node_modules/@typegoose/typegoose/lib/internal/constants.d.ts",
+        "../node_modules/@types/mongoose/index.d.ts",
+        "../node_modules/@types/node/index.d.ts"
+      ],
+      "../node_modules/@types/bson/index.d.ts": [
+        "../node_modules/@types/node/index.d.ts"
+      ],
       "../node_modules/@types/eslint-scope/index.d.ts": [
         "../node_modules/@types/eslint/index.d.ts",
         "../node_modules/@types/estree/index.d.ts"
@@ -870,6 +1290,20 @@
         "../node_modules/@types/eslint/helpers.d.ts",
         "../node_modules/@types/estree/index.d.ts",
         "../node_modules/@types/json-schema/index.d.ts"
+      ],
+      "../node_modules/@types/mongodb/index.d.ts": [
+        "../node_modules/@types/bson/index.d.ts",
+        "../node_modules/@types/node/events.d.ts",
+        "../node_modules/@types/node/index.d.ts",
+        "../node_modules/@types/node/stream.d.ts",
+        "../node_modules/@types/node/tls.d.ts"
+      ],
+      "../node_modules/@types/mongoose/index.d.ts": [
+        "../node_modules/@types/mongodb/index.d.ts",
+        "../node_modules/@types/mongoose/index.d.ts",
+        "../node_modules/@types/node/events.d.ts",
+        "../node_modules/@types/node/index.d.ts",
+        "../node_modules/@types/node/stream.d.ts"
       ],
       "../node_modules/@types/node/assert.d.ts": [
         "../node_modules/@types/node/assert.d.ts"
@@ -1141,11 +1575,19 @@
         "../node_modules/discord.js-commando/typings/index.d.ts",
         "../node_modules/discord.js/typings/index.d.ts"
       ],
+      "../src/commands/games/tictactoeleaderboard.ts": [
+        "../node_modules/discord.js-commando/typings/index.d.ts",
+        "../node_modules/discord.js/typings/index.d.ts"
+      ],
       "../src/commands/misc/congratulate.ts": [
         "../node_modules/discord.js-commando/typings/index.d.ts",
         "../node_modules/discord.js/typings/index.d.ts"
       ],
       "../src/commands/misc/help.ts": [
+        "../node_modules/discord.js-commando/typings/index.d.ts",
+        "../node_modules/discord.js/typings/index.d.ts"
+      ],
+      "../src/commands/misc/initChibiKnight.ts": [
         "../node_modules/discord.js-commando/typings/index.d.ts",
         "../node_modules/discord.js/typings/index.d.ts"
       ],
@@ -1157,21 +1599,67 @@
         "../node_modules/discord.js-commando/typings/index.d.ts",
         "../node_modules/discord.js/typings/index.d.ts"
       ],
+      "../src/commands/roles/activateRoles.ts": [
+        "../node_modules/discord.js-commando/typings/index.d.ts",
+        "../node_modules/discord.js/typings/index.d.ts"
+      ],
+      "../src/commands/roles/myRoles.ts": [
+        "../node_modules/discord.js-commando/typings/index.d.ts",
+        "../node_modules/discord.js/typings/index.d.ts"
+      ],
+      "../src/commands/roles/roles.ts": [
+        "../node_modules/discord.js-commando/typings/index.d.ts",
+        "../node_modules/discord.js/typings/index.d.ts"
+      ],
+      "../src/database/Cache.ts": [
+        "../node_modules/discord.js-commando/typings/index.d.ts",
+        "../src/database/dto/server.dto.ts"
+      ],
+      "../src/database/dto/index.ts": [
+        "../src/database/dto/server.dto.ts",
+        "../src/database/dto/user.dto.ts"
+      ],
+      "../src/database/mongo.ts": [
+        "../node_modules/@typegoose/typegoose/lib/typegoose.d.ts"
+      ],
       "../src/logger.ts": [
         "../node_modules/winston/index.d.ts"
       ],
       "../src/main.ts": [
-        "../node_modules/discord.js-commando/typings/index.d.ts"
+        "../node_modules/discord.js-commando/typings/index.d.ts",
+        "../src/database/Cache.ts"
+      ],
+      "../src/utils/roles.utils.ts": [
+        "../node_modules/discord.js-commando/typings/index.d.ts",
+        "../node_modules/discord.js/typings/index.d.ts"
       ]
     },
     "semanticDiagnosticsPerFile": [
       "../node_modules/@discordjs/collection/dist/index.d.ts",
+      "../node_modules/@typegoose/typegoose/lib/defaultClasses.d.ts",
+      "../node_modules/@typegoose/typegoose/lib/globalOptions.d.ts",
+      "../node_modules/@typegoose/typegoose/lib/hooks.d.ts",
+      "../node_modules/@typegoose/typegoose/lib/index.d.ts",
+      "../node_modules/@typegoose/typegoose/lib/internal/constants.d.ts",
+      "../node_modules/@typegoose/typegoose/lib/internal/errors.d.ts",
+      "../node_modules/@typegoose/typegoose/lib/internal/utils.d.ts",
+      "../node_modules/@typegoose/typegoose/lib/logSettings.d.ts",
+      "../node_modules/@typegoose/typegoose/lib/modelOptions.d.ts",
+      "../node_modules/@typegoose/typegoose/lib/plugin.d.ts",
+      "../node_modules/@typegoose/typegoose/lib/prop.d.ts",
+      "../node_modules/@typegoose/typegoose/lib/queryMethod.d.ts",
+      "../node_modules/@typegoose/typegoose/lib/typegoose.d.ts",
+      "../node_modules/@typegoose/typegoose/lib/typeguards.d.ts",
+      "../node_modules/@typegoose/typegoose/lib/types.d.ts",
+      "../node_modules/@types/bson/index.d.ts",
       "../node_modules/@types/eslint-scope/index.d.ts",
       "../node_modules/@types/eslint/helpers.d.ts",
       "../node_modules/@types/eslint/index.d.ts",
       "../node_modules/@types/estree/index.d.ts",
       "../node_modules/@types/json-schema/index.d.ts",
       "../node_modules/@types/json5/index.d.ts",
+      "../node_modules/@types/mongodb/index.d.ts",
+      "../node_modules/@types/mongoose/index.d.ts",
       "../node_modules/@types/node/assert.d.ts",
       "../node_modules/@types/node/async_hooks.d.ts",
       "../node_modules/@types/node/base.d.ts",
@@ -1224,6 +1712,8 @@
       "../node_modules/discord.js/typings/index.d.ts",
       "../node_modules/dotenv/types/index.d.ts",
       "../node_modules/logform/index.d.ts",
+      "../node_modules/loglevel/index.d.ts",
+      "../node_modules/reflect-metadata/index.d.ts",
       "../node_modules/typescript/lib/lib.es2015.collection.d.ts",
       "../node_modules/typescript/lib/lib.es2015.core.d.ts",
       "../node_modules/typescript/lib/lib.es2015.d.ts",
@@ -1257,16 +1747,31 @@
       "../node_modules/winston/lib/winston/transports/index.d.ts",
       "../src/commands/games/cancelGame.ts",
       "../src/commands/games/resources/QandA.ts",
+      "../src/commands/games/resources/links.ts",
       "../src/commands/games/tictactoe.ts",
+      "../src/commands/games/tictactoeleaderboard.ts",
       "../src/commands/misc/congratulate.ts",
       "../src/commands/misc/help.ts",
+      "../src/commands/misc/initChibiKnight.ts",
       "../src/commands/misc/resources/groupsDescriptions.ts",
       "../src/commands/misc/resources/links.ts",
       "../src/commands/misc/say.ts",
       "../src/commands/misc/shameonyou.ts",
+      "../src/commands/roles/activateRoles.ts",
+      "../src/commands/roles/myRoles.ts",
+      "../src/commands/roles/roles.ts",
       "../src/config/configuration.ts",
+      "../src/database/Cache.ts",
+      "../src/database/dto/index.ts",
+      "../src/database/dto/server.dto.ts",
+      "../src/database/dto/user.dto.ts",
+      "../src/database/models/server.model.ts",
+      "../src/database/models/user.model.ts",
+      "../src/database/mongo.ts",
       "../src/logger.ts",
-      "../src/main.ts"
+      "../src/main.ts",
+      "../src/utils/resources/links.ts",
+      "../src/utils/roles.utils.ts"
     ]
   },
   "version": "4.2.3"

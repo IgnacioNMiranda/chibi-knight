@@ -33,7 +33,7 @@ export default class ShameOnYouCommand extends Command {
     args: { disrespectedPerson: User },
   ): Promise<Message> {
     // Obtains disrespected gif's urls.
-    const gifs = links[1].gifs;
+    const gifs = links.shameonyou.gifs;
     const randIndex = Math.floor(Math.random() * gifs.length);
 
     const embedMessage = new MessageEmbed()

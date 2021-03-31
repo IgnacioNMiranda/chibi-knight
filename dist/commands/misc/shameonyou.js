@@ -36,7 +36,7 @@ class ShameOnYouCommand extends discord_js_commando_1.Command {
     }
     run(message, args) {
         return __awaiter(this, void 0, void 0, function* () {
-            const gifs = links_1.links[1].gifs;
+            const gifs = links_1.links.shameonyou.gifs;
             const randIndex = Math.floor(Math.random() * gifs.length);
             const embedMessage = new discord_js_1.MessageEmbed()
                 .setDescription(`Shame on you! ${args.disrespectedPerson.username} !!`)

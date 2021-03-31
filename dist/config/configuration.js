@@ -22,10 +22,15 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const dotenv = __importStar(require("dotenv"));
 dotenv.config();
 const config = {
+    env: process.env.NODE_ENV || 'development',
+    appName: process.env.APP_NAME || 'Chibi Knight',
     clientId: process.env.CLIENT_ID,
     token: process.env.BOT_TOKEN,
-    prefix: process.env.PREFIX,
+    prefix: process.env.BOT_PREFIX,
     embedMessageColor: process.env.EMBED_MESSAGE_COLOR || 0x57a7ef,
+    mongodb: {
+        connection_url: process.env.MONGODB_CONNECTION,
+    },
 };
 exports.default = config;
 //# sourceMappingURL=configuration.js.map
