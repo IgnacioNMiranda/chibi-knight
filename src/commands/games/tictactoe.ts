@@ -4,7 +4,6 @@ import { QandA } from './resources/QandA';
 import { app } from '../../main';
 import configuration from '../../config/configuration';
 import logger from '../../logger';
-import mongoose from 'mongoose';
 import {
   DocumentType,
   getModelForClass,
@@ -12,6 +11,9 @@ import {
 } from '@typegoose/typegoose';
 import DbUser from '../../database/models/user.model';
 import { links } from './resources/links';
+import { defineRoles } from '../../utils/roles.utils';
+import { openMongoConnection } from '../../database/mongo';
+import Server from '../../database/models/server.model';
 
 /**
  * Starts a tic-tac-toe game.
@@ -20,6 +22,7 @@ export default class TicTacToeCommand extends Command {
   defaultSymbol: string;
   tictactoeBoard: string[];
   private readonly userRepository: ReturnModelType<typeof DbUser>;
+  private readonly serverRepository: ReturnModelType<typeof Server>;
 
   constructor(client: CommandoClient) {
     super(client, {
@@ -41,6 +44,7 @@ export default class TicTacToeCommand extends Command {
     this.defaultSymbol = ':purple_square:';
 
     this.userRepository = getModelForClass(DbUser);
+    this.serverRepository = getModelForClass(Server);
   }
 
   /**
@@ -51,11 +55,20 @@ export default class TicTacToeCommand extends Command {
     args: { player2: User },
   ): Promise<Message> {
     // Obtains the challenging player instance.
-    const player1 = message.author;
+    const { author: player1 } = message;
     const { player2 } = args;
 
+    let gameInstanceActive: boolean;
+    try {
+      gameInstanceActive = await app.cache.getGameInstanceActive(message);
+    } catch (error) {
+      return message.say(
+        'Error ): could not start game. Try again later :purple_heart:',
+      );
+    }
+
     // If there's already a game in course or a player challenged Chibi Knight or themself, the game cannot be executed.
-    if (app.gameInstanceActive) {
+    if (gameInstanceActive) {
       return message.say(`There's already a game in course ${player1}!`);
     } else if (player1.id === player2.id) {
       return message.say('You cannot challenge yourself ¬¬ ...');
@@ -90,14 +103,37 @@ export default class TicTacToeCommand extends Command {
           `Game cancelled ): Come back when you are brave enough, ${player2}.`,
         );
       } else if (receivedMsg === 'yes' || receivedMsg === 'y') {
-        app.gameInstanceActive = true;
-        this.ticTacToeInstance(message, player1, player2, QandAGames);
+        try {
+          const mongoose = await openMongoConnection();
+          const server = await this.serverRepository.findOne({
+            guildId: message.guild.id,
+          });
+          server.gameInstanceActive = true;
+          await server.save();
+          await mongoose.connection.close();
+
+          const cachedServer = app.cache.cache.get(message.guild.id);
+          if (cachedServer) {
+            cachedServer.gameInstanceActive = true;
+            app.cache.cache.set(message.guild.id, cachedServer);
+          }
+
+          this.ticTacToeInstance(message, player1, player2, QandAGames);
+        } catch (error) {
+          logger.error(
+            `MongoDB Connection error. Could not register change game instance active state for ${message.guild.name}`,
+            {
+              context: this.constructor.name,
+            },
+          );
+          return message.say(
+            'Error ): could not start game. Try again later :purple_heart:',
+          );
+        }
       }
     } else {
-      await message.say(`Time's up! ${player2.username} dont want to play ):`);
+      return message.say(`Time's up! ${player2.username} dont want to play ):`);
     }
-
-    return null;
   }
 
   /**
@@ -223,25 +259,30 @@ export default class TicTacToeCommand extends Command {
               },
             );
 
-            await mongoose.connect(configuration.mongodb.connection_url, {
-              useNewUrlParser: true,
-              useUnifiedTopology: true,
-              useCreateIndex: true,
-            });
-
+            const mongoose = await openMongoConnection();
+            const score = 20;
             const user: DocumentType<DbUser> = await this.userRepository
               .findOne({ discordId: winner.id })
               .exec();
             if (user) {
-              user.name = winner.username;
               user.tictactoeWins += 1;
+              user.participationScore += score;
               await user.save();
             } else {
-              const newUser: DbUser = new DbUser(winner.id, winner.username, 1);
+              const newUser: DbUser = new DbUser(
+                winner.id,
+                winner.username,
+                1,
+                score,
+              );
               await this.userRepository.create(newUser);
             }
+            await mongoose.connection.close();
 
-            await mongoose.disconnect();
+            const authorGuildMember = await message.guild.members.fetch(
+              winner.id,
+            );
+            defineRoles(user.participationScore, authorGuildMember, message);
             logger.info('Victory registered successfully', {
               context: this.constructor.name,
             });
@@ -256,11 +297,13 @@ export default class TicTacToeCommand extends Command {
         }
 
         newEmbedMessage.addField('Result :trophy:', result, false);
-        newEmbedMessage.addField(
-          'Consolation prize :second_place:',
-          `Don't worry ${loser}, this is for you:`,
-        );
-        newEmbedMessage.setImage(links.tictactoe.gifs[0]);
+        if (winner && loser) {
+          newEmbedMessage.addField(
+            'Consolation prize :second_place:',
+            `Don't worry ${loser}, this is for you:`,
+          );
+          newEmbedMessage.setImage(links.tictactoe.gifs[0]);
+        }
 
         /* sentEmbedMessage.channel.messages.fetch({limit: 5})
                     .then(messagesCollection => {
@@ -307,9 +350,31 @@ export default class TicTacToeCommand extends Command {
       }
     });
 
-    collector.on('end', (collected: any, reason: any) => {
+    collector.on('end', async (collected: any, reason: any) => {
       // Unlocks the game instance.
-      app.gameInstanceActive = false;
+      try {
+        const mongoose = await openMongoConnection();
+        const server = await this.serverRepository.findOne({
+          guildId: message.guild.id,
+        });
+        server.gameInstanceActive = false;
+        await server.save();
+        await mongoose.connection.close();
+      } catch (error) {
+        logger.error(
+          `MongoDB Connection error. Could not change game instance active for ${message.guild.name} server`,
+          {
+            context: this.constructor.name,
+          },
+        );
+      }
+
+      const cachedServer = app.cache.cache.get(message.guild.id);
+      if (cachedServer) {
+        cachedServer.gameInstanceActive = false;
+        app.cache.cache.set(message.guild.id, cachedServer);
+      }
+
       logger.info(reason, {
         context: this.constructor.name,
       });

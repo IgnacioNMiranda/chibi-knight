@@ -1,10 +1,10 @@
 import { getModelForClass, ReturnModelType } from '@typegoose/typegoose';
-import mongoose from 'mongoose';
 import { Message, MessageEmbed } from 'discord.js';
 import { Command, CommandoClient, CommandoMessage } from 'discord.js-commando';
 import configuration from '../../config/configuration';
 import DbUser from '../../database/models/user.model';
 import logger from '../../logger';
+import { openMongoConnection } from '../../database/mongo';
 
 /**
  * Displays the tictactoe game leaderboard.
@@ -29,12 +29,7 @@ export default class TicTacToeLeaderBoardCommand extends Command {
    */
   async run(message: CommandoMessage): Promise<Message> {
     try {
-      await mongoose.connect(configuration.mongodb.connection_url, {
-        useNewUrlParser: true,
-        useUnifiedTopology: true,
-        useCreateIndex: true,
-      });
-
+      const mongoose = await openMongoConnection();
       const topUsers = await this.userRepository
         .find({
           tictactoeWins: { $exists: true },
@@ -42,8 +37,7 @@ export default class TicTacToeLeaderBoardCommand extends Command {
         .limit(10)
         .sort({ tictactoeWins: -1 })
         .exec();
-
-      await mongoose.disconnect();
+      await mongoose.connection.close();
 
       const leaderboard = new MessageEmbed()
         .setTitle(`❌⭕ TicTacToe Leaderboard ❌⭕`)
@@ -81,7 +75,6 @@ export default class TicTacToeLeaderBoardCommand extends Command {
           context: this.constructor.name,
         },
       );
-      logger.error(error, { context: this.constructor.name });
       return message.say(
         'Sorry ): Could not retrieve tictactoe leaderboard. I failed you :sweat:',
       );
