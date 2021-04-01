@@ -4,6 +4,7 @@ import configuration from '../../config/configuration';
 import logger from '../../logger';
 import { Guild, User } from '../../database/models/index';
 import { app } from '../../main';
+import GuildData from '../../database/models/guildData.model';
 
 /**
  * Initialize bot funcionalities setting cache and adding server to BD.
@@ -12,7 +13,7 @@ export default class InitChibiKnightCommand extends Command {
   constructor(client: CommandoClient) {
     super(client, {
       name: 'initialize',
-      aliases: ['i'],
+      aliases: ['init'],
       group: 'misc',
       memberName: 'initialize',
       description: 'Initialize Chibi Knight funcionalities.',
@@ -54,17 +55,22 @@ export default class InitChibiKnightCommand extends Command {
         const guildMembers = await members.fetch();
         guildMembers.forEach(async ({ user }) => {
           if (!user.bot) {
+            const guildData: GuildData = { guildId };
             const bdUser = await app.userService.getById(user.id);
             if (bdUser) {
-              if (!bdUser.guilds.find((id) => id === guildId)) {
-                bdUser.guilds.push(guildId);
+              if (
+                !bdUser.guildsData.find(
+                  (guildData) => guildData.guildId === guildId,
+                )
+              ) {
+                bdUser.guildsData.push(guildData);
                 await bdUser.save();
               }
             } else {
               const newUser: User = {
                 discordId: user.id,
                 name: user.username,
-                guilds: [guildId],
+                guildsData: [guildData],
               };
               await app.userService.create(newUser);
             }

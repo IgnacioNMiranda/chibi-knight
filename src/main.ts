@@ -9,6 +9,7 @@ import Cache from './database/Cache';
 import { MongoConnection } from './database/mongo';
 import { TextChannel } from 'discord.js';
 import { GuildService, UserService } from './database/services/index';
+import GuildData from './database/models/guildData.model';
 
 class App {
   // Instance of the bot client.
@@ -152,7 +153,7 @@ class App {
 
             for (let i = 0; i < messageWords.length; i++) {
               const word = messageWords[i];
-              // Give 1 point for user interaction
+              // Give 2 points for user interaction
               if (word.match(userRegex)) {
                 // <@! userId >
                 const userId = word.substring(3, word.length - 1);
@@ -177,24 +178,33 @@ class App {
               const user: DocumentType<DbUser> = await this.userService.getById(
                 author.id,
               );
+
+              let finalParticipationScore = score;
               if (user) {
-                user.participationScore += score;
+                const guildDataIdx = user.guildsData.findIndex(
+                  (guildData) => guildData.guildId === guildId,
+                );
+                user.guildsData[guildDataIdx].participationScore += score;
+                finalParticipationScore =
+                  user.guildsData[guildDataIdx].participationScore;
                 await user.save();
               } else {
-                const newUser: DbUser = new DbUser(
-                  author.id,
-                  author.username,
-                  [guildId],
-                  0,
-                  score,
-                );
+                const guildData: GuildData = {
+                  guildId,
+                  participationScore: score,
+                };
+                const newUser: DbUser = {
+                  discordId: author.id,
+                  name: author.username,
+                  guildsData: [guildData],
+                };
                 await this.userService.create(newUser);
               }
 
               const authorGuildMember = await message.guild.members.fetch(
                 author.id,
               );
-              defineRoles(user.participationScore, authorGuildMember, message);
+              defineRoles(finalParticipationScore, authorGuildMember, message);
             } catch (error) {
               logger.error(
                 `MongoDB Connection error. Could not register ${author.username}'s words points`,

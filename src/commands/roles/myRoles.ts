@@ -27,13 +27,14 @@ export default class MyRolesCommand extends Command {
 
     const { id: guildId } = message.guild;
     const cachedGuild = app.cache.getGuildById(guildId);
-    if (!cachedGuild?.rolesActivated) {
+
+    if (cachedGuild && !cachedGuild.rolesActivated) {
       return message.say(activatedRolesError);
     }
 
     try {
       const guild = await app.guildService.getById(guildId);
-      if (!guild?.rolesActivated) {
+      if (guild && !guild.rolesActivated) {
         return message.say(activatedRolesError);
       }
     } catch (error) {
@@ -64,7 +65,10 @@ export default class MyRolesCommand extends Command {
     let score = 'Who knows D:';
     try {
       const user = await app.userService.getById(id);
-      score = user.participationScore.toString();
+      const guildData = user.guildsData.find(
+        (guildData) => guildData.guildId === guildId,
+      );
+      score = guildData.participationScore.toString();
     } catch (error) {}
 
     const embedMessage = new MessageEmbed()

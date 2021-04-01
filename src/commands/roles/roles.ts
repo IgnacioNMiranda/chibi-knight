@@ -25,15 +25,16 @@ export default class RolesCommand extends Command {
   async run(message: CommandoMessage): Promise<Message> {
     const activatedRolesError = `${configuration.appName}'s roles are not activated. First, you have to run ${configuration.prefix}activateroles.`;
 
-    const { id } = message.guild;
-    const cachedGuild = app.cache.getGuildById(id);
-    if (!cachedGuild?.rolesActivated) {
+    const { id: guildId } = message.guild;
+    const cachedGuild = app.cache.getGuildById(guildId);
+
+    if (cachedGuild && !cachedGuild.rolesActivated) {
       return message.say(activatedRolesError);
     }
 
     try {
-      const guild = await app.guildService.getById(id);
-      if (!guild?.rolesActivated) {
+      const guild = await app.guildService.getById(guildId);
+      if (guild && !guild.rolesActivated) {
         return message.say(activatedRolesError);
       }
     } catch (error) {

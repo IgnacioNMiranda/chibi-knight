@@ -8,7 +8,8 @@ import { DocumentType } from '@typegoose/typegoose';
 import DbUser from '../../database/models/user.model';
 import { links } from './resources/links';
 import { defineRoles } from '../../utils/roles.utils';
-import Server from '../../database/models/guild.model';
+import { Guild } from '../../database/models/index';
+import GuildData from '../../database/models/guildData.model';
 
 /**
  * Starts a tic-tac-toe game.
@@ -105,7 +106,7 @@ export default class TicTacToeCommand extends Command {
             app.cache.setGuildById(id, cachedGuild);
           } else {
             const { guildId, rolesActivated, gameInstanceActive } = guild;
-            const cached: Server = {
+            const cached: Guild = {
               guildId,
               rolesActivated,
               gameInstanceActive,
@@ -255,29 +256,36 @@ export default class TicTacToeCommand extends Command {
               },
             );
 
-            const score = 20;
+            const score = 10;
+            let finalScore = score;
             const user: DocumentType<DbUser> = await app.userService.getById(
               winner.id,
             );
             if (user) {
-              user.tictactoeWins += 1;
-              user.participationScore += score;
+              const guildDataIdx = user.guildsData.findIndex(
+                (guildData) => guildData.guildId === guildId,
+              );
+              user.guildsData[guildDataIdx].participationScore += score;
+              user.guildsData[guildDataIdx].tictactoeWins += 1;
+              finalScore = user.guildsData[guildDataIdx].participationScore;
               await user.save();
             } else {
-              const newUser: DbUser = new DbUser(
-                winner.id,
-                winner.username,
-                [guildId],
-                1,
-                score,
-              );
+              const guildData: GuildData = {
+                guildId,
+                participationScore: score,
+              };
+              const newUser: DbUser = {
+                discordId: winner.id,
+                name: winner.username,
+                guildsData: [guildData],
+              };
               await app.userService.create(newUser);
             }
 
             const authorGuildMember = await message.guild.members.fetch(
               winner.id,
             );
-            defineRoles(user.participationScore, authorGuildMember, message);
+            defineRoles(finalScore, authorGuildMember, message);
             logger.info('Victory registered successfully', {
               context: this.constructor.name,
             });

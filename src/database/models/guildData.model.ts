@@ -1,21 +1,21 @@
 import { index, prop } from '@typegoose/typegoose';
 
 @index({ guildId: 'text' }, { weights: { guildId: 1 } })
-export default class Guild {
+export default class GuildData {
   @prop({
     type: String,
   })
   public guildId: string;
 
   @prop({
-    type: Boolean,
-    default: false,
+    type: Number,
+    default: 0,
   })
-  rolesActivated?: boolean;
+  public participationScore?: number;
 
   @prop({
-    type: Boolean,
-    default: false,
+    type: Number,
+    default: 0,
   })
-  public gameInstanceActive?: boolean;
+  public tictactoeWins?: number;
 }
