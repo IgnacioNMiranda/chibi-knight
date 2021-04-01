@@ -11,11 +11,6 @@ var __metadata = (this && this.__metadata) || function (k, v) {
 Object.defineProperty(exports, "__esModule", { value: true });
 const typegoose_1 = require("@typegoose/typegoose");
 let Guild = class Guild {
-    constructor(guildId, rolesActivated, gameInstanceActive) {
-        this.guildId = guildId;
-        this.rolesActivated = rolesActivated;
-        this.gameInstanceActive = gameInstanceActive;
-    }
 };
 __decorate([
     typegoose_1.prop({
@@ -38,8 +33,7 @@ __decorate([
     __metadata("design:type", Boolean)
 ], Guild.prototype, "gameInstanceActive", void 0);
 Guild = __decorate([
-    typegoose_1.index({ guildId: 'text' }, { weights: { guildId: 1 } }),
-    __metadata("design:paramtypes", [String, Boolean, Boolean])
+    typegoose_1.index({ guildId: 'text' }, { weights: { guildId: 1 } })
 ], Guild);
 exports.default = Guild;
 //# sourceMappingURL=guild.model.js.map

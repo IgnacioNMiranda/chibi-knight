@@ -17,7 +17,6 @@ const path_1 = __importDefault(require("path"));
 const configuration_1 = __importDefault(require("./config/configuration"));
 const discord_js_commando_1 = require("discord.js-commando");
 const logger_1 = __importDefault(require("./logger"));
-const user_model_1 = __importDefault(require("./database/models/user.model"));
 const roles_utils_1 = require("./utils/roles.utils");
 const Cache_1 = __importDefault(require("./database/Cache"));
 const mongo_1 = require("./database/mongo");
@@ -155,16 +154,28 @@ class App {
                         }
                         try {
                             const user = yield this.userService.getById(author.id);
+                            let finalParticipationScore = score;
                             if (user) {
-                                user.participationScore += score;
+                                const guildDataIdx = user.guildsData.findIndex((guildData) => guildData.guildId === guildId);
+                                user.guildsData[guildDataIdx].participationScore += score;
+                                finalParticipationScore =
+                                    user.guildsData[guildDataIdx].participationScore;
                                 yield user.save();
                             }
                             else {
-                                const newUser = new user_model_1.default(author.id, author.username, [guildId], 0, score);
+                                const guildData = {
+                                    guildId,
+                                    participationScore: score,
+                                };
+                                const newUser = {
+                                    discordId: author.id,
+                                    name: author.username,
+                                    guildsData: [guildData],
+                                };
                                 yield this.userService.create(newUser);
                             }
                             const authorGuildMember = yield message.guild.members.fetch(author.id);
-                            roles_utils_1.defineRoles(user.participationScore, authorGuildMember, message);
+                            roles_utils_1.defineRoles(finalParticipationScore, authorGuildMember, message);
                         }
                         catch (error) {
                             logger_1.default.error(`MongoDB Connection error. Could not register ${author.username}'s words points`, {
