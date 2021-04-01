@@ -55,6 +55,24 @@ class UserService {
             }
         });
     }
+    getByNestedFilter(unwind, filter, limit = 10, sort) {
+        return __awaiter(this, void 0, void 0, function* () {
+            try {
+                const mongo = yield main_1.app.mongoConnection.connect();
+                if (mongo) {
+                    return yield this.userRepository.aggregate([
+                        { $unwind: `$${unwind}` },
+                        { $match: filter },
+                        { $sort: sort },
+                        { $limit: limit },
+                    ]);
+                }
+            }
+            catch (error) {
+                throw error;
+            }
+        });
+    }
     getById(discordUserId) {
         return __awaiter(this, void 0, void 0, function* () {
             try {

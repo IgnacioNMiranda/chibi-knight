@@ -20,7 +20,7 @@ class InitChibiKnightCommand extends discord_js_commando_1.Command {
     constructor(client) {
         super(client, {
             name: 'initialize',
-            aliases: ['i'],
+            aliases: ['init'],
             group: 'misc',
             memberName: 'initialize',
             description: 'Initialize Chibi Knight funcionalities.',
@@ -48,10 +48,11 @@ class InitChibiKnightCommand extends discord_js_commando_1.Command {
                     const guildMembers = yield members.fetch();
                     guildMembers.forEach(({ user }) => __awaiter(this, void 0, void 0, function* () {
                         if (!user.bot) {
+                            const guildData = { guildId };
                             const bdUser = yield main_1.app.userService.getById(user.id);
                             if (bdUser) {
-                                if (!bdUser.guilds.find((id) => id === guildId)) {
-                                    bdUser.guilds.push(guildId);
+                                if (!bdUser.guildsData.find((guildData) => guildData.guildId === guildId)) {
+                                    bdUser.guildsData.push(guildData);
                                     yield bdUser.save();
                                 }
                             }
@@ -59,7 +60,7 @@ class InitChibiKnightCommand extends discord_js_commando_1.Command {
                                 const newUser = {
                                     discordId: user.id,
                                     name: user.username,
-                                    guilds: [guildId],
+                                    guildsData: [guildData],
                                 };
                                 yield main_1.app.userService.create(newUser);
                             }

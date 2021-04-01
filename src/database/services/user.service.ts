@@ -50,6 +50,27 @@ export default class UserService {
     }
   }
 
+  async getByNestedFilter(
+    unwind: string,
+    filter: any,
+    limit = 10,
+    sort: any,
+  ): Promise<any[]> {
+    try {
+      const mongo = await app.mongoConnection.connect();
+      if (mongo) {
+        return await this.userRepository.aggregate([
+          { $unwind: `$${unwind}` },
+          { $match: filter },
+          { $sort: sort },
+          { $limit: limit },
+        ]);
+      }
+    } catch (error) {
+      throw error;
+    }
+  }
+
   async getById(discordUserId: string): Promise<DocumentType<User>> {
     try {
       const mongo = await app.mongoConnection.connect();

@@ -521,9 +521,14 @@
         "signature": "c72271b2c6263f09f517606089c3fdd3569c6fafbb7e2c17ff03b22924cf0bed",
         "affectsGlobalScope": false
       },
+      "../src/database/models/guildData.model.ts": {
+        "version": "55c24ad009cde0951927b7067a00170088ad343ca9466a1007f15dd2f268ccad",
+        "signature": "58f67d5463c10b2e404c3391a61156a8547cd9963d7f419e6a43a4a299bb5745",
+        "affectsGlobalScope": false
+      },
       "../src/database/models/user.model.ts": {
-        "version": "68fb39ffa8efae11d5943387d9a6eace918a6b17320332506b2ba167168633bd",
-        "signature": "f0b2d26b7490c6ea117247603d22bbbd595823449680f54253630829f2f9b1a4",
+        "version": "d575fe2a25bd348d4c6fe0e911b66fe58a8e1614a1a9d0aef29b128ccd08a5e7",
+        "signature": "3b14384ca62e53920eaa52b482958aabcd3ca49ac66c47f899b029f6d836ad03",
         "affectsGlobalScope": false
       },
       "../src/utils/resources/links.ts": {
@@ -532,18 +537,18 @@
         "affectsGlobalScope": false
       },
       "../src/utils/roles.utils.ts": {
-        "version": "27ff2302005c02da6ff45ded74a810da1b34ebee43eefc9f67928cfeb7df54bd",
+        "version": "481596bfd35de170b20d204cc87717e4f6a8e63428d4b441370c713e38b5a8aa",
         "signature": "f8579a7ce5a1941735d36affa5c68bb0c3f1e6448ff4131780ebba4a199eff3a",
         "affectsGlobalScope": false
       },
       "../src/database/models/guild.model.ts": {
-        "version": "b8819af812023d97c7debce17134c1169aaab09ce7686568e136038bffce989f",
-        "signature": "09ef62e79f5fe93de828dd46617dbd71a992d2c2f2e2719d187977b2f7332a1f",
+        "version": "c662ddfd9ce78f2c0791ba02b74b1c1e74c7c3e2181f68e71e0e3694ce401c7f",
+        "signature": "8dbe6363c7869dfd799bf184d3126759ea5ddab14da08379a42460a96bd35d1a",
         "affectsGlobalScope": false
       },
       "../src/database/models/index.ts": {
-        "version": "7a0189f9a994d357638caf2982d2d5d9cd81202007f71c235ec2f61b6a71b45e",
-        "signature": "34f230faec7a6988b4e40a5e811e8ac7d45268e72e0c3414bf266596ab7e30f8",
+        "version": "151aed7fb50f3afc2a08e2d0520fc1a0c43c417bf498212c8638d7f466b33ccc",
+        "signature": "e48c058c8cc13638deda837088e1104cb96071d9c7964dbe223830961e12e417",
         "affectsGlobalScope": false
       },
       "../src/database/Cache.ts": {
@@ -562,8 +567,8 @@
         "affectsGlobalScope": false
       },
       "../src/database/services/user.service.ts": {
-        "version": "4886f38cf27891ccc08562769e8fe1ce604637a66ccf1baeec587c24bc0a5a78",
-        "signature": "b99261e3afa6dca262e823b67ceee791eeae540839f8d706f17af983cac563d1",
+        "version": "0864be5d020c455fe577a5bb0c8d7ce30eb11dfbb5dc6df219798d406c76812f",
+        "signature": "13fe62df1a083cf436bbd20323a110587c54e0b7fa5e73e634af36c111512032",
         "affectsGlobalScope": false
       },
       "../src/database/services/index.ts": {
@@ -572,7 +577,7 @@
         "affectsGlobalScope": false
       },
       "../src/main.ts": {
-        "version": "ab9e2c6ed4a531a5b15f50ccdf4e22df79aa267f82711da852e4cba459eee3ae",
+        "version": "0b442fcd6411b45fd4c04a968c5aa43dc3fdd7954c6dba9407d8cc00df32c70d",
         "signature": "435ea346d891abfea4c3f176a5263adc5484c2312a342d7b37a614aef0c1060e",
         "affectsGlobalScope": false
       },
@@ -592,12 +597,12 @@
         "affectsGlobalScope": false
       },
       "../src/commands/games/tictactoe.ts": {
-        "version": "e5011a2affe0e9d11c8767933ded8e860134362c743f157673b22b8c85c3679a",
+        "version": "a32340119a658f5fce4e0764ab378a89fa7310ecbf7a8d58ef46f37bccf01710",
         "signature": "75911b98bad5c249fe0b6965291c06a935798c692f8905ce04eb06e432fdbe8f",
         "affectsGlobalScope": false
       },
       "../src/commands/games/tictactoeleaderboard.ts": {
-        "version": "9fddd2af6d4090df9e31ccb5ed7acd0b63f2d9820755cdd1fa75767e58e7ba2d",
+        "version": "91d8c0b2ceb44df6b5401b17f97ad2aad7c53b9746af41073419bcf1cc0d0ed5",
         "signature": "53ffd5bd142b7ded257f620f03a53869df6c8a103ae655367fea4d5b062e0318",
         "affectsGlobalScope": false
       },
@@ -622,7 +627,7 @@
         "affectsGlobalScope": false
       },
       "../src/commands/misc/initChibiKnight.ts": {
-        "version": "e794b6802c43061f6d352cec03eab8a2c5c8c984345727e3e7b16446ef77b011",
+        "version": "0318cc57487b63894affbe8fa273246a0be4b9efc67e8eab521c751f36c59dc8",
         "signature": "ef9f091c487ad979349947ec42dde92a27b35df13e703d46a23b691db9a067ff",
         "affectsGlobalScope": false
       },
@@ -642,12 +647,12 @@
         "affectsGlobalScope": false
       },
       "../src/commands/roles/myRoles.ts": {
-        "version": "8fd585dc1e3b9e162c4920a4cdcc428681eddcbf1a7e7b7c18baa695b63bdb3f",
+        "version": "74e9cedd190fcfbc6dd9f505c97ab919039559b000d0a077561ad12e060163c9",
         "signature": "fea6f6f551c5bbbd18e9f2f298a82b9bc5a00ff709d832c8f62ad2875689ada7",
         "affectsGlobalScope": false
       },
       "../src/commands/roles/roles.ts": {
-        "version": "cd67bd8e13d18cf093ab1381371d9d3a81a4b0d6ab1d69067654c540b2a2124b",
+        "version": "4ef2510e6e8be643c099138a5caf0d92394a3b95802d82dbb00931a3a9e876ad",
         "signature": "91222fc0e9e5c47b878afbf5e13a3b66929cb6d02e6f2b91784e85fff2e00090",
         "affectsGlobalScope": false
       },
@@ -1085,7 +1090,8 @@
         "../src/commands/games/resources/QandA.ts",
         "../src/commands/games/resources/links.ts",
         "../src/config/configuration.ts",
-        "../src/database/models/guild.model.ts",
+        "../src/database/models/guildData.model.ts",
+        "../src/database/models/index.ts",
         "../src/database/models/user.model.ts",
         "../src/logger.ts",
         "../src/main.ts",
@@ -1115,6 +1121,7 @@
         "../node_modules/discord.js-commando/typings/index.d.ts",
         "../node_modules/discord.js/typings/index.d.ts",
         "../src/config/configuration.ts",
+        "../src/database/models/guildData.model.ts",
         "../src/database/models/index.ts",
         "../src/logger.ts",
         "../src/main.ts"
@@ -1166,12 +1173,17 @@
       "../src/database/models/guild.model.ts": [
         "../node_modules/@typegoose/typegoose/lib/typegoose.d.ts"
       ],
+      "../src/database/models/guildData.model.ts": [
+        "../node_modules/@typegoose/typegoose/lib/typegoose.d.ts"
+      ],
       "../src/database/models/index.ts": [
         "../src/database/models/guild.model.ts",
+        "../src/database/models/guildData.model.ts",
         "../src/database/models/user.model.ts"
       ],
       "../src/database/models/user.model.ts": [
-        "../node_modules/@typegoose/typegoose/lib/typegoose.d.ts"
+        "../node_modules/@typegoose/typegoose/lib/typegoose.d.ts",
+        "../src/database/models/guildData.model.ts"
       ],
       "../src/database/mongo.ts": [
         "../node_modules/@typegoose/typegoose/lib/typegoose.d.ts",
@@ -1201,6 +1213,7 @@
         "../node_modules/discord.js/typings/index.d.ts",
         "../src/config/configuration.ts",
         "../src/database/Cache.ts",
+        "../src/database/models/guildData.model.ts",
         "../src/database/models/user.model.ts",
         "../src/database/mongo.ts",
         "../src/database/services/index.ts",
@@ -1618,7 +1631,11 @@
       ],
       "../src/database/models/index.ts": [
         "../src/database/models/guild.model.ts",
+        "../src/database/models/guildData.model.ts",
         "../src/database/models/user.model.ts"
+      ],
+      "../src/database/models/user.model.ts": [
+        "../src/database/models/guildData.model.ts"
       ],
       "../src/database/mongo.ts": [
         "../node_modules/@typegoose/typegoose/lib/typegoose.d.ts"
@@ -1778,6 +1795,7 @@
       "../src/config/configuration.ts",
       "../src/database/Cache.ts",
       "../src/database/models/guild.model.ts",
+      "../src/database/models/guildData.model.ts",
       "../src/database/models/index.ts",
       "../src/database/models/user.model.ts",
       "../src/database/mongo.ts",

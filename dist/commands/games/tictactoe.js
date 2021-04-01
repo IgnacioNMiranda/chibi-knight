@@ -18,7 +18,6 @@ const QandA_1 = require("./resources/QandA");
 const main_1 = require("../../main");
 const configuration_1 = __importDefault(require("../../config/configuration"));
 const logger_1 = __importDefault(require("../../logger"));
-const user_model_1 = __importDefault(require("../../database/models/user.model"));
 const links_1 = require("./resources/links");
 const roles_utils_1 = require("../../utils/roles.utils");
 class TicTacToeCommand extends discord_js_commando_1.Command {
@@ -186,19 +185,30 @@ class TicTacToeCommand extends discord_js_commando_1.Command {
                             logger_1.default.info(`Registering ${winner.username}'s tictactoe victory...`, {
                                 context: this.constructor.name,
                             });
-                            const score = 20;
+                            const score = 10;
+                            let finalScore = score;
                             const user = yield main_1.app.userService.getById(winner.id);
                             if (user) {
-                                user.tictactoeWins += 1;
-                                user.participationScore += score;
+                                const guildDataIdx = user.guildsData.findIndex((guildData) => guildData.guildId === guildId);
+                                user.guildsData[guildDataIdx].participationScore += score;
+                                user.guildsData[guildDataIdx].tictactoeWins += 1;
+                                finalScore = user.guildsData[guildDataIdx].participationScore;
                                 yield user.save();
                             }
                             else {
-                                const newUser = new user_model_1.default(winner.id, winner.username, [guildId], 1, score);
+                                const guildData = {
+                                    guildId,
+                                    participationScore: score,
+                                };
+                                const newUser = {
+                                    discordId: winner.id,
+                                    name: winner.username,
+                                    guildsData: [guildData],
+                                };
                                 yield main_1.app.userService.create(newUser);
                             }
                             const authorGuildMember = yield message.guild.members.fetch(winner.id);
-                            roles_utils_1.defineRoles(user.participationScore, authorGuildMember, message);
+                            roles_utils_1.defineRoles(finalScore, authorGuildMember, message);
                             logger_1.default.info('Victory registered successfully', {
                                 context: this.constructor.name,
                             });

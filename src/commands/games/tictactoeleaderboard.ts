@@ -23,13 +23,12 @@ export default class TicTacToeLeaderBoardCommand extends Command {
    */
   async run(message: CommandoMessage): Promise<Message> {
     try {
-      const topUsers = await app.userService.getByFilter(
-        {
-          tictactoeWins: { $exists: true },
-          guilds: message.guild.id,
-        },
+      const { id: guildId } = message.guild;
+      const topUsers = await app.userService.getByNestedFilter(
+        'guildsData',
+        { 'guildsData.guildId': guildId },
         10,
-        { tictactoeWins: -1 },
+        { 'guildsData.tictactoeWins': -1 },
       );
 
       const leaderboard = new MessageEmbed()
@@ -54,7 +53,8 @@ export default class TicTacToeLeaderBoardCommand extends Command {
             break;
         }
         usernamesList.push(`${trophy ? trophy : ' '} ${user.name}`);
-        scoreList.push(user.tictactoeWins);
+
+        scoreList.push(user.guildsData.participationScore);
         position += 1;
       });
       leaderboard.addField('Positioning', usernamesList, true);
