@@ -30,10 +30,8 @@ class TicTacToeLeaderBoardCommand extends discord_js_commando_1.Command {
     run(message) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
-                const topUsers = yield main_1.app.userService.getByFilter({
-                    tictactoeWins: { $exists: true },
-                    guilds: message.guild.id,
-                }, 10, { tictactoeWins: -1 });
+                const { id: guildId } = message.guild;
+                const topUsers = yield main_1.app.userService.getByNestedFilter('guildsData', { 'guildsData.guildId': guildId }, 10, { 'guildsData.tictactoeWins': -1 });
                 const leaderboard = new discord_js_1.MessageEmbed()
                     .setTitle(`❌⭕ TicTacToe Leaderboard ❌⭕`)
                     .setColor(configuration_1.default.embedMessageColor)
@@ -55,7 +53,7 @@ class TicTacToeLeaderBoardCommand extends discord_js_commando_1.Command {
                             break;
                     }
                     usernamesList.push(`${trophy ? trophy : ' '} ${user.name}`);
-                    scoreList.push(user.tictactoeWins);
+                    scoreList.push(user.guildsData.participationScore);
                     position += 1;
                 });
                 leaderboard.addField('Positioning', usernamesList, true);

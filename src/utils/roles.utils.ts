@@ -76,10 +76,10 @@ function defineRoles(
   );
 
   // User has an unlockable role.
-  let nextAvailableRole: { name: string; requiredPoints: number };
-  availableBotRoles.forEach((role) => {
+  let nextAvailableRole: { name: string; requiredPoints: number } = roles.ZOTE;
+  availableBotRoles.forEach((role, idx) => {
     if (botRolesExistingInUser.find((botRole) => botRole.name === role.name)) {
-      nextAvailableRole = role;
+      nextAvailableRole = availableBotRoles[idx + 1];
     }
   });
 
@@ -104,14 +104,16 @@ function defineRoles(
 
 async function applyRole(role: Role, user: GuildMember, message: Message) {
   try {
-    await user.roles.add(role);
-    const embedMessage = new MessageEmbed()
-      .setColor(ROLE_COLOR)
-      .setImage(links.upgradeRole)
-      .setDescription(
-        `Congratulations ${user}, you have obtain the '${role.name}' role!`,
-      );
-    message.channel.send(embedMessage);
+    if (!user.roles.cache.get(role.id)) {
+      await user.roles.add(role);
+      const embedMessage = new MessageEmbed()
+        .setColor(ROLE_COLOR)
+        .setImage(links.upgradeRole)
+        .setDescription(
+          `Congratulations ${user}, you have obtain the '${role.name}' role!`,
+        );
+      message.channel.send(embedMessage);
+    }
   } catch (error) {
     const errMessage = `Failed '${role.name}' role assignation. I think I need more permissions ):`;
     logger.error(errMessage, { context: this.constructor.name });

@@ -8,30 +8,32 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
 var __metadata = (this && this.__metadata) || function (k, v) {
     if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 };
-var __importDefault = (this && this.__importDefault) || function (mod) {
-    return (mod && mod.__esModule) ? mod : { "default": mod };
-};
 Object.defineProperty(exports, "__esModule", { value: true });
 const typegoose_1 = require("@typegoose/typegoose");
-const guildData_model_1 = __importDefault(require("./guildData.model"));
-let User = class User {
+let GuildData = class GuildData {
 };
 __decorate([
-    typegoose_1.prop(String),
+    typegoose_1.prop({
+        type: String,
+    }),
     __metadata("design:type", String)
-], User.prototype, "discordId", void 0);
-__decorate([
-    typegoose_1.prop(String),
-    __metadata("design:type", String)
-], User.prototype, "name", void 0);
+], GuildData.prototype, "guildId", void 0);
 __decorate([
     typegoose_1.prop({
-        type: [guildData_model_1.default],
+        type: Number,
+        default: 0,
     }),
-    __metadata("design:type", Array)
-], User.prototype, "guildsData", void 0);
-User = __decorate([
-    typegoose_1.index({ discordId: 'text' }, { weights: { discordId: 1 } })
-], User);
-exports.default = User;
-//# sourceMappingURL=user.model.js.map
+    __metadata("design:type", Number)
+], GuildData.prototype, "participationScore", void 0);
+__decorate([
+    typegoose_1.prop({
+        type: Number,
+        default: 0,
+    }),
+    __metadata("design:type", Number)
+], GuildData.prototype, "tictactoeWins", void 0);
+GuildData = __decorate([
+    typegoose_1.index({ guildId: 'text' }, { weights: { guildId: 1 } })
+], GuildData);
+exports.default = GuildData;
+//# sourceMappingURL=guildData.model.js.map

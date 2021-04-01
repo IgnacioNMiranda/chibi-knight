@@ -33,12 +33,12 @@ class MyRolesCommand extends discord_js_commando_1.Command {
             const activatedRolesError = `${configuration_1.default.appName}'s roles are not activated. First, you have to run ${configuration_1.default.prefix}activateroles.`;
             const { id: guildId } = message.guild;
             const cachedGuild = main_1.app.cache.getGuildById(guildId);
-            if (!(cachedGuild === null || cachedGuild === void 0 ? void 0 : cachedGuild.rolesActivated)) {
+            if (cachedGuild && !cachedGuild.rolesActivated) {
                 return message.say(activatedRolesError);
             }
             try {
                 const guild = yield main_1.app.guildService.getById(guildId);
-                if (!(guild === null || guild === void 0 ? void 0 : guild.rolesActivated)) {
+                if (guild && !guild.rolesActivated) {
                     return message.say(activatedRolesError);
                 }
             }
@@ -61,7 +61,8 @@ class MyRolesCommand extends discord_js_commando_1.Command {
             let score = 'Who knows D:';
             try {
                 const user = yield main_1.app.userService.getById(id);
-                score = user.participationScore.toString();
+                const guildData = user.guildsData.find((guildData) => guildData.guildId === guildId);
+                score = guildData.participationScore.toString();
             }
             catch (error) { }
             const embedMessage = new discord_js_1.MessageEmbed()

@@ -78,10 +78,10 @@ function defineRoles(participationPoints, user, message) {
     const availableBotRoles = Object.values(roles);
     const botRolesExistingInUser = userRoles.filter((userRole) => availableBotRoles.find((role) => role.name === userRole.name) !==
         undefined);
-    let nextAvailableRole;
-    availableBotRoles.forEach((role) => {
+    let nextAvailableRole = roles.ZOTE;
+    availableBotRoles.forEach((role, idx) => {
         if (botRolesExistingInUser.find((botRole) => botRole.name === role.name)) {
-            nextAvailableRole = role;
+            nextAvailableRole = availableBotRoles[idx + 1];
         }
     });
     if (nextAvailableRole &&
@@ -100,12 +100,14 @@ exports.defineRoles = defineRoles;
 function applyRole(role, user, message) {
     return __awaiter(this, void 0, void 0, function* () {
         try {
-            yield user.roles.add(role);
-            const embedMessage = new discord_js_1.MessageEmbed()
-                .setColor(ROLE_COLOR)
-                .setImage(links_1.links.upgradeRole)
-                .setDescription(`Congratulations ${user}, you have obtain the '${role.name}' role!`);
-            message.channel.send(embedMessage);
+            if (!user.roles.cache.get(role.id)) {
+                yield user.roles.add(role);
+                const embedMessage = new discord_js_1.MessageEmbed()
+                    .setColor(ROLE_COLOR)
+                    .setImage(links_1.links.upgradeRole)
+                    .setDescription(`Congratulations ${user}, you have obtain the '${role.name}' role!`);
+                message.channel.send(embedMessage);
+            }
         }
         catch (error) {
             const errMessage = `Failed '${role.name}' role assignation. I think I need more permissions ):`;
