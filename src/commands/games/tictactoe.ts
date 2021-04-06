@@ -7,7 +7,7 @@ import logger from '../../logger';
 import { DocumentType } from '@typegoose/typegoose';
 import DbUser from '../../database/models/user.model';
 import { links } from './resources/links';
-import { defineRoles } from '../../utils/roles.utils';
+import { RoleUtil } from '../../utils/index';
 import { Guild } from '../../database/models/index';
 import GuildData from '../../database/models/guildData.model';
 
@@ -285,7 +285,7 @@ export default class TicTacToeCommand extends Command {
             const authorGuildMember = await message.guild.members.fetch(
               winner.id,
             );
-            defineRoles(finalScore, authorGuildMember, message);
+            RoleUtil.defineRoles(finalScore, authorGuildMember, message);
             logger.info('Victory registered successfully', {
               context: this.constructor.name,
             });

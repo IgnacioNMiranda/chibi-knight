@@ -17,7 +17,7 @@ const discord_js_commando_1 = require("discord.js-commando");
 const logger_1 = __importDefault(require("../../logger"));
 const main_1 = require("../../main");
 const configuration_1 = __importDefault(require("../../config/configuration"));
-const roles_utils_1 = require("../../utils/roles.utils");
+const index_1 = require("../../utils/index");
 class ActivateRolesCommand extends discord_js_commando_1.Command {
     constructor(client) {
         super(client, {
@@ -36,7 +36,7 @@ class ActivateRolesCommand extends discord_js_commando_1.Command {
                     return message.say(`You don't have permissions to run this command. Contact with an Administrator :sweat:`);
                 }
                 const { id: guildId } = message.guild;
-                const activatedRolesError = `You already have initialize ${configuration_1.default.appName}'s roles :relieved:`;
+                const activatedRolesError = `You already have initialize ${configuration_1.default.appName}'s roles :relieved: Check yours with **${configuration_1.default.prefix}myroles**.`;
                 const cachedGuild = main_1.app.cache.getGuildById(guildId);
                 if (cachedGuild === null || cachedGuild === void 0 ? void 0 : cachedGuild.rolesActivated) {
                     return message.say(activatedRolesError);
@@ -48,7 +48,7 @@ class ActivateRolesCommand extends discord_js_commando_1.Command {
                     }
                     else {
                         let rolesList = '';
-                        const everyRole = Object.values(roles_utils_1.roles);
+                        const everyRole = Object.values(index_1.RoleUtil.roles);
                         everyRole.forEach((role) => {
                             rolesList += `• ${role.name} \n`;
                         });
@@ -61,17 +61,20 @@ class ActivateRolesCommand extends discord_js_commando_1.Command {
                             .setFooter(`Do you really want to activate ${configuration_1.default.appName}'s roles ? (yes/y/no/n)`);
                         yield message.say(embedMessage);
                         const filter = (response) => {
-                            return response.author.id === message.author.id;
+                            const validAnswer = /yes|y|no|n/.test(response.content.toLowerCase());
+                            return response.author.id === message.author.id && validAnswer;
                         };
                         const collectedMessages = yield message.channel.awaitMessages(filter, {
                             max: 1,
                             time: 15000,
                         });
                         if (collectedMessages === null || collectedMessages === void 0 ? void 0 : collectedMessages.first()) {
-                            const receivedResponse = collectedMessages.first().content;
+                            const receivedResponse = collectedMessages
+                                .first()
+                                .content.toLowerCase();
                             if (receivedResponse === 'yes' || receivedResponse === 'y') {
                                 yield message.say(`Okay, we're working for you, meanwhile take a nap n.n`);
-                                const created = yield roles_utils_1.initRoles(message);
+                                const created = yield index_1.RoleUtil.initRoles(message);
                                 if (created) {
                                     guild.rolesActivated = true;
                                     yield guild.save();
@@ -81,13 +84,13 @@ class ActivateRolesCommand extends discord_js_commando_1.Command {
                                         rolesActivated: true,
                                     };
                                     main_1.app.cache.setGuildById(message.guild.id, cachedGuild);
-                                    return message.say(`Roles created successfully :purple_heart: Try to see yours with ${configuration_1.default.prefix}roles command.`);
+                                    return message.say(`Roles created successfully :purple_heart: Try to see yours with **${configuration_1.default.prefix}myroles** command.`);
                                 }
                                 else {
                                     return message.say(`Error while trying to create roles, maybe I don't have enough permissions :sweat:`);
                                 }
                             }
-                            else {
+                            else if (receivedResponse === 'no' || receivedResponse === 'n') {
                                 return message.say('Roger!');
                             }
                         }
@@ -97,7 +100,7 @@ class ActivateRolesCommand extends discord_js_commando_1.Command {
                     }
                 }
                 else {
-                    return message.say(`You have not run ${configuration_1.default.prefix}initialize command. You cannot activate roles before that.`);
+                    return message.say(`You have not run **${configuration_1.default.prefix}init** command. You cannot activate roles before that.`);
                 }
             }
             catch (error) {

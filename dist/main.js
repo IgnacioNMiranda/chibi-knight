@@ -17,10 +17,10 @@ const path_1 = __importDefault(require("path"));
 const configuration_1 = __importDefault(require("./config/configuration"));
 const discord_js_commando_1 = require("discord.js-commando");
 const logger_1 = __importDefault(require("./logger"));
-const roles_utils_1 = require("./utils/roles.utils");
+const index_1 = require("./utils/index");
 const Cache_1 = __importDefault(require("./database/Cache"));
 const mongo_1 = require("./database/mongo");
-const index_1 = require("./database/services/index");
+const index_2 = require("./database/services/index");
 class App {
     constructor() {
         this.initApplication();
@@ -55,8 +55,8 @@ class App {
         });
     }
     initServices() {
-        this.guildService = new index_1.GuildService();
-        this.userService = new index_1.UserService();
+        this.guildService = new index_2.GuildService();
+        this.userService = new index_2.UserService();
     }
     initClient() {
         return __awaiter(this, void 0, void 0, function* () {
@@ -175,7 +175,7 @@ class App {
                                 yield this.userService.create(newUser);
                             }
                             const authorGuildMember = yield message.guild.members.fetch(author.id);
-                            roles_utils_1.defineRoles(finalParticipationScore, authorGuildMember, message);
+                            index_1.RoleUtil.defineRoles(finalParticipationScore, authorGuildMember, message);
                         }
                         catch (error) {
                             logger_1.default.error(`MongoDB Connection error. Could not register ${author.username}'s words points`, {
@@ -190,7 +190,7 @@ class App {
             const channel = guild.channels.cache.find((channel) => channel.type === 'text' &&
                 channel.permissionsFor(guild.me).has('SEND_MESSAGES'));
             if (channel) {
-                channel.send(`Thanks for invite me to your server n.n please, first run the ${configuration_1.default.prefix}initialize command, I need it to work correctly (:`);
+                channel.send(`Thanks for invite me to your server n.n please, first run the **${configuration_1.default.prefix}init** command, I need it to work correctly (:`);
             }
         });
         this.client.on('guildDelete', (guild) => __awaiter(this, void 0, void 0, function* () {
@@ -200,6 +200,10 @@ class App {
                     context: this.constructor.name,
                 });
                 yield this.guildService.deleteById(guildId);
+                yield this.userService.deleteGuildDataById(guildId);
+                if (guild.me.permissions.has('MANAGE_ROLES')) {
+                    yield index_1.RoleUtil.removeRoles(guild);
+                }
                 logger_1.default.info(`${guild.name} leaved and deleted succesfully`, {
                     context: this.constructor.name,
                 });

@@ -42,7 +42,7 @@ class UserService {
             }
         });
     }
-    getByFilter(filter, limit = 10, sort) {
+    getByFilter(filter, limit = 10, sort = 1) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
                 const mongo = yield main_1.app.mongoConnection.connect();
@@ -93,6 +93,31 @@ class UserService {
                 if (mongo) {
                     return this.userRepository
                         .deleteOne({ discordId: discordUserId })
+                        .exec();
+                }
+            }
+            catch (error) {
+                throw error;
+            }
+        });
+    }
+    deleteGuildDataById(guildId) {
+        return __awaiter(this, void 0, void 0, function* () {
+            try {
+                const mongo = yield main_1.app.mongoConnection.connect();
+                if (mongo) {
+                    this.userRepository
+                        .updateMany({
+                        guildsData: {
+                            $elemMatch: {
+                                guildId,
+                            },
+                        },
+                    }, {
+                        $pull: {
+                            guildsData: { guildId },
+                        },
+                    })
                         .exec();
                 }
             }

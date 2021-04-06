@@ -1,7 +1,7 @@
 import { Message, MessageEmbed } from 'discord.js';
 import { Command, CommandoClient, CommandoMessage } from 'discord.js-commando';
 import configuration from '../../config/configuration';
-import { roles } from '../../utils/roles.utils';
+import { RoleUtil } from '../../utils/index';
 import { app } from '../../main';
 
 /**
@@ -52,7 +52,7 @@ export default class MyRolesCommand extends Command {
 
     let rolesList = '';
     let nextAvailableRole: { name: string; requiredPoints: number };
-    const rolesArray = Object.values(roles);
+    const rolesArray = Object.values(RoleUtil.roles);
     rolesArray.forEach((role, idx) => {
       if (userRoles.find((userRole) => userRole.name === role.name)) {
         rolesList += `• ${role.name} \n`;

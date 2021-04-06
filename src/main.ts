@@ -4,7 +4,7 @@ import { CommandoClient } from 'discord.js-commando';
 import logger from './logger';
 import { DocumentType } from '@typegoose/typegoose';
 import DbUser from './database/models/user.model';
-import { defineRoles } from './utils/roles.utils';
+import { RoleUtil } from './utils/index';
 import Cache from './database/Cache';
 import { MongoConnection } from './database/mongo';
 import { TextChannel } from 'discord.js';
@@ -204,7 +204,11 @@ class App {
               const authorGuildMember = await message.guild.members.fetch(
                 author.id,
               );
-              defineRoles(finalParticipationScore, authorGuildMember, message);
+              RoleUtil.defineRoles(
+                finalParticipationScore,
+                authorGuildMember,
+                message,
+              );
             } catch (error) {
               logger.error(
                 `MongoDB Connection error. Could not register ${author.username}'s words points`,
@@ -226,7 +230,7 @@ class App {
       );
       if (channel) {
         (channel as TextChannel).send(
-          `Thanks for invite me to your server n.n please, first run the ${configuration.prefix}initialize command, I need it to work correctly (:`,
+          `Thanks for invite me to your server n.n please, first run the **${configuration.prefix}init** command, I need it to work correctly (:`,
         );
       }
     });
@@ -241,6 +245,10 @@ class App {
           },
         );
         await this.guildService.deleteById(guildId);
+        await this.userService.deleteGuildDataById(guildId);
+        if (guild.me.permissions.has('MANAGE_ROLES')) {
+          await RoleUtil.removeRoles(guild);
+        }
         logger.info(`${guild.name} leaved and deleted succesfully`, {
           context: this.constructor.name,
         });
