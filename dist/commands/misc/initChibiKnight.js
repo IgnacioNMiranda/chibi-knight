@@ -19,10 +19,10 @@ const main_1 = require("../../main");
 class InitChibiKnightCommand extends discord_js_commando_1.Command {
     constructor(client) {
         super(client, {
-            name: 'initialize',
-            aliases: ['init'],
+            name: 'init',
+            aliases: ['i'],
             group: 'misc',
-            memberName: 'initialize',
+            memberName: 'init',
             description: 'Initialize Chibi Knight funcionalities.',
             hidden: true,
         });
@@ -69,7 +69,7 @@ class InitChibiKnightCommand extends discord_js_commando_1.Command {
                     logger_1.default.info(`'${message.guild.name}' users has been registered succesfully`, {
                         context: this.constructor.name,
                     });
-                    return message.say(`${configuration_1.default.appName} has been initialize successfully :purple_heart: check out the commands with ${configuration_1.default.prefix}help :smile:`);
+                    return message.say(`${configuration_1.default.appName} has been initialize successfully :purple_heart: check out the commands with **${configuration_1.default.prefix}help** :smile:`);
                 }
                 else {
                     return message.say(`${configuration_1.default.appName} has already been initialize n.n`);

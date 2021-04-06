@@ -19,7 +19,7 @@ const main_1 = require("../../main");
 const configuration_1 = __importDefault(require("../../config/configuration"));
 const logger_1 = __importDefault(require("../../logger"));
 const links_1 = require("./resources/links");
-const roles_utils_1 = require("../../utils/roles.utils");
+const index_1 = require("../../utils/index");
 class TicTacToeCommand extends discord_js_commando_1.Command {
     constructor(client) {
         super(client, {
@@ -208,7 +208,7 @@ class TicTacToeCommand extends discord_js_commando_1.Command {
                                 yield main_1.app.userService.create(newUser);
                             }
                             const authorGuildMember = yield message.guild.members.fetch(winner.id);
-                            roles_utils_1.defineRoles(finalScore, authorGuildMember, message);
+                            index_1.RoleUtil.defineRoles(finalScore, authorGuildMember, message);
                             logger_1.default.info('Victory registered successfully', {
                                 context: this.constructor.name,
                             });

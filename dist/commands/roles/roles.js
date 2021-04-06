@@ -16,7 +16,7 @@ const discord_js_1 = require("discord.js");
 const discord_js_commando_1 = require("discord.js-commando");
 const main_1 = require("../../main");
 const configuration_1 = __importDefault(require("../../config/configuration"));
-const roles_utils_1 = require("../../utils/roles.utils");
+const index_1 = require("../../utils/index");
 class RolesCommand extends discord_js_commando_1.Command {
     constructor(client) {
         super(client, {
@@ -50,7 +50,7 @@ class RolesCommand extends discord_js_commando_1.Command {
                 .setDescription(`:jack_o_lantern: Available ${configuration_1.default.appName}'s Roles :jack_o_lantern:`);
             let rolesList = '';
             let scoresList = '';
-            const availableRoles = Object.values(roles_utils_1.roles);
+            const availableRoles = Object.values(index_1.RoleUtil.roles);
             availableRoles.forEach((role) => {
                 rolesList += `• ${role.name} \n`;
                 scoresList += `${role.requiredPoints} \n`;

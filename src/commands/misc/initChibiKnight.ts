@@ -12,17 +12,17 @@ import GuildData from '../../database/models/guildData.model';
 export default class InitChibiKnightCommand extends Command {
   constructor(client: CommandoClient) {
     super(client, {
-      name: 'initialize',
-      aliases: ['init'],
+      name: 'init',
+      aliases: ['i'],
       group: 'misc',
-      memberName: 'initialize',
+      memberName: 'init',
       description: 'Initialize Chibi Knight funcionalities.',
       hidden: true,
     });
   }
 
   /**
-   * It executes when someone types the "initialize" command.
+   * It executes when someone types the "init" command.
    */
   async run(message: CommandoMessage): Promise<Message> {
     try {
@@ -83,7 +83,7 @@ export default class InitChibiKnightCommand extends Command {
           },
         );
         return message.say(
-          `${configuration.appName} has been initialize successfully :purple_heart: check out the commands with ${configuration.prefix}help :smile:`,
+          `${configuration.appName} has been initialize successfully :purple_heart: check out the commands with **${configuration.prefix}help** :smile:`,
         );
       } else {
         return message.say(

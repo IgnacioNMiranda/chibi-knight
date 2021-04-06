@@ -3,6 +3,7 @@ import {
   ReturnModelType,
   getModelForClass,
 } from '@typegoose/typegoose';
+import { Aggregate } from 'mongoose';
 import { app } from '../../main';
 import { User } from '../models/index';
 
@@ -38,7 +39,7 @@ export default class UserService {
   async getByFilter(
     filter: any,
     limit = 10,
-    sort: any,
+    sort = 1,
   ): Promise<DocumentType<User>[]> {
     try {
       const mongo = await app.mongoConnection.connect();
@@ -55,7 +56,7 @@ export default class UserService {
     filter: any,
     limit = 10,
     sort: any,
-  ): Promise<any[]> {
+  ): Promise<Aggregate<User[]>> {
     try {
       const mongo = await app.mongoConnection.connect();
       if (mongo) {
@@ -88,6 +89,32 @@ export default class UserService {
       if (mongo) {
         return this.userRepository
           .deleteOne({ discordId: discordUserId })
+          .exec();
+      }
+    } catch (error) {
+      throw error;
+    }
+  }
+
+  async deleteGuildDataById(guildId: string) {
+    try {
+      const mongo = await app.mongoConnection.connect();
+      if (mongo) {
+        this.userRepository
+          .updateMany(
+            {
+              guildsData: {
+                $elemMatch: {
+                  guildId,
+                },
+              },
+            },
+            {
+              $pull: {
+                guildsData: { guildId },
+              },
+            },
+          )
           .exec();
       }
     } catch (error) {
