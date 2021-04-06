@@ -2,7 +2,7 @@ import { Message, MessageEmbed } from 'discord.js';
 import { Command, CommandoClient, CommandoMessage } from 'discord.js-commando';
 import { app } from '../../main';
 import configuration from '../../config/configuration';
-import { roles } from '../../utils/roles.utils';
+import { RoleUtil } from '../../utils/index';
 
 /**
  * Displays information about roles and their respective scores.
@@ -51,7 +51,7 @@ export default class RolesCommand extends Command {
 
     let rolesList = '';
     let scoresList = '';
-    const availableRoles = Object.values(roles);
+    const availableRoles = Object.values(RoleUtil.roles);
     availableRoles.forEach((role) => {
       rolesList += `• ${role.name} \n`;
       scoresList += `${role.requiredPoints} \n`;

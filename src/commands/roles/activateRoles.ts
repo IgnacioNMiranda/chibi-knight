@@ -3,7 +3,7 @@ import { Command, CommandoClient, CommandoMessage } from 'discord.js-commando';
 import logger from '../../logger';
 import { app } from '../../main';
 import configuration from '../../config/configuration';
-import { roles, initRoles } from '../../utils/roles.utils';
+import { RoleUtil } from '../../utils/index';
 import { Guild } from '../../database/models';
 
 /**
@@ -35,7 +35,7 @@ export default class ActivateRolesCommand extends Command {
       }
 
       const { id: guildId } = message.guild;
-      const activatedRolesError = `You already have initialize ${configuration.appName}'s roles :relieved:`;
+      const activatedRolesError = `You already have initialize ${configuration.appName}'s roles :relieved: Check yours with **${configuration.prefix}myroles**.`;
       const cachedGuild = app.cache.getGuildById(guildId);
       if (cachedGuild?.rolesActivated) {
         return message.say(activatedRolesError);
@@ -47,7 +47,7 @@ export default class ActivateRolesCommand extends Command {
           return message.say(activatedRolesError);
         } else {
           let rolesList = '';
-          const everyRole = Object.values(roles);
+          const everyRole = Object.values(RoleUtil.roles);
           everyRole.forEach((role) => {
             rolesList += `• ${role.name} \n`;
           });
@@ -63,8 +63,11 @@ export default class ActivateRolesCommand extends Command {
             );
           await message.say(embedMessage);
 
-          const filter = (response: any) => {
-            return response.author.id === message.author.id;
+          const filter = (response: Message) => {
+            const validAnswer = /yes|y|no|n/.test(
+              response.content.toLowerCase(),
+            );
+            return response.author.id === message.author.id && validAnswer;
           };
           // Waits 15 seconds while types a valid answer (yes/y/no/n).
           const collectedMessages = await message.channel.awaitMessages(
@@ -76,12 +79,14 @@ export default class ActivateRolesCommand extends Command {
           );
 
           if (collectedMessages?.first()) {
-            const receivedResponse = collectedMessages.first().content;
+            const receivedResponse = collectedMessages
+              .first()
+              .content.toLowerCase();
             if (receivedResponse === 'yes' || receivedResponse === 'y') {
               await message.say(
                 `Okay, we're working for you, meanwhile take a nap n.n`,
               );
-              const created = await initRoles(message);
+              const created = await RoleUtil.initRoles(message);
               if (created) {
                 guild.rolesActivated = true;
                 await guild.save();
@@ -94,14 +99,14 @@ export default class ActivateRolesCommand extends Command {
                 app.cache.setGuildById(message.guild.id, cachedGuild);
 
                 return message.say(
-                  `Roles created successfully :purple_heart: Try to see yours with ${configuration.prefix}roles command.`,
+                  `Roles created successfully :purple_heart: Try to see yours with **${configuration.prefix}myroles** command.`,
                 );
               } else {
                 return message.say(
                   `Error while trying to create roles, maybe I don't have enough permissions :sweat:`,
                 );
               }
-            } else {
+            } else if (receivedResponse === 'no' || receivedResponse === 'n') {
               return message.say('Roger!');
             }
           } else {
@@ -110,7 +115,7 @@ export default class ActivateRolesCommand extends Command {
         }
       } else {
         return message.say(
-          `You have not run ${configuration.prefix}initialize command. You cannot activate roles before that.`,
+          `You have not run **${configuration.prefix}init** command. You cannot activate roles before that.`,
         );
       }
     } catch (error) {

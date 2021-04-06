@@ -50,7 +50,7 @@ export default class UserService {
     try {
       const mongo = await app.mongoConnection.connect();
       if (mongo) {
-        return this.guildRepository.deleteOne({ guildId }).exec();
+        this.guildRepository.deleteOne({ guildId }).exec();
       }
     } catch (error) {
       throw error;
