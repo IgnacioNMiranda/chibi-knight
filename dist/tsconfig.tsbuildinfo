@@ -536,9 +536,14 @@
         "signature": "f90340dac253b7d4f38e21cc718a2f45f77b7fe4dd12b962b67c01d18a487469",
         "affectsGlobalScope": false
       },
-      "../src/utils/roles.utils.ts": {
-        "version": "481596bfd35de170b20d204cc87717e4f6a8e63428d4b441370c713e38b5a8aa",
-        "signature": "f8579a7ce5a1941735d36affa5c68bb0c3f1e6448ff4131780ebba4a199eff3a",
+      "../src/utils/role.utils.ts": {
+        "version": "4abeeac76fae16b2240cfffeac580c7caf936dcb627e8cd2f6b3a2f8aa24b22b",
+        "signature": "eb4ae53f8e15153f5f42ad57e61ecedbcc9d3e3376ba5d4f6651741e9e4067c5",
+        "affectsGlobalScope": false
+      },
+      "../src/utils/index.ts": {
+        "version": "5e7ec450e2f78a762f7b3efe4119cc54f5221cdc314e7dbeb637956c341a6f95",
+        "signature": "d624f977204265a685b6dc1e5f6133a61012ccb427015058761d383af6082b73",
         "affectsGlobalScope": false
       },
       "../src/database/models/guild.model.ts": {
@@ -562,13 +567,13 @@
         "affectsGlobalScope": false
       },
       "../src/database/services/guild.service.ts": {
-        "version": "b81cfbc7a9489083bceaddb785f9a63e6398a1dc0cf635d78e625fc26f0fc5e6",
-        "signature": "65dd9c500f899ad93d50143046552378371b2e4d11e04d58feaa16e0069110e6",
+        "version": "06b06bebb92caf2ec318079f0f5fbb630172833149731cab4f7f099e74c94c62",
+        "signature": "3cc0f7a86917ec9e9db43078c55fd32c053f6d22a3342bcc51f66ced9021c815",
         "affectsGlobalScope": false
       },
       "../src/database/services/user.service.ts": {
-        "version": "0864be5d020c455fe577a5bb0c8d7ce30eb11dfbb5dc6df219798d406c76812f",
-        "signature": "13fe62df1a083cf436bbd20323a110587c54e0b7fa5e73e634af36c111512032",
+        "version": "726d0ea94caec5da4d1a81ca0a88a2d28cbd602ae48b149976d993fd3be5ed53",
+        "signature": "282685f5faed779b08ce696b00a78ff49ef8b9ecfcde69355555650b7dc50a35",
         "affectsGlobalScope": false
       },
       "../src/database/services/index.ts": {
@@ -577,7 +582,7 @@
         "affectsGlobalScope": false
       },
       "../src/main.ts": {
-        "version": "0b442fcd6411b45fd4c04a968c5aa43dc3fdd7954c6dba9407d8cc00df32c70d",
+        "version": "15e1864984504a281da1350422c139fec323660f81a829f342947df6e9908f73",
         "signature": "435ea346d891abfea4c3f176a5263adc5484c2312a342d7b37a614aef0c1060e",
         "affectsGlobalScope": false
       },
@@ -597,12 +602,12 @@
         "affectsGlobalScope": false
       },
       "../src/commands/games/tictactoe.ts": {
-        "version": "a32340119a658f5fce4e0764ab378a89fa7310ecbf7a8d58ef46f37bccf01710",
+        "version": "4ab96b162c7256d69bdfa7ddf8acaf968d0e4b0a1f239ebb84de4ed35b472b9d",
         "signature": "75911b98bad5c249fe0b6965291c06a935798c692f8905ce04eb06e432fdbe8f",
         "affectsGlobalScope": false
       },
       "../src/commands/games/tictactoeleaderboard.ts": {
-        "version": "91d8c0b2ceb44df6b5401b17f97ad2aad7c53b9746af41073419bcf1cc0d0ed5",
+        "version": "37bd51f32665c416668b88f6ab82747405722b1af5e4c4db42b920feb8d76286",
         "signature": "53ffd5bd142b7ded257f620f03a53869df6c8a103ae655367fea4d5b062e0318",
         "affectsGlobalScope": false
       },
@@ -627,7 +632,7 @@
         "affectsGlobalScope": false
       },
       "../src/commands/misc/initChibiKnight.ts": {
-        "version": "0318cc57487b63894affbe8fa273246a0be4b9efc67e8eab521c751f36c59dc8",
+        "version": "d145e5cf5c85b91940a0ef7c04c82e9044b50157d2b044f75334903e225f784d",
         "signature": "ef9f091c487ad979349947ec42dde92a27b35df13e703d46a23b691db9a067ff",
         "affectsGlobalScope": false
       },
@@ -642,17 +647,17 @@
         "affectsGlobalScope": false
       },
       "../src/commands/roles/activateRoles.ts": {
-        "version": "f5de32b335095ee3182d6290b836eabe1f38ca071098b3a58d4433ba50a12329",
+        "version": "0cb12bf0c2a865ec701f667382725d72bf725d2188e89d40988ee309eeedaab4",
         "signature": "87d2dcf23ae5af153c7e6aa2d9fd1534fccd9648ce6aec1c69bf30df9b08e05f",
         "affectsGlobalScope": false
       },
       "../src/commands/roles/myRoles.ts": {
-        "version": "74e9cedd190fcfbc6dd9f505c97ab919039559b000d0a077561ad12e060163c9",
+        "version": "3648be39c336c0ef531e7f5ce4f862071be0eb7d23e6ab4eb93f34fc3ae80b0b",
         "signature": "fea6f6f551c5bbbd18e9f2f298a82b9bc5a00ff709d832c8f62ad2875689ada7",
         "affectsGlobalScope": false
       },
       "../src/commands/roles/roles.ts": {
-        "version": "4ef2510e6e8be643c099138a5caf0d92394a3b95802d82dbb00931a3a9e876ad",
+        "version": "9bba08407427d69131beb2592594f335fa7986218e71d040fc2041dc47c937ba",
         "signature": "91222fc0e9e5c47b878afbf5e13a3b66929cb6d02e6f2b91784e85fff2e00090",
         "affectsGlobalScope": false
       },
@@ -1095,12 +1100,13 @@
         "../src/database/models/user.model.ts",
         "../src/logger.ts",
         "../src/main.ts",
-        "../src/utils/roles.utils.ts"
+        "../src/utils/index.ts"
       ],
       "../src/commands/games/tictactoeleaderboard.ts": [
         "../node_modules/discord.js-commando/typings/index.d.ts",
         "../node_modules/discord.js/typings/index.d.ts",
         "../src/config/configuration.ts",
+        "../src/database/models/index.ts",
         "../src/logger.ts",
         "../src/main.ts"
       ],
@@ -1145,21 +1151,21 @@
         "../src/database/models/index.ts",
         "../src/logger.ts",
         "../src/main.ts",
-        "../src/utils/roles.utils.ts"
+        "../src/utils/index.ts"
       ],
       "../src/commands/roles/myRoles.ts": [
         "../node_modules/discord.js-commando/typings/index.d.ts",
         "../node_modules/discord.js/typings/index.d.ts",
         "../src/config/configuration.ts",
         "../src/main.ts",
-        "../src/utils/roles.utils.ts"
+        "../src/utils/index.ts"
       ],
       "../src/commands/roles/roles.ts": [
         "../node_modules/discord.js-commando/typings/index.d.ts",
         "../node_modules/discord.js/typings/index.d.ts",
         "../src/config/configuration.ts",
         "../src/main.ts",
-        "../src/utils/roles.utils.ts"
+        "../src/utils/index.ts"
       ],
       "../src/config/configuration.ts": [
         "../node_modules/dotenv/types/index.d.ts"
@@ -1200,6 +1206,7 @@
       ],
       "../src/database/services/user.service.ts": [
         "../node_modules/@typegoose/typegoose/lib/typegoose.d.ts",
+        "../node_modules/@types/mongoose/index.d.ts",
         "../src/database/models/index.ts",
         "../src/main.ts"
       ],
@@ -1218,9 +1225,12 @@
         "../src/database/mongo.ts",
         "../src/database/services/index.ts",
         "../src/logger.ts",
-        "../src/utils/roles.utils.ts"
+        "../src/utils/index.ts"
       ],
-      "../src/utils/roles.utils.ts": [
+      "../src/utils/index.ts": [
+        "../src/utils/role.utils.ts"
+      ],
+      "../src/utils/role.utils.ts": [
         "../node_modules/discord.js-commando/typings/index.d.ts",
         "../node_modules/discord.js/typings/index.d.ts",
         "../src/config/configuration.ts",
@@ -1650,6 +1660,7 @@
       ],
       "../src/database/services/user.service.ts": [
         "../node_modules/@typegoose/typegoose/lib/typegoose.d.ts",
+        "../node_modules/@types/mongoose/index.d.ts",
         "../src/database/models/index.ts"
       ],
       "../src/logger.ts": [
@@ -1661,7 +1672,10 @@
         "../src/database/mongo.ts",
         "../src/database/services/index.ts"
       ],
-      "../src/utils/roles.utils.ts": [
+      "../src/utils/index.ts": [
+        "../src/utils/role.utils.ts"
+      ],
+      "../src/utils/role.utils.ts": [
         "../node_modules/discord.js-commando/typings/index.d.ts",
         "../node_modules/discord.js/typings/index.d.ts"
       ]
@@ -1804,8 +1818,9 @@
       "../src/database/services/user.service.ts",
       "../src/logger.ts",
       "../src/main.ts",
+      "../src/utils/index.ts",
       "../src/utils/resources/links.ts",
-      "../src/utils/roles.utils.ts"
+      "../src/utils/role.utils.ts"
     ]
   },
   "version": "4.2.3"

@@ -40,6 +40,7 @@ class TicTacToeLeaderBoardCommand extends discord_js_commando_1.Command {
                 const scoreList = [];
                 let position = 1;
                 topUsers.forEach((user) => {
+                    const { guildsData } = user;
                     let trophy;
                     switch (position) {
                         case 1:
@@ -53,7 +54,7 @@ class TicTacToeLeaderBoardCommand extends discord_js_commando_1.Command {
                             break;
                     }
                     usernamesList.push(`${trophy ? trophy : ' '} ${user.name}`);
-                    scoreList.push(user.guildsData.participationScore);
+                    scoreList.push(guildsData.tictactoeWins);
                     position += 1;
                 });
                 leaderboard.addField('Positioning', usernamesList, true);

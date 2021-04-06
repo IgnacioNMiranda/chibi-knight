@@ -15,7 +15,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const discord_js_1 = require("discord.js");
 const discord_js_commando_1 = require("discord.js-commando");
 const configuration_1 = __importDefault(require("../../config/configuration"));
-const roles_utils_1 = require("../../utils/roles.utils");
+const index_1 = require("../../utils/index");
 const main_1 = require("../../main");
 class MyRolesCommand extends discord_js_commando_1.Command {
     constructor(client) {
@@ -49,7 +49,7 @@ class MyRolesCommand extends discord_js_commando_1.Command {
             const userRoles = message.guild.members.cache.find((member) => member.id === id).roles.cache;
             let rolesList = '';
             let nextAvailableRole;
-            const rolesArray = Object.values(roles_utils_1.roles);
+            const rolesArray = Object.values(index_1.RoleUtil.roles);
             rolesArray.forEach((role, idx) => {
                 if (userRoles.find((userRole) => userRole.name === role.name)) {
                     rolesList += `• ${role.name} \n`;

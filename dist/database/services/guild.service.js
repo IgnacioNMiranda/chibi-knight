@@ -60,7 +60,7 @@ class UserService {
             try {
                 const mongo = yield main_1.app.mongoConnection.connect();
                 if (mongo) {
-                    return this.guildRepository.deleteOne({ guildId }).exec();
+                    this.guildRepository.deleteOne({ guildId }).exec();
                 }
             }
             catch (error) {
