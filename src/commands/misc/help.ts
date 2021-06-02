@@ -2,7 +2,7 @@
 import { Command, CommandoClient, CommandoMessage } from 'discord.js-commando';
 import { Message, MessageEmbed } from 'discord.js';
 import { groupsDescriptions } from './resources/groupsDescriptions';
-import configuration from '../../config/configuration';
+import { configuration } from '../../config/configuration';
 
 /**
  * Sends an embed message with information of every existing command.

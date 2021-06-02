@@ -1,5 +1,5 @@
 import { mongoose } from '@typegoose/typegoose';
-import configuration from '../config/configuration';
+import { configuration } from '../config/configuration';
 
 export class MongoConnection {
   private mongo: typeof mongoose;

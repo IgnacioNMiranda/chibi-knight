@@ -1,8 +1,8 @@
 import { Message, MessageEmbed } from 'discord.js';
 import { Command, CommandoClient, CommandoMessage } from 'discord.js-commando';
 import { app } from '../../main';
-import configuration from '../../config/configuration';
-import logger from '../../logger';
+import { configuration } from '../../config/configuration';
+import { logger } from '../../logger';
 import { User } from '../../database/models';
 
 /**

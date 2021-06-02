@@ -1,6 +1,6 @@
 import { Guild, GuildMember, Message, MessageEmbed, Role } from 'discord.js';
-import logger from '../logger';
-import configuration from '../config/configuration';
+import { logger } from '../logger';
+import { configuration } from '../config/configuration';
 import { links } from './resources/links';
 import { CommandoMessage } from 'discord.js-commando';
 
