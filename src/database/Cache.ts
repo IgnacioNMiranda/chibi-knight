@@ -1,6 +1,6 @@
 import { CommandoMessage } from 'discord.js-commando';
 import { app } from '../main';
-import logger from '../logger';
+import { logger } from '../logger';
 import { Guild } from './models';
 
 export default class Cache {
@@ -27,7 +27,7 @@ export default class Cache {
           rolesActivated,
           gameInstanceActive,
         };
-        this.setGuildById(guildId, cachedGuild);
+        this.set(guildId, cachedGuild);
       });
     } catch (error) {
       logger.error(
@@ -44,17 +44,17 @@ export default class Cache {
     this.cache = new Map<string, Guild>();
   }
 
-  getGuildById(guildId: string): Guild {
-    return this.cache.get(guildId);
+  get(resourceId: string): any {
+    return this.cache.get(resourceId);
   }
 
-  setGuildById(guildId: string, guild: Guild) {
-    return this.cache.set(guildId, guild);
+  set(resourceId: string, resource: any) {
+    return this.cache.set(resourceId, resource);
   }
 
   async getGameInstanceActive(message: CommandoMessage): Promise<any> {
     const { id: guildId } = message.guild;
-    const cachedGuild = this.getGuildById(guildId);
+    const cachedGuild = this.get(guildId);
     if (cachedGuild) {
       return cachedGuild.gameInstanceActive;
     } else {

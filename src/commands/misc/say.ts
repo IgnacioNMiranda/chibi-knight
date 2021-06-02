@@ -1,6 +1,6 @@
 import { Message } from 'discord.js';
 import { Command, CommandoClient, CommandoMessage } from 'discord.js-commando';
-import logger from '../../logger';
+import { logger } from '../../logger';
 
 /**
  * Replies the receives message on command.

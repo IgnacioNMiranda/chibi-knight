@@ -1,6 +1,6 @@
 import { Message, MessageEmbed } from 'discord.js';
 import { Command, CommandoClient, CommandoMessage } from 'discord.js-commando';
-import configuration from '../../config/configuration';
+import { configuration } from '../../config/configuration';
 import { RoleUtil } from '../../utils/index';
 import { app } from '../../main';
 
@@ -26,7 +26,7 @@ export default class MyRolesCommand extends Command {
     const activatedRolesError = `${configuration.appName}'s roles are not activated. First, you have to run ${configuration.prefix}activateroles.`;
 
     const { id: guildId } = message.guild;
-    const cachedGuild = app.cache.getGuildById(guildId);
+    const cachedGuild = app.cache.get(guildId);
 
     if (cachedGuild && !cachedGuild.rolesActivated) {
       return message.say(activatedRolesError);
