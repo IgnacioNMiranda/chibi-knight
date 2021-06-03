@@ -114,11 +114,14 @@ class App {
     this.client.on('error', console.error).on('warn', console.warn);
 
     this.client.on('message', async (message) => {
-      const { id: guildId } = message.guild;
       if (
         !message.author.bot &&
         !message.content.startsWith(configuration.prefix)
       ) {
+        if (message.guild === null) {
+          return;
+        }
+        const { id: guildId } = message.guild;
         let rolesActivated = false;
         const cachedGuild = this.cache.get(guildId);
         if (cachedGuild) {
