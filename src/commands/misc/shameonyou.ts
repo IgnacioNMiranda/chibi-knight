@@ -45,9 +45,7 @@ export default class ShameOnYouCommand extends Command {
       await message.say(embedMessage);
       await message.delete();
     } catch (error) {
-      logger.error(error, {
-        context: this.constructor.name,
-      });
+      // If bot cannot delete messages.
     }
     return;
   }

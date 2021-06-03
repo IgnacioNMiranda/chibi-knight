@@ -25,6 +25,9 @@ export default class ActivateRolesCommand extends Command {
    */
   async run(message: CommandoMessage): Promise<Message> {
     try {
+      if (!message.guild) {
+        return message.say(`We cannot have roles here ¬¬`);
+      }
       const user: GuildMember = await message.guild.members.fetch(
         message.author.id,
       );
@@ -82,8 +85,8 @@ export default class ActivateRolesCommand extends Command {
             await message.say(
               `Okay, we're working for you, meanwhile take a nap n.n`,
             );
-            const created = await RoleUtil.initRoles(message);
-            if (created) {
+            const rolesCreated = await RoleUtil.initRoles(message);
+            if (rolesCreated) {
               guild.rolesActivated = true;
               await guild.save();
 
@@ -102,9 +105,8 @@ export default class ActivateRolesCommand extends Command {
               `Error while trying to create roles, maybe I don't have enough permissions :sweat:`,
             );
           }
-          if (receivedResponse === 'no' || receivedResponse === 'n') {
-            return message.say('Roger!');
-          }
+
+          return message.say('Okay! (:');
         }
         return message.say(`Time's up! Try again later ):`);
       }

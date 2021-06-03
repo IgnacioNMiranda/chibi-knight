@@ -52,7 +52,10 @@ export default class Cache {
     return this.cache.set(resourceId, resource);
   }
 
-  async getGameInstanceActive(message: CommandoMessage): Promise<any> {
+  async getGameInstanceActive(message: CommandoMessage): Promise<boolean> {
+    if (!message.guild) {
+      return false;
+    }
     const { id: guildId } = message.guild;
     const cachedGuild = this.get(guildId);
     if (cachedGuild) {

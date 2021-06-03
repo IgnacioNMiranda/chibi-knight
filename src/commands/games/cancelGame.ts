@@ -23,6 +23,9 @@ export default class CancelGameCommand extends Command {
    * It executes when someone types the "say" command.
    */
   async run(message: CommandoMessage): Promise<Message> {
+    if (message.guild === null) {
+      return message.say('You cannot cancel a game in a private chat.');
+    }
     const { id } = message.guild;
     const cachedGuild = app.cache.get(id);
     if (cachedGuild) {
