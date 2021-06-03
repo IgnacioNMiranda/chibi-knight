@@ -1,12 +1,12 @@
 import pathlib from 'path';
-import configuration from './config/configuration';
+import { configuration } from './config/configuration';
 import { CommandoClient } from 'discord.js-commando';
-import logger from './logger';
+import { logger } from './logger';
 import { DocumentType } from '@typegoose/typegoose';
 import DbUser from './database/models/user.model';
 import { RoleUtil } from './utils/index';
 import Cache from './database/Cache';
-import { MongoConnection } from './database/mongo';
+import { MongoConnection } from './database/Mongo';
 import { TextChannel } from 'discord.js';
 import { GuildService, UserService } from './database/services/index';
 import GuildData from './database/models/guildData.model';
@@ -114,13 +114,16 @@ class App {
     this.client.on('error', console.error).on('warn', console.warn);
 
     this.client.on('message', async (message) => {
-      const { id: guildId } = message.guild;
       if (
         !message.author.bot &&
         !message.content.startsWith(configuration.prefix)
       ) {
+        if (message.guild === null) {
+          return;
+        }
+        const { id: guildId } = message.guild;
         let rolesActivated = false;
-        const cachedGuild = this.cache.getGuildById(guildId);
+        const cachedGuild = this.cache.get(guildId);
         if (cachedGuild) {
           rolesActivated = cachedGuild.rolesActivated;
         } else {

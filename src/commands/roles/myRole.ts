@@ -1,20 +1,20 @@
 import { Message, MessageEmbed } from 'discord.js';
 import { Command, CommandoClient, CommandoMessage } from 'discord.js-commando';
-import configuration from '../../config/configuration';
+import { configuration } from '../../config/configuration';
 import { RoleUtil } from '../../utils/index';
 import { app } from '../../main';
 
 /**
- * Displays information about the roles and score of an specific User.
+ * Displays information about the role and score of an specific User.
  */
-export default class MyRolesCommand extends Command {
+export default class MyRoleCommand extends Command {
   constructor(client: CommandoClient) {
     super(client, {
-      name: 'myroles',
+      name: 'myrole',
       aliases: ['mr'],
       group: 'roles',
-      memberName: 'myroles',
-      description: `Shows user's roles and their score.`,
+      memberName: 'myrole',
+      description: `Shows user's role and their score.`,
       args: [],
     });
   }
@@ -23,10 +23,14 @@ export default class MyRolesCommand extends Command {
    * It executes when someone types the "roles" command.
    */
   async run(message: CommandoMessage): Promise<Message> {
+    if (!message.guild) {
+      return message.say(`You don't have roles here.`);
+    }
+
     const activatedRolesError = `${configuration.appName}'s roles are not activated. First, you have to run ${configuration.prefix}activateroles.`;
 
     const { id: guildId } = message.guild;
-    const cachedGuild = app.cache.getGuildById(guildId);
+    const cachedGuild = app.cache.get(guildId);
 
     if (cachedGuild && !cachedGuild.rolesActivated) {
       return message.say(activatedRolesError);
@@ -46,21 +50,7 @@ export default class MyRolesCommand extends Command {
     const {
       author: { id },
     } = message;
-    const userRoles = message.guild.members.cache.find(
-      (member) => member.id === id,
-    ).roles.cache;
-
-    let rolesList = '';
-    let nextAvailableRole: { name: string; requiredPoints: number };
-    const rolesArray = Object.values(RoleUtil.roles);
-    rolesArray.forEach((role, idx) => {
-      if (userRoles.find((userRole) => userRole.name === role.name)) {
-        rolesList += `• ${role.name} \n`;
-        if (idx != rolesArray.length - 1) {
-          nextAvailableRole = rolesArray[idx + 1];
-        }
-      }
-    });
+    const user = message.guild.members.cache.find((member) => member.id === id);
 
     let score = 'Who knows D:';
     try {
@@ -73,10 +63,21 @@ export default class MyRolesCommand extends Command {
 
     const embedMessage = new MessageEmbed()
       .setColor(configuration.embedMessageColor)
-      .setDescription(`${message.author.username}'s Roles`);
+      .setDescription(`${message.author.username}'s Role`);
 
-    if (rolesList) {
-      embedMessage.addField('You have the following roles:', rolesList);
+    const discordRole = RoleUtil.getRoleFromUser(user);
+    const currentRole = RoleUtil.getRole(discordRole);
+    const nextAvailableRole = RoleUtil.getNextAvailableRoleOfUser(user);
+    if (
+      (nextAvailableRole &&
+        nextAvailableRole.name !== RoleUtil.roles.ZOTE.name) ||
+      !nextAvailableRole
+    ) {
+      embedMessage.addField(
+        'You have the following role:',
+        `• ${currentRole.name}`,
+      );
+      embedMessage.setImage(currentRole.imageUrl);
     } else {
       embedMessage.addField(
         `You don't have any role`,
@@ -85,26 +86,15 @@ export default class MyRolesCommand extends Command {
     }
 
     embedMessage.addField('Current Score', score);
-
     if (nextAvailableRole) {
-      if (nextAvailableRole.name !== rolesArray[rolesArray.length - 1].name) {
-        embedMessage.setFooter(
-          `You need ${
-            nextAvailableRole.requiredPoints - parseInt(score)
-          } points to get '${nextAvailableRole.name}' role.`,
-        );
-      } else {
-        embedMessage.setFooter(
-          `You are an ${
-            rolesArray[rolesArray.length - 1].name
-          }, you have reached supremacy!!`,
-        );
-      }
+      embedMessage.setFooter(
+        `You need ${
+          nextAvailableRole.requiredPoints - parseInt(score)
+        } more points to get '${nextAvailableRole.name}' role.`,
+      );
     } else {
       embedMessage.setFooter(
-        `You need a total amount of ${
-          rolesArray[0].requiredPoints - parseInt(score)
-        } points to get '${rolesArray[0].name}' role.`,
+        `You are ${currentRole.name}, you have reached the absolute supremacy!!`,
       );
     }
 

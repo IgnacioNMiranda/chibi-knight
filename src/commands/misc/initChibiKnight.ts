@@ -1,7 +1,7 @@
 import { Command, CommandoClient, CommandoMessage } from 'discord.js-commando';
 import { GuildMember, Message } from 'discord.js';
-import configuration from '../../config/configuration';
-import logger from '../../logger';
+import { configuration } from '../../config/configuration';
+import { logger } from '../../logger';
 import { Guild, User } from '../../database/models/index';
 import { app } from '../../main';
 import GuildData from '../../database/models/guildData.model';

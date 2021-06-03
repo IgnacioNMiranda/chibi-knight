@@ -2,8 +2,8 @@ import { Command, CommandoClient, CommandoMessage } from 'discord.js-commando';
 import { MessageEmbed, User, Message } from 'discord.js';
 import { QandA } from './resources/QandA';
 import { app } from '../../main';
-import configuration from '../../config/configuration';
-import logger from '../../logger';
+import { configuration } from '../../config/configuration';
+import { logger } from '../../logger';
 import { DocumentType } from '@typegoose/typegoose';
 import DbUser from '../../database/models/user.model';
 import { links } from './resources/links';
@@ -61,9 +61,11 @@ export default class TicTacToeCommand extends Command {
     // If there's already a game in course or a player challenged Chibi Knight or themself, the game cannot be executed.
     if (gameInstanceActive) {
       return message.say(`There's already a game in course ${player1}!`);
-    } else if (player1.id === player2.id) {
+    }
+    if (player1.id === player2.id) {
       return message.say('You cannot challenge yourself ¬¬ ...');
-    } else if (player2.bot) {
+    }
+    if (player2.bot) {
       return message.say(
         "You cannot challenge me :anger: I'm a superior being... I would destroy you n.n :purple_heart:",
       );
@@ -90,20 +92,21 @@ export default class TicTacToeCommand extends Command {
     if (collectedMessages?.first()) {
       const receivedMsg = collectedMessages.first().content;
       if (receivedMsg === 'no' || receivedMsg === 'n') {
-        await message.say(
+        return message.say(
           `Game cancelled ): Come back when you are brave enough, ${player2}.`,
         );
-      } else if (receivedMsg === 'yes' || receivedMsg === 'y') {
+      }
+      if (receivedMsg === 'yes' || receivedMsg === 'y') {
         try {
           const { id } = message.guild;
           const guild = await app.guildService.getById(id);
           guild.gameInstanceActive = true;
           await guild.save();
 
-          const cachedGuild = app.cache.getGuildById(id);
+          const cachedGuild = app.cache.get(id);
           if (cachedGuild) {
             cachedGuild.gameInstanceActive = true;
-            app.cache.setGuildById(id, cachedGuild);
+            app.cache.set(id, cachedGuild);
           } else {
             const { guildId, rolesActivated, gameInstanceActive } = guild;
             const cached: Guild = {
@@ -111,7 +114,7 @@ export default class TicTacToeCommand extends Command {
               rolesActivated,
               gameInstanceActive,
             };
-            app.cache.setGuildById(guildId, cached);
+            app.cache.set(guildId, cached);
           }
 
           this.ticTacToeInstance(message, player1, player2, QandAGames);
@@ -127,9 +130,8 @@ export default class TicTacToeCommand extends Command {
           );
         }
       }
-    } else {
-      return message.say(`Time's up! ${player2.username} dont want to play ):`);
     }
+    return message.say(`Time's up! ${player2.username} dont want to play ):`);
   }
 
   /**
@@ -194,6 +196,7 @@ export default class TicTacToeCommand extends Command {
           QandAGames.ticTacToePositions.some(
             (position: number) => position === parseInt(playedPosition),
           ) && this.tictactoeBoard[playedPosition] === this.defaultSymbol;
+
         return receivedMsg.author.id === activePlayer.id && validPlay;
       },
       { max: 9 },
@@ -206,7 +209,7 @@ export default class TicTacToeCommand extends Command {
         await m.delete();
       } catch (error) {}
 
-      // If player1 made a move, the mark is ❌. If it was player2, the mark is a ⭕.
+      // If player1 made a move, the mark is :x:. If it was player2, the mark is a :o:.
       activePlayer.id == player1.id
         ? (this.tictactoeBoard[playedNumber] = ':x:')
         : (this.tictactoeBoard[playedNumber] = ':o:');
@@ -250,7 +253,7 @@ export default class TicTacToeCommand extends Command {
         if (winner) {
           try {
             logger.info(
-              `Registering ${winner.username}'s tictactoe victory...`,
+              `Registering ${winner.username}'s tictactoe victory in '${m.guild.name}' guild...`,
               {
                 context: this.constructor.name,
               },
@@ -304,6 +307,12 @@ export default class TicTacToeCommand extends Command {
           newEmbedMessage.addField(
             'Consolation prize :second_place:',
             `Don't worry ${loser}, this is for you:`,
+          );
+          newEmbedMessage.setImage(links.tictactoe.gifs[0]);
+        } else if (!winner && !loser) {
+          newEmbedMessage.addField(
+            'Consolation prize :woozy_face:',
+            `You two are so bad, this is for you <3`,
           );
           newEmbedMessage.setImage(links.tictactoe.gifs[0]);
         }
@@ -368,10 +377,10 @@ export default class TicTacToeCommand extends Command {
         );
       }
 
-      const cachedGuild = app.cache.getGuildById(guildId);
+      const cachedGuild = app.cache.get(guildId);
       if (cachedGuild) {
         cachedGuild.gameInstanceActive = false;
-        app.cache.setGuildById(guildId, cachedGuild);
+        app.cache.set(guildId, cachedGuild);
       }
 
       logger.info(reason, {

@@ -1,8 +1,8 @@
 import { Command, CommandoClient, CommandoMessage } from 'discord.js-commando';
 import { Message, MessageEmbed, User } from 'discord.js';
 import { links } from './resources/links';
-import configuration from '../../config/configuration';
-import logger from '../../logger';
+import { configuration } from '../../config/configuration';
+import { logger } from '../../logger';
 
 /**
  * Sends an embed message disrespecting certain User and a disrespectful image.
@@ -45,9 +45,7 @@ export default class ShameOnYouCommand extends Command {
       await message.say(embedMessage);
       await message.delete();
     } catch (error) {
-      logger.error(error, {
-        context: this.constructor.name,
-      });
+      // If bot cannot delete messages.
     }
     return;
   }

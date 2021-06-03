@@ -2,7 +2,7 @@ import * as dotenv from 'dotenv';
 
 dotenv.config();
 
-const config = {
+const configuration = {
   env: process.env.NODE_ENV || 'development',
   appName: process.env.APP_NAME || 'Chibi Knight',
   clientId: process.env.CLIENT_ID,
@@ -14,4 +14,4 @@ const config = {
   },
 };
 
-export default config;
+export { configuration };
