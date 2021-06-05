@@ -25,7 +25,10 @@ export default class SayCommand extends Command {
   /**
    * It executes when someone types the "say" command.
    */
-  async run(message: CommandoMessage, args: any): Promise<Message> {
+  async run(
+    message: CommandoMessage,
+    args: { receivedMessage: string },
+  ): Promise<Message> {
     try {
       await message.say(args.receivedMessage);
       await message.delete();

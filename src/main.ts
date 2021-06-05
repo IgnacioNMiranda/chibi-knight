@@ -114,114 +114,107 @@ class App {
     this.client.on('error', console.error).on('warn', console.warn);
 
     this.client.on('message', async (message) => {
+      const notAllowedPrefix = ['>', '#', '$', '!', ';', 'rpg'];
+      const { content, author, guild } = message;
+
       if (
-        !message.author.bot &&
-        !message.content.startsWith(configuration.prefix)
+        author.bot ||
+        content.startsWith(configuration.prefix) ||
+        guild === null ||
+        notAllowedPrefix.some((prefix) => content.startsWith(prefix))
       ) {
-        if (message.guild === null) {
+        return;
+      }
+
+      const { id: guildId } = guild;
+      let rolesActivated = false;
+      const cachedGuild = this.cache.get(guildId);
+      if (cachedGuild) {
+        rolesActivated = cachedGuild.rolesActivated;
+      } else {
+        try {
+          const guild = await this.guildService.getById(guildId);
+          rolesActivated = guild.rolesActivated;
+        } catch (error) {}
+      }
+
+      if (!rolesActivated) {
+        return;
+      }
+
+      const messageWords = content.split(' ');
+      const userRegex = /(<@![0-9]+>)/;
+
+      // Give points to valid messages.
+      let score = 0;
+      const validWords = messageWords.filter(
+        (word) => word.length >= 2 && !word.match(userRegex),
+      ).length;
+      if (validWords >= 3) {
+        score += 3;
+      }
+
+      messageWords.some(async (word: string) => {
+        if (word.match(userRegex)) {
+          // <@! userId >
+          const userId = word.substring(3, word.length - 1);
+          try {
+            const user = await message.guild.members.fetch(userId);
+            if (user) {
+              score += 2;
+            }
+          } catch (error) {
+            logger.error(
+              'There was a problem registering score from user interaction',
+              {
+                context: this.constructor.name,
+              },
+            );
+          }
           return;
         }
-        const { id: guildId } = message.guild;
-        let rolesActivated = false;
-        const cachedGuild = this.cache.get(guildId);
-        if (cachedGuild) {
-          rolesActivated = cachedGuild.rolesActivated;
+      });
+
+      try {
+        const user: DocumentType<DbUser> = await this.userService.getById(
+          author.id,
+        );
+
+        let finalParticipationScore = score;
+        if (user) {
+          const guildDataIdx = user.guildsData.findIndex(
+            (guildData) => guildData.guildId === guildId,
+          );
+          user.guildsData[guildDataIdx].participationScore += score;
+          finalParticipationScore =
+            user.guildsData[guildDataIdx].participationScore;
+          await user.save();
         } else {
-          try {
-            const guild = await this.guildService.getById(guildId);
-            rolesActivated = guild.rolesActivated;
-          } catch (error) {}
+          const guildData: GuildData = {
+            guildId,
+            participationScore: score,
+          };
+          const newUser: DbUser = {
+            discordId: author.id,
+            name: author.username,
+            guildsData: [guildData],
+          };
+          await this.userService.create(newUser);
         }
 
-        if (rolesActivated) {
-          const notAllowedPrefix = ['>', '#', '$', '!', ';', 'rpg'];
-          if (
-            !notAllowedPrefix.some((prefix) =>
-              message.content.startsWith(prefix),
-            )
-          ) {
-            let score = 0;
-
-            const { content, author } = message;
-            const messageWords = content.split(' ');
-            const userRegex = /(<@![0-9]+>)/;
-
-            // Give points to valid messages.
-            const validWords = messageWords.filter(
-              (word) => word.length >= 2 && !word.match(userRegex),
-            ).length;
-            if (validWords >= 3) {
-              score += 3;
-            }
-
-            for (let i = 0; i < messageWords.length; i++) {
-              const word = messageWords[i];
-              // Give 2 points for user interaction
-              if (word.match(userRegex)) {
-                // <@! userId >
-                const userId = word.substring(3, word.length - 1);
-                try {
-                  const user = await message.guild.members.fetch(userId);
-                  if (user) {
-                    score += 2;
-                  }
-                } catch (error) {
-                  logger.error(
-                    'There was a problem registering score from user interaction',
-                    {
-                      context: this.constructor.name,
-                    },
-                  );
-                }
-                break;
-              }
-            }
-
-            try {
-              const user: DocumentType<DbUser> = await this.userService.getById(
-                author.id,
-              );
-
-              let finalParticipationScore = score;
-              if (user) {
-                const guildDataIdx = user.guildsData.findIndex(
-                  (guildData) => guildData.guildId === guildId,
-                );
-                user.guildsData[guildDataIdx].participationScore += score;
-                finalParticipationScore =
-                  user.guildsData[guildDataIdx].participationScore;
-                await user.save();
-              } else {
-                const guildData: GuildData = {
-                  guildId,
-                  participationScore: score,
-                };
-                const newUser: DbUser = {
-                  discordId: author.id,
-                  name: author.username,
-                  guildsData: [guildData],
-                };
-                await this.userService.create(newUser);
-              }
-
-              const authorGuildMember = await message.guild.members.fetch(
-                author.id,
-              );
-              RoleUtil.defineRoles(
-                finalParticipationScore,
-                authorGuildMember,
-                message,
-              );
-            } catch (error) {
-              logger.error(
-                `MongoDB Connection error. Could not register ${author.username}'s words points`,
-                {
-                  context: this.constructor.name,
-                },
-              );
-            }
-          }
-        }
+        const authorGuildMember = await message.guild.members.fetch(author.id);
+        RoleUtil.defineRoles(
+          finalParticipationScore,
+          authorGuildMember,
+          message,
+        );
+      } catch (error) {
+        logger.error(
+          `MongoDB Connection error. Could not register ${author.username}'s words points`,
+          {
+            context: this.constructor.name,
+          },
+        );
       }
     });
 
@@ -252,7 +245,7 @@ class App {
         if (guild.me.permissions.has('MANAGE_ROLES')) {
           await RoleUtil.removeRoles(guild);
         }
-        logger.info(`${guild.name} leaved and deleted succesfully`, {
+        logger.info(`'${guild.name}' leaved and deleted succesfully`, {
           context: this.constructor.name,
         });
       } catch (error) {
