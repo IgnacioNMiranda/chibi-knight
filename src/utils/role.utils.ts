@@ -15,7 +15,8 @@ export default class RoleUtil {
     FALSE_KNIGHT: {
       name: 'False Knight',
       requiredPoints: 250,
-      imageUrl: 'https://i.redd.it/glc4eegmj6g21.jpg',
+      imageUrl:
+        'https://64.media.tumblr.com/356b8e0e7dee00acc039604288194b3c/tumblr_px601eoSrB1wv5hmyo3_400.gif',
     },
     HORNET: {
       name: 'Hornet',
@@ -32,7 +33,8 @@ export default class RoleUtil {
     HIVE_KNIGHT: {
       name: 'Hive Knight',
       requiredPoints: 2000,
-      imageUrl: 'https://i.imgur.com/GAurUyr.png',
+      imageUrl:
+        'https://64.media.tumblr.com/a3fe65707da54f7b94fa2ef73300ad0e/tumblr_phxzts4UTK1wv5hmyo2_400.gif',
     },
     SOUL_MASTER: {
       name: 'Soul Master',
@@ -44,7 +46,7 @@ export default class RoleUtil {
       name: 'White Defender',
       requiredPoints: 5000,
       imageUrl:
-        'https://static.wikia.nocookie.net/hollowknight/images/a/a7/B_White_Defender.png/revision/latest/scale-to-width-down/310?cb=20170803164634',
+        'https://64.media.tumblr.com/10cbee955cdc5787510ac0556832d6f8/tumblr_phxzts4UTK1wv5hmyo7_400.gif',
     },
     GREAT_NAILSAGE_SLY: {
       name: 'Great Nailsage Sly',
@@ -84,13 +86,16 @@ export default class RoleUtil {
     },
   };
   static ROLE_COLOR = configuration.embedMessageColor;
+  static NO_ROLE = {
+    imageUrl:
+      'https://media1.tenor.com/images/ba7c371ec27c24b0b2725e34daf4afde/tenor.gif',
+  };
 
   static defineRoles(
     participationPoints: number,
     user: GuildMember,
     message: Message,
   ) {
-    const botRoleExistingInUser = this.getRoleFromUser(user);
     const nextAvailableRole = this.getNextAvailableRoleOfUser(user);
 
     if (
@@ -104,6 +109,7 @@ export default class RoleUtil {
       );
       // Role has to exist on the server to be applied.
       if (existingRoleInServer) {
+        const botRoleExistingInUser = this.getRoleFromUser(user);
         const haveRole = user.roles.cache.get(existingRoleInServer.id);
         if (!haveRole) {
           this.applyRole(

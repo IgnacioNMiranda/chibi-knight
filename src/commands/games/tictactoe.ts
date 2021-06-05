@@ -89,49 +89,51 @@ export default class TicTacToeCommand extends Command {
       time: 15000,
     });
 
-    if (collectedMessages?.first()) {
-      const receivedMsg = collectedMessages.first().content;
-      if (receivedMsg === 'no' || receivedMsg === 'n') {
-        return message.say(
-          `Game cancelled ): Come back when you are brave enough, ${player2}.`,
-        );
-      }
-      if (receivedMsg === 'yes' || receivedMsg === 'y') {
-        try {
-          const { id } = message.guild;
-          const guild = await app.guildService.getById(id);
-          guild.gameInstanceActive = true;
-          await guild.save();
-
-          const cachedGuild = app.cache.get(id);
-          if (cachedGuild) {
-            cachedGuild.gameInstanceActive = true;
-            app.cache.set(id, cachedGuild);
-          } else {
-            const { guildId, rolesActivated, gameInstanceActive } = guild;
-            const cached: Guild = {
-              guildId,
-              rolesActivated,
-              gameInstanceActive,
-            };
-            app.cache.set(guildId, cached);
-          }
-
-          this.ticTacToeInstance(message, player1, player2, QandAGames);
-        } catch (error) {
-          logger.error(
-            `MongoDB Connection error. Could not register change game instance active state for ${message.guild.name}`,
-            {
-              context: this.constructor.name,
-            },
-          );
-          return message.say(
-            'Error ): could not start game. Try again later :purple_heart:',
-          );
-        }
-      }
+    if (!collectedMessages.first()) {
+      return message.say(
+        `Time's up! ${player2.username} doesn't want to play ):`,
+      );
     }
-    return message.say(`Time's up! ${player2.username} dont want to play ):`);
+
+    const receivedMsg = collectedMessages.first().content;
+    if (receivedMsg === 'no' || receivedMsg === 'n') {
+      return message.say(
+        `Game cancelled ): Come back when you are brave enough, ${player2}.`,
+      );
+    }
+
+    try {
+      const { id } = message.guild;
+      const guild = await app.guildService.getById(id);
+      guild.gameInstanceActive = true;
+      await guild.save();
+
+      const cachedGuild = app.cache.get(id);
+      if (cachedGuild) {
+        cachedGuild.gameInstanceActive = true;
+        app.cache.set(id, cachedGuild);
+      } else {
+        const { guildId, rolesActivated, gameInstanceActive } = guild;
+        const cached: Guild = {
+          guildId,
+          rolesActivated,
+          gameInstanceActive,
+        };
+        app.cache.set(guildId, cached);
+      }
+
+      this.ticTacToeInstance(message, player1, player2, QandAGames);
+    } catch (error) {
+      logger.error(
+        `MongoDB Connection error. Could not register change game instance active state for ${message.guild.name}`,
+        {
+          context: this.constructor.name,
+        },
+      );
+      return message.say(
+        'Error ): could not start game. Try again later :purple_heart:',
+      );
+    }
   }
 
   /**
@@ -147,17 +149,7 @@ export default class TicTacToeCommand extends Command {
       ticTacToePositions: any;
     },
   ) {
-    this.tictactoeBoard = [
-      this.defaultSymbol,
-      this.defaultSymbol,
-      this.defaultSymbol,
-      this.defaultSymbol,
-      this.defaultSymbol,
-      this.defaultSymbol,
-      this.defaultSymbol,
-      this.defaultSymbol,
-      this.defaultSymbol,
-    ];
+    this.tictactoeBoard = Array(9).fill(this.defaultSymbol);
     const { id: guildId } = message.guild;
 
     const random = Math.random() < 0.5;
@@ -215,9 +207,10 @@ export default class TicTacToeCommand extends Command {
         : (this.tictactoeBoard[playedNumber] = ':o:');
 
       // Change the play turn.
-      const auxPlayer = activePlayer;
+      [activePlayer, otherPlayer] = [otherPlayer, activePlayer];
+      /*       const auxPlayer = activePlayer;
       activePlayer = otherPlayer;
-      otherPlayer = auxPlayer;
+      otherPlayer = auxPlayer; */
 
       // Creates the new embed message with the new mark.
       const newEmbedMessage = this.embedDefaultTicTacToeBoard(player1, player2);

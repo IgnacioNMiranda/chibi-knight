@@ -14,7 +14,7 @@ export default class RolesCommand extends Command {
       aliases: ['r'],
       group: 'roles',
       memberName: 'roles',
-      description: `Shows every registered ${configuration.appName}'s roles`,
+      description: `Shows every registered ${configuration.appName}'s roles or specific @User's role.`,
       args: [
         {
           key: 'user',
@@ -29,7 +29,7 @@ export default class RolesCommand extends Command {
   /**
    * It executes when someone types the "roles" command.
    */
-  async run(message: CommandoMessage, args: { user?: User }): Promise<Message> {
+  async run(message: CommandoMessage, args: { user: User }): Promise<Message> {
     const activatedRolesError = `${configuration.appName}'s roles are not activated. First, you have to run ${configuration.prefix}activateroles.`;
 
     let guildId: string;
