@@ -45,73 +45,76 @@ export default class ActivateRolesCommand extends Command {
       }
 
       const guild = await app.guildService.getById(guildId);
-      if (guild) {
-        if (guild.rolesActivated) {
-          return message.say(activatedRolesError);
-        }
+      if (!guild) {
+        return message.say(
+          `You have not run **${configuration.prefix}init** command. You cannot activate roles before that.`,
+        );
+      }
 
-        let rolesList = '';
-        const everyRole = Object.values(RoleUtil.roles);
-        everyRole.forEach((role) => {
-          rolesList += `• ${role.name} \n`;
-        });
+      if (guild.rolesActivated) {
+        return message.say(activatedRolesError);
+      }
 
-        const embedMessage = new MessageEmbed()
-          .attachFiles(['./public/img/chibiKnightLogo.png'])
-          .setAuthor('Chibi Knight', 'attachment://chibiKnightLogo.png')
-          .setThumbnail('attachment://chibiKnightLogo.png')
-          .addField('The next roles will be added to your server:', rolesList)
-          .setColor(configuration.embedMessageColor)
-          .setFooter(
-            `Do you really want to activate ${configuration.appName}'s roles ? (yes/y/no/n)`,
-          );
-        await message.say(embedMessage);
+      let rolesList = '';
+      const everyRole = Object.values(RoleUtil.roles);
+      everyRole.forEach((role) => {
+        rolesList += `• ${role.name} \n`;
+      });
 
-        const filter = (response: Message) => {
-          const validAnswer = /yes|y|no|n/.test(response.content.toLowerCase());
-          return response.author.id === message.author.id && validAnswer;
-        };
-        // Waits 15 seconds while types a valid answer (yes/y/no/n).
-        const collectedMessages = await message.channel.awaitMessages(filter, {
-          max: 1,
-          time: 15000,
-        });
+      const embedMessage = new MessageEmbed()
+        .attachFiles(['./public/img/chibiKnightLogo.png'])
+        .setAuthor(configuration.appName, 'attachment://chibiKnightLogo.png')
+        .setThumbnail('attachment://chibiKnightLogo.png')
+        .addField('The next roles will be added to your server:', rolesList)
+        .setColor(configuration.embedMessageColor)
+        .setFooter(
+          `Do you really want to activate ${configuration.appName}'s roles ? (yes/y/no/n)`,
+        );
+      await message.say(embedMessage);
 
-        if (collectedMessages?.first()) {
-          const receivedResponse = collectedMessages
-            .first()
-            .content.toLowerCase();
-          if (receivedResponse === 'yes' || receivedResponse === 'y') {
-            await message.say(
-              `Okay, we're working for you, meanwhile take a nap n.n`,
-            );
-            const rolesCreated = await RoleUtil.initRoles(message);
-            if (rolesCreated) {
-              guild.rolesActivated = true;
-              await guild.save();
+      const filter = (response: Message) => {
+        const validAnswer = /yes|y|no|n/.test(response.content.toLowerCase());
+        return response.author.id === message.author.id && validAnswer;
+      };
+      // Waits 15 seconds while types a valid answer (yes/y/no/n).
+      const collectedMessages = await message.channel.awaitMessages(filter, {
+        max: 1,
+        time: 15000,
+      });
 
-              const cachedGuild: Guild = {
-                guildId: message.guild.id,
-                gameInstanceActive: guild.gameInstanceActive,
-                rolesActivated: true,
-              };
-              app.cache.set(message.guild.id, cachedGuild);
-
-              return message.say(
-                `Roles created successfully :purple_heart: Try to see yours with **${configuration.prefix}myroles** command.`,
-              );
-            }
-            return message.say(
-              `Error while trying to create roles, maybe I don't have enough permissions :sweat:`,
-            );
-          }
-
-          return message.say('Okay! (:');
-        }
+      if (!collectedMessages.first()) {
         return message.say(`Time's up! Try again later ):`);
       }
+
+      const receivedResponse = collectedMessages.first().content.toLowerCase();
+      if (receivedResponse === 'no' || receivedResponse === 'n') {
+        return message.say('Okay! (:');
+      }
+
+      // Answer was yes.
+      await message.say(
+        `Okay, we're working for you, meanwhile take a nap n.n`,
+      );
+
+      const rolesCreated = await RoleUtil.initRoles(message);
+      if (!rolesCreated) {
+        return message.say(
+          `Error while trying to create roles, maybe I don't have enough permissions :sweat:`,
+        );
+      }
+
+      guild.rolesActivated = true;
+      await guild.save();
+
+      const newCachedGuild: Guild = {
+        guildId: message.guild.id,
+        gameInstanceActive: guild.gameInstanceActive,
+        rolesActivated: true,
+      };
+      app.cache.set(message.guild.id, newCachedGuild);
+
       return message.say(
-        `You have not run **${configuration.prefix}init** command. You cannot activate roles before that.`,
+        `Roles created successfully :purple_heart: Try to see yours with **${configuration.prefix}myroles** command.`,
       );
     } catch (error) {
       logger.error(

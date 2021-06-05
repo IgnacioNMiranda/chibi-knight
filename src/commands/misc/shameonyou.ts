@@ -2,7 +2,6 @@ import { Command, CommandoClient, CommandoMessage } from 'discord.js-commando';
 import { Message, MessageEmbed, User } from 'discord.js';
 import { links } from './resources/links';
 import { configuration } from '../../config/configuration';
-import { logger } from '../../logger';
 
 /**
  * Sends an embed message disrespecting certain User and a disrespectful image.
@@ -33,7 +32,7 @@ export default class ShameOnYouCommand extends Command {
     args: { disrespectedPerson: User },
   ): Promise<Message> {
     // Obtains disrespected gif's urls.
-    const gifs = links.shameonyou.gifs;
+    const { gifs } = links.shameonyou;
     const randIndex = Math.floor(Math.random() * gifs.length);
 
     const embedMessage = new MessageEmbed()

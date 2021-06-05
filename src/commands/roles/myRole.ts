@@ -83,6 +83,7 @@ export default class MyRoleCommand extends Command {
         `You don't have any role`,
         'Try to be more participatory n.n',
       );
+      embedMessage.setImage(RoleUtil.NO_ROLE.imageUrl);
     }
 
     embedMessage.addField('Current Score', score);
