@@ -4,4 +4,6 @@ node_modules
 .env
 
 # Ignore built ts files
-dist/**/*.ts
+dist
+
+yarn-error.log
