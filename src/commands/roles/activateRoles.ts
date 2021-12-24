@@ -5,7 +5,7 @@ import {
   MessageEmbed,
 } from 'discord.js'
 import { Command, CommandoClient, CommandoMessage } from 'discord.js-commando'
-import { initRoles, logger, roles } from '@/utils'
+import { initRoles, logger, roles, UserAnswers } from '@/utils'
 import { app } from '@/index'
 import { configuration } from '@/config'
 import { Guild } from '@/database'
@@ -65,7 +65,10 @@ export default class ActivateRolesCommand extends Command {
         rolesList += `• ${role.name} \n`
       })
 
-      const file = new MessageAttachment('./public/img/chibiKnightLogo.png')
+      const botLogo = new MessageAttachment(
+        './public/img/chibiKnightLogo.png',
+        'chibiKnightLogo.png'
+      )
       const embedMessage = new MessageEmbed()
         .setImage('attachment://chibiKnightLogo.png')
         .setAuthor(configuration.appName, 'attachment://chibiKnightLogo.png')
@@ -75,7 +78,7 @@ export default class ActivateRolesCommand extends Command {
         .setFooter(
           `Do you really want to activate ${configuration.appName}'s roles ? (yes/y/no/n)`
         )
-      await message.say({ embedMessage, files: [file] })
+      await message.say({ embedMessage, files: [botLogo] })
 
       const filter = (response: Message) => {
         const validAnswer = /yes|y|no|n/.test(response.content.toLowerCase())
@@ -91,12 +94,21 @@ export default class ActivateRolesCommand extends Command {
         return message.say(`Time's up! Try again later ):`)
       }
 
-      const receivedResponse = collectedMessages.first().content.toLowerCase()
-      if (receivedResponse === 'no' || receivedResponse === 'n') {
+      const receivedResponse = collectedMessages.first().content.toUpperCase()
+      if (
+        receivedResponse === UserAnswers.N ||
+        receivedResponse === UserAnswers.NO
+      ) {
         return message.say('Okay! (:')
+      } else if (
+        receivedResponse !== UserAnswers.Y &&
+        receivedResponse !== UserAnswers.YES
+      ) {
+        return message.say(
+          'You typed an invalid answer so I suppose you dont want to activate roles (:'
+        )
       }
 
-      // Answer was yes.
       await message.say(`Okay, we're working for you, meanwhile take a nap n.n`)
 
       const rolesCreated = await initRoles(message)
@@ -111,7 +123,6 @@ export default class ActivateRolesCommand extends Command {
 
       const newCachedGuild: Guild = {
         guildId: message.guild.id,
-        gameInstanceActive: guild.gameInstanceActive,
         rolesActivated: true,
       }
       app.cache.set(message.guild.id, newCachedGuild)

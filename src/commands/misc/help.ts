@@ -29,12 +29,14 @@ export default class HelpCommand extends Command {
    * It executes when someone types the "help" command.
    */
   run(message: CommandoMessage, args: { command: string }): Promise<Message> {
-    const file = new MessageAttachment('./public/img/chibiKnightLogo.png')
+    const botLogo = new MessageAttachment(
+      './public/img/chibiKnightLogo.png',
+      'chibiKnightLogo.png'
+    )
     const embedMessage = new MessageEmbed()
       .setAuthor(configuration.appName, 'attachment://chibiKnightLogo.png')
       .setThumbnail('attachment://chibiKnightLogo.png')
       .setColor(configuration.embedMessageColor)
-      .setImage('attachment://chibiKnightLogo.png')
 
     const { command: commandName } = args
     if (commandName !== 'null') {
@@ -64,7 +66,7 @@ export default class HelpCommand extends Command {
         embedMessage.setFooter(
           `Type ${configuration.prefix}help to see a list with every available command.`
         )
-        return message.say({ embedMessage, files: [file] })
+        return message.say({ embed: embedMessage, files: [botLogo] })
       }
 
       return message.say(
@@ -76,38 +78,34 @@ export default class HelpCommand extends Command {
       `:crossed_swords: These are the available commands for Chibi Knight n.n`
     )
 
-    const groups = this.client.registry.groups
-    groups
-      .filter((group) =>
-        group.commands.some(
-          (cmd: Command) => !cmd.hidden && cmd.isUsable(message)
-        )
-      )
-      .forEach((group) => {
-        const commandsList = group.commands
-          .filter((cmd: Command) => !cmd.hidden && cmd.isUsable(message))
-          .map((cmd: Command) => {
-            let cmdArgs = ''
-            const argsCollector = cmd.argsCollector
-            if (argsCollector?.args.length > 0) {
-              const args = argsCollector.args
-              if (args[0].type.id === 'user') {
-                args[0].default === 'null'
-                  ? (cmdArgs = ' {@User}')
-                  : (cmdArgs = ' @User')
-              } else if (args[0].type.id === 'string') {
-                cmdArgs = ` {${args[0].key}}`
-              }
+    const { groups } = this.client.registry
+    groups.forEach((group) => {
+      const commandsList = group.commands
+        .filter((cmd: Command) => !cmd.hidden && cmd.isUsable(message))
+        .map((cmd: Command) => {
+          let cmdArgs = ''
+          const argsCollector = cmd.argsCollector
+          if (argsCollector?.args.length > 0) {
+            const args = argsCollector.args
+            if (args[0].type.id === 'user') {
+              args[0].default === 'null'
+                ? (cmdArgs = ' {@User}')
+                : (cmdArgs = ' @User')
+            } else if (args[0].type.id === 'string') {
+              cmdArgs = ` {${args[0].key}}`
             }
-            return `**${configuration.prefix}${cmd.name}${cmdArgs}:** ${cmd.description}`
-          })
+          }
+          return `**${configuration.prefix}${cmd.name}${cmdArgs}:** ${cmd.description}`
+        })
+      if (commandsList && commandsList.length) {
         const groupTitle = groupsDescriptions[group.id]
         embedMessage.addField(groupTitle, commandsList.join('\n'))
-      })
+      }
+    })
 
     embedMessage.setFooter(
       `Type ${configuration.prefix}help {command} to see information about an specific command.`
     )
-    return message.say(embedMessage)
+    return message.say({ embed: embedMessage, files: [botLogo] })
   }
 }

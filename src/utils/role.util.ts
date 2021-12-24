@@ -96,7 +96,7 @@ export const defineRoles = (
   user: GuildMember,
   message: Message
 ) => {
-  const nextAvailableRole = getNextAvailableRoleOfUser(user)
+  const nextAvailableRole = getNextAvailableRoleFromUser(user)
 
   if (
     nextAvailableRole &&
@@ -147,7 +147,7 @@ export const getRole = (
   return role
 }
 
-export const getNextAvailableRoleOfUser = (
+export const getNextAvailableRoleFromUser = (
   user: GuildMember
 ): {
   name: string
@@ -195,7 +195,7 @@ export const applyRole = async (
     message.channel.send(embedMessage)
   } catch (error) {
     if (error.code === 50013) {
-      const errMessage = `Failed '${role.name}' role assignation. I think I need more permissions ):`
+      const errMessage = `Failed '${role.name}' role assignation. I guess I need more permissions ):`
       logger.error(errMessage, { context: CONTEXT })
       message.channel.send(errMessage)
     }
@@ -233,14 +233,15 @@ export const initRoles = async (message: CommandoMessage): Promise<boolean> => {
 export const removeRoles = async (guild: Guild): Promise<boolean> => {
   try {
     const botRoles = Object.values(roles)
-    botRoles.forEach(async (role) => {
+    const rolesRemover = botRoles.map(async (role) => {
       const existingRole = guild.roles.cache.find(
         (guildRole: Role) => guildRole.name === role.name
       )
       if (existingRole) {
-        await existingRole.delete('Bot fired from server')
+        return existingRole.delete('Bot fired from server')
       }
     })
+    await Promise.all(rolesRemover)
     return true
   } catch (error) {
     logger.error(
