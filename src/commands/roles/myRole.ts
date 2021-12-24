@@ -3,7 +3,7 @@ import { Command, CommandoClient, CommandoMessage } from 'discord.js-commando'
 import { configuration } from '@/config'
 import { app } from '@/index'
 import {
-  getNextAvailableRoleOfUser,
+  getNextAvailableRoleFromUser,
   getRole,
   getRoleFromUser,
   roles,
@@ -72,17 +72,17 @@ export default class MyRoleCommand extends Command {
       .setDescription(`${message.author.username}'s Role`)
 
     const discordRole = getRoleFromUser(user)
-    const currentRole = getRole(discordRole)
-    const nextAvailableRole = getNextAvailableRoleOfUser(user)
+    const currentBotRelatedRole = getRole(discordRole)
+    const nextAvailableRole = getNextAvailableRoleFromUser(user)
     if (
       (nextAvailableRole && nextAvailableRole.name !== roles.zote.name) ||
       !nextAvailableRole
     ) {
       embedMessage.addField(
         'You have the following role:',
-        `• ${currentRole.name}`
+        `• ${currentBotRelatedRole.name}`
       )
-      embedMessage.setImage(currentRole.imageUrl)
+      embedMessage.setImage(currentBotRelatedRole.imageUrl)
     } else {
       embedMessage.addField(
         `You don't have any role`,
@@ -100,7 +100,7 @@ export default class MyRoleCommand extends Command {
       )
     } else {
       embedMessage.setFooter(
-        `You are ${currentRole.name}, you have reached the absolute supremacy!!`
+        `You are ${currentBotRelatedRole.name}, you have reached the absolute supremacy!!`
       )
     }
 

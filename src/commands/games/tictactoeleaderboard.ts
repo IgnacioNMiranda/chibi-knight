@@ -27,6 +27,7 @@ export default class TicTacToeLeaderBoardCommand extends Command {
       if (!message.guild) {
         return message.say(`We don't have a tictactoe leaderboard here ¬¬`)
       }
+
       const { id: guildId } = message.guild
       const topUsers = await app.userService.getByNestedFilter(
         'guildsData',

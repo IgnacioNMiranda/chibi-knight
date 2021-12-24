@@ -47,12 +47,12 @@ export default class CancelGameCommand extends Command {
       await guild.save()
 
       const { guildId, rolesActivated, gameInstanceActive } = guild
-      const cached: Guild = {
+      const newCachedGuild: Guild = {
         guildId,
         rolesActivated,
         gameInstanceActive,
       }
-      app.cache.set(guildId, cached)
+      app.cache.set(guildId, newCachedGuild)
       return message.say('Game cancelled.')
     } catch (error) {
       logger.error(

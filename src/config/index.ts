@@ -3,7 +3,7 @@ import { config } from 'dotenv'
 
 config()
 
-const configuration = {
+export const configuration = {
   env: process.env.NODE_ENV || 'development',
   appName: process.env.APP_NAME || 'Chibi Knight',
   clientId: process.env.CLIENT_ID,
@@ -15,5 +15,3 @@ const configuration = {
     connection_url: process.env.MONGODB_CONNECTION,
   },
 }
-
-export { configuration }

@@ -21,11 +21,10 @@ export class Cache {
       })
       const guilds = await app.guildService.getAll()
       guilds.forEach((guild) => {
-        const { guildId, rolesActivated, gameInstanceActive } = guild
+        const { guildId, rolesActivated } = guild
         const cachedGuild: Guild = {
           guildId,
           rolesActivated,
-          gameInstanceActive,
         }
         this.set(guildId, cachedGuild)
       })
@@ -50,29 +49,5 @@ export class Cache {
 
   set(resourceId: string, resource: any) {
     return this.cache.set(resourceId, resource)
-  }
-
-  async getGameInstanceActive(message: CommandoMessage): Promise<boolean> {
-    if (!message.guild) {
-      return false
-    }
-    const { id: guildId } = message.guild
-    const cachedGuild = this.get(guildId)
-    if (cachedGuild) {
-      return cachedGuild.gameInstanceActive
-    } else {
-      try {
-        const guild = await app.guildService.getById(guildId)
-        return guild.gameInstanceActive
-      } catch (error) {
-        logger.error(
-          `MongoDB Connection error. Could not retrieve gameInstanceActive for '${message.guild.name}' server`,
-          {
-            context: this.constructor.name,
-          }
-        )
-        throw error
-      }
-    }
   }
 }

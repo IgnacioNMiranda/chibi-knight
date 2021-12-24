@@ -1,10 +1,19 @@
 import { Command, CommandoClient, CommandoMessage } from 'discord.js-commando'
-import { MessageEmbed, User, Message, ColorResolvable } from 'discord.js'
+import {
+  MessageEmbed,
+  User,
+  Message,
+  ColorResolvable,
+  CollectorFilter,
+} from 'discord.js'
 import { app } from '@/index'
 import { configuration } from '@/config'
 import { DocumentType } from '@typegoose/typegoose'
 import { User as DbUser, GuildData, Guild } from '@/database'
-import { commandsLinks, QandA, logger, defineRoles } from '@/utils'
+import { commandsLinks, QandA, logger, defineRoles, UserAnswers } from '@/utils'
+import CancelGameCommand from './cancelGame'
+
+const BOARD_POSITIONS = [0, 1, 2, 3, 4, 5, 6, 7, 8]
 
 /**
  * Starts a tic-tac-toe game.
@@ -44,16 +53,10 @@ export default class TicTacToeCommand extends Command {
     const { author: player1 } = message
     const { player2 } = args
 
-    let gameInstanceActive: boolean
-    try {
-      gameInstanceActive = await app.cache.getGameInstanceActive(message)
-    } catch (error) {
-      return message.say(
-        'Error ): could not start game. Try again later :sweat:'
-      )
-    }
+    const gameInstanceActive = (
+      await app.guildService.getById(message.guild.id)
+    ).gameInstanceActive
 
-    // If there's already a game in course or a player challenged Chibi Knight or themself, the game cannot be executed.
     if (gameInstanceActive) {
       return message.say(`There's already a game in course ${player1}!`)
     }
@@ -66,36 +69,7 @@ export default class TicTacToeCommand extends Command {
       )
     }
 
-    const QandAGames = QandA.initiateGame // Obtains object with games answers.
-    const filter = (response: any) => {
-      return QandAGames.answers.some(
-        (answer: string) =>
-          answer === response.content && response.author.id === player2.id
-      )
-    }
-
-    await message.say(
-      `${player2} has been challenged by ${player1} to play #. Do you accept the challenge? (yes/y/no/n)`
-    )
-
-    // Waits 15 seconds while player2 types a valid answer (yes/y/no/n).
-    const collectedMessages = await message.channel.awaitMessages(filter, {
-      max: 1,
-      time: 15000,
-    })
-
-    if (!collectedMessages.first()) {
-      return message.say(
-        `Time's up! ${player2.username} doesn't want to play ):`
-      )
-    }
-
-    const receivedMsg = collectedMessages.first().content
-    if (receivedMsg === 'no' || receivedMsg === 'n') {
-      return message.say(
-        `Game cancelled ): Come back when you are brave enough, ${player2}.`
-      )
-    }
+    await this.resolveChallengedPlayerResponse(message, player1, player2)
 
     try {
       const { id } = message.guild
@@ -103,21 +77,7 @@ export default class TicTacToeCommand extends Command {
       guild.gameInstanceActive = true
       await guild.save()
 
-      const cachedGuild = app.cache.get(id)
-      if (cachedGuild) {
-        cachedGuild.gameInstanceActive = true
-        app.cache.set(id, cachedGuild)
-      } else {
-        const { guildId, rolesActivated, gameInstanceActive } = guild
-        const cached: Guild = {
-          guildId,
-          rolesActivated,
-          gameInstanceActive,
-        }
-        app.cache.set(guildId, cached)
-      }
-
-      this.ticTacToeInstance(message, player1, player2, QandAGames)
+      this.ticTacToeInstance(message, player1, player2)
     } catch (error) {
       logger.error(
         `MongoDB Connection error. Could not register change game instance active state for ${message.guild.name}`,
@@ -137,11 +97,7 @@ export default class TicTacToeCommand extends Command {
   async ticTacToeInstance(
     message: CommandoMessage,
     player1: User,
-    player2: User,
-    QandAGames: {
-      answers: string[]
-      ticTacToePositions: any
-    }
+    player2: User
   ) {
     this.tictactoeBoard = Array(9).fill(this.defaultSymbol)
     const { id: guildId } = message.guild
@@ -169,19 +125,22 @@ export default class TicTacToeCommand extends Command {
         const possibleCancelledGame = receivedMsg.content
           .split(' ')[0]
           .split(configuration.prefix)[1]
-        if (
-          possibleCancelledGame === 'cancelgame' ||
-          possibleCancelledGame === 'cg'
-        ) {
+
+        const gameCancelled =
+          possibleCancelledGame === 'cg' ||
+          possibleCancelledGame === 'cancelGame'
+        if (gameCancelled) {
           collector.stop('Cancel game command executed.')
         }
 
         // Checks if the played position is valid.
         const playedPosition = receivedMsg.content
         const validPlay =
-          QandAGames.ticTacToePositions.some(
+          !Number.isInteger(playedPosition) &&
+          BOARD_POSITIONS.some(
             (position: number) => position === parseInt(playedPosition)
-          ) && this.tictactoeBoard[playedPosition] === this.defaultSymbol
+          ) &&
+          this.tictactoeBoard[playedPosition] === this.defaultSymbol
 
         return receivedMsg.author.id === activePlayer.id && validPlay
       },
@@ -204,9 +163,6 @@ export default class TicTacToeCommand extends Command {
 
       // Change the play turn.
       ;[activePlayer, otherPlayer] = [otherPlayer, activePlayer]
-      /*       const auxPlayer = activePlayer;
-      activePlayer = otherPlayer;
-      otherPlayer = auxPlayer; */
 
       // Creates the new embed message with the new mark.
       const newEmbedMessage = this.embedDefaultTicTacToeBoard(player1, player2)
@@ -306,21 +262,10 @@ export default class TicTacToeCommand extends Command {
           newEmbedMessage.setImage(commandsLinks.games.tictactoe.gifs[0])
         }
 
-        /* sentEmbedMessage.channel.messages.fetch({limit: 5})
-                    .then(messagesCollection => {
-                        if (!messagesCollection.some(msg => msg == sentEmbedMessage)) {
-                            sentEmbedMessage = new MessageEmbed(newEmbedMessage);
-                            message.say(sentEmbedMessage);
-                        } else {
-                            // Edits the embed tictactoe message.
-                            sentEmbedMessage.edit(newEmbedMessage);
-                        }
-                    }); */
-
         // Edits the embed tictactoe message.
         await sentEmbedMessage.edit(newEmbedMessage)
 
-        // Stop message recollection.
+        // Stop message collection.
         collector.stop(stopReason)
       } else {
         newEmbedMessage
@@ -335,23 +280,12 @@ export default class TicTacToeCommand extends Command {
             false
           )
 
-        /* sentEmbedMessage.channel.messages.fetch({limit: 5})
-                    .then(messagesCollection => {
-                        if (!messagesCollection.some(msg => msg == sentEmbedMessage)) {
-                            sentEmbedMessage = new MessageEmbed(newEmbedMessage);
-                            message.say(sentEmbedMessage);
-                        } else {
-                            // Edits the embed tictactoe message.
-                            sentEmbedMessage.edit(newEmbedMessage);
-                        }
-                    }); */
-
         // Edits the embed tictactoe message.
         await sentEmbedMessage.edit(newEmbedMessage)
       }
     })
 
-    collector.on('end', async (collected: any, reason: any) => {
+    collector.on('end', async (_: any, reason: any) => {
       // Unlocks the game instance.
       try {
         const guild = await app.guildService.getById(guildId)
@@ -366,16 +300,47 @@ export default class TicTacToeCommand extends Command {
         )
       }
 
-      const cachedGuild = app.cache.get(guildId)
-      if (cachedGuild) {
-        cachedGuild.gameInstanceActive = false
-        app.cache.set(guildId, cachedGuild)
-      }
-
       logger.info(reason, {
         context: this.constructor.name,
       })
     })
+  }
+
+  async resolveChallengedPlayerResponse(
+    message: CommandoMessage,
+    player1: User,
+    player2: User
+  ): Promise<CommandoMessage | string> {
+    const filter: CollectorFilter = (response) => {
+      const gameResponse = response.content.toUpperCase()
+      return (
+        response.author.id === player2.id &&
+        (gameResponse === UserAnswers.N || gameResponse === UserAnswers.Y)
+      )
+    }
+
+    await message.say(
+      `${player2} has been challenged by ${player1} to play #. Do you accept the challenge? (y/n)`
+    )
+
+    // Waits 15 seconds while player2 types a valid answer (y/n).
+    const collectedMessages = await message.channel.awaitMessages(filter, {
+      max: 1,
+      time: 15000,
+    })
+
+    if (!collectedMessages.first()) {
+      return message.say(
+        `Time's up! ${player2.username} doesn't want to play ):`
+      )
+    }
+
+    const receivedMsg = collectedMessages.first().content.toUpperCase()
+    if (receivedMsg === UserAnswers.N || receivedMsg === UserAnswers.NO) {
+      return message.say(
+        `Game cancelled ): Come back when you are brave enough, ${player2}.`
+      )
+    }
   }
 
   /**
@@ -384,7 +349,7 @@ export default class TicTacToeCommand extends Command {
   embedDefaultTicTacToeBoard(player1: User, player2: User): MessageEmbed {
     return new MessageEmbed()
       .setTitle(`:x::o: Gato:3 :x::o:`)
-      .setColor(configuration.embedMessageColor as ColorResolvable)
+      .setColor(configuration.embedMessageColor)
       .setDescription(
         'Tres en raya | Michi | Triqui | Gato | Cuadritos | Tictactoe | Whatever'
       )
