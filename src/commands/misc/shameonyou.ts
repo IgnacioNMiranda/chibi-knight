@@ -1,7 +1,7 @@
-import { Command, CommandoClient, CommandoMessage } from 'discord.js-commando';
-import { Message, MessageEmbed, User } from 'discord.js';
-import { links } from './resources/links';
-import { configuration } from '../../config/configuration';
+import { Command, CommandoClient, CommandoMessage } from 'discord.js-commando'
+import { Message, MessageEmbed, User } from 'discord.js'
+import { configuration } from '@/config'
+import { commandsLinks } from '@/utils'
 
 /**
  * Sends an embed message disrespecting certain User and a disrespectful image.
@@ -21,7 +21,7 @@ export default class ShameOnYouCommand extends Command {
           type: 'user',
         },
       ],
-    });
+    })
   }
 
   /**
@@ -29,23 +29,22 @@ export default class ShameOnYouCommand extends Command {
    */
   async run(
     message: CommandoMessage,
-    args: { disrespectedPerson: User },
+    args: { disrespectedPerson: User }
   ): Promise<Message> {
     // Obtains disrespected gif's urls.
-    const { gifs } = links.shameonyou;
-    const randIndex = Math.floor(Math.random() * gifs.length);
+    const { gifs } = commandsLinks.misc.shameonyou
+    const randIndex = Math.floor(Math.random() * gifs.length)
 
     const embedMessage = new MessageEmbed()
       .setDescription(`Shame on you! ${args.disrespectedPerson.username} !!`)
       .setColor(configuration.embedMessageColor)
-      .setImage(gifs[randIndex]);
+      .setImage(gifs[randIndex])
 
     try {
-      await message.say(embedMessage);
-      await message.delete();
+      await message.say(embedMessage)
+      return message.delete()
     } catch (error) {
       // If bot cannot delete messages.
     }
-    return;
   }
 }

@@ -1,5 +1,5 @@
-import { Message } from 'discord.js';
-import { Command, CommandoClient, CommandoMessage } from 'discord.js-commando';
+import { Message } from 'discord.js'
+import { Command, CommandoClient, CommandoMessage } from 'discord.js-commando'
 
 /**
  * Replies the receives message on command.
@@ -19,7 +19,7 @@ export default class SayCommand extends Command {
           type: 'string',
         },
       ],
-    });
+    })
   }
 
   /**
@@ -27,14 +27,13 @@ export default class SayCommand extends Command {
    */
   async run(
     message: CommandoMessage,
-    args: { receivedMessage: string },
+    args: { receivedMessage: string }
   ): Promise<Message> {
     try {
-      await message.say(args.receivedMessage);
-      await message.delete();
+      await message.say(args.receivedMessage)
+      return message.delete()
     } catch (error) {
       // If bot cannot delete messages.
     }
-    return;
   }
 }

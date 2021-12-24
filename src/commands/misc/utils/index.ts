@@ -3,4 +3,4 @@ export const groupsDescriptions = {
   misc: ':tickets: MISCELLANEOUS :tickets:',
   music: '',
   roles: ':jack_o_lantern: ROLES :jack_o_lantern: ',
-};
+}
