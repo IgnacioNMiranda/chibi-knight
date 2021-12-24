@@ -1,5 +1,3 @@
-import Guild from './guild.model';
-import User from './user.model';
-import GuildData from './guildData.model';
-
-export { Guild, User, GuildData };
+export * from './guild.model'
+export * from './guildData.model'
+export * from './user.model'

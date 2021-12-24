@@ -2,58 +2,29 @@ import {
   DocumentType,
   ReturnModelType,
   getModelForClass,
-} from '@typegoose/typegoose';
-import { app } from '../../main';
-import { Guild } from '../models/index';
+} from '@typegoose/typegoose'
+import { Guild } from '../models'
 
-export default class UserService {
-  private readonly guildRepository: ReturnModelType<typeof Guild>;
+export class GuildService {
+  private readonly guildRepository: ReturnModelType<typeof Guild>
 
   constructor() {
-    this.guildRepository = getModelForClass(Guild);
+    this.guildRepository = getModelForClass(Guild)
   }
 
   async create(guild: Guild) {
-    try {
-      const mongo = await app.mongoConnection.connect();
-      if (mongo) {
-        return this.guildRepository.create(guild);
-      }
-    } catch (error) {
-      throw error;
-    }
+    return this.guildRepository.create(guild)
   }
 
   async getAll(): Promise<DocumentType<Guild>[]> {
-    try {
-      const mongo = await app.mongoConnection.connect();
-      if (mongo) {
-        return this.guildRepository.find().exec();
-      }
-    } catch (error) {
-      throw error;
-    }
+    return this.guildRepository.find().exec()
   }
 
   async getById(guildId: string): Promise<DocumentType<Guild>> {
-    try {
-      const mongo = await app.mongoConnection.connect();
-      if (mongo) {
-        return this.guildRepository.findOne({ guildId }).exec();
-      }
-    } catch (error) {
-      throw error;
-    }
+    return this.guildRepository.findOne({ guildId }).exec()
   }
 
   async deleteById(guildId: string) {
-    try {
-      const mongo = await app.mongoConnection.connect();
-      if (mongo) {
-        this.guildRepository.deleteOne({ guildId }).exec();
-      }
-    } catch (error) {
-      throw error;
-    }
+    this.guildRepository.deleteOne({ guildId }).exec()
   }
 }
