@@ -1,1 +1,0 @@
-{"version":3,"file":"QandA.js","sourceRoot":"","sources":["../../../../src/commands/games/resources/QandA.ts"],"names":[],"mappings":";;;AAAa,QAAA,KAAK,GAAG;IAEnB;QACE,QAAQ,EAAE,cAAc;QACxB,OAAO,EAAE,CAAC,KAAK,EAAE,GAAG,EAAE,IAAI,EAAE,GAAG,CAAC;QAChC,kBAAkB,EAAE,CAAC,CAAC,EAAE,CAAC,EAAE,CAAC,EAAE,CAAC,EAAE,CAAC,EAAE,CAAC,EAAE,CAAC,EAAE,CAAC,EAAE,CAAC,CAAC;KAChD;CACF,CAAC"}

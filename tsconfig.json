@@ -15,11 +15,11 @@
     "moduleResolution": "node",
     "esModuleInterop": true,
     "paths": {
-      "*": ["node_modules/*"]
+      "@/*": ["src/*"]
     },
     "lib": [
       "es6"
-    ]
+    ],
   },
   "include": ["src/**/*"]
 }
