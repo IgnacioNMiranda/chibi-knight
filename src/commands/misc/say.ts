@@ -1,36 +1,26 @@
-import { Message } from 'discord.js'
-import { Command, CommandoClient, CommandoMessage } from 'discord.js-commando'
+import type { Message } from 'discord.js'
+import { Command, Args } from '@sapphire/framework'
 
 /**
  * Replies the receives message on command.
  */
-export default class SayCommand extends Command {
-  constructor(client: CommandoClient) {
-    super(client, {
-      name: 'say',
+export class SayCommand extends Command {
+  public constructor(context: Command.Context, options: Command.Options) {
+    super(context, {
+      ...options,
       aliases: ['s'],
-      group: 'misc',
-      memberName: 'say',
+      fullCategory: ['misc'],
       description: 'Replies with the received message.',
-      args: [
-        {
-          key: 'receivedMessage',
-          prompt: 'What text would you like the bot to say?',
-          type: 'string',
-        },
-      ],
     })
   }
 
   /**
    * It executes when someone types the "say" command.
    */
-  async run(
-    message: CommandoMessage,
-    args: { receivedMessage: string }
-  ): Promise<Message> {
+  async messageRun(message: Message, args: Args): Promise<Message<boolean>> {
     try {
-      await message.say(args.receivedMessage)
+      const text = await args.pick('string')
+      await message.channel.send(text)
       return message.delete()
     } catch (error) {
       // If bot cannot delete messages.

@@ -1,41 +1,26 @@
-import { Command, CommandoClient, CommandoMessage } from 'discord.js-commando'
-import {
-  MessageEmbed,
-  User,
-  Message,
-  ColorResolvable,
-  CollectorFilter,
-} from 'discord.js'
-import { app } from '@/index'
+import type { Message } from 'discord.js'
+import { Command, Args, container } from '@sapphire/framework'
+import { MessageEmbed, User, CollectorFilter } from 'discord.js'
 import { configuration } from '@/config'
 import { DocumentType } from '@typegoose/typegoose'
-import { User as DbUser, GuildData, Guild } from '@/database'
-import { commandsLinks, QandA, logger, defineRoles, UserAnswers } from '@/utils'
-import CancelGameCommand from './cancelGame'
+import { User as DbUser, GuildData } from '@/database'
+import { commandsLinks, logger, defineRoles, UserAnswers } from '@/utils'
 
 const BOARD_POSITIONS = [0, 1, 2, 3, 4, 5, 6, 7, 8]
 
 /**
  * Starts a tic-tac-toe game.
  */
-export default class TicTacToeCommand extends Command {
+export class TicTacToeCommand extends Command {
   defaultSymbol: string
   tictactoeBoard: string[]
 
-  constructor(client: CommandoClient) {
-    super(client, {
-      name: 'tictactoe',
+  constructor(context: Command.Context, options: Command.Options) {
+    super(context, {
+      ...options,
       aliases: ['ttt'],
-      group: 'games',
-      memberName: 'tictactoe',
+      fullCategory: ['games'],
       description: 'Initiates a tictactoe game.',
-      args: [
-        {
-          key: 'player2',
-          prompt: 'Who do you want to challenge?',
-          type: 'user',
-        },
-      ],
     })
 
     // Default symbol of the board.
@@ -45,35 +30,64 @@ export default class TicTacToeCommand extends Command {
   /**
    * It executes when someone types the "tictactoe" command.
    */
-  async run(
-    message: CommandoMessage,
-    args: { player2: User }
-  ): Promise<Message> {
+  async messageRun(message: Message, args: Args): Promise<Message> {
     // Obtains the challenging player instance.
     const { author: player1 } = message
-    const { player2 } = args
+    const player2 = await args.pick('user')
 
     const gameInstanceActive = (
-      await app.guildService.getById(message.guild.id)
+      await container.db.guildService.getById(message.guild.id)
     ).gameInstanceActive
 
     if (gameInstanceActive) {
-      return message.say(`There's already a game in course ${player1}!`)
+      return message.channel.send(
+        `There's already a game in course ${player1}!`
+      )
     }
     if (player1.id === player2.id) {
-      return message.say('You cannot challenge yourself ¬¬ ...')
+      return message.channel.send('You cannot challenge yourself ¬¬ ...')
     }
     if (player2.bot) {
-      return message.say(
+      return message.channel.send(
         "You cannot challenge me :anger: I'm a superior being... I would destroy you n.n :purple_heart:"
       )
     }
 
-    await this.resolveChallengedPlayerResponse(message, player1, player2)
+    const filter: CollectorFilter<Message[]> = (response) => {
+      const gameResponse = response.content.toUpperCase()
+      return (
+        response.author.id === player2.id &&
+        (gameResponse === UserAnswers.N || gameResponse === UserAnswers.Y)
+      )
+    }
+
+    await message.channel.send(
+      `${player2} has been challenged by ${player1} to play #. Do you accept the challenge? (y/n)`
+    )
+
+    // Waits 15 seconds while player2 types a valid answer (y/n).
+    const collectedMessages = await message.channel.awaitMessages({
+      filter,
+      max: 1,
+      time: 15000,
+    })
+
+    if (!collectedMessages.first()) {
+      return message.channel.send(
+        `Time's up! ${player2.username} doesn't want to play ):`
+      )
+    }
+
+    const receivedMsg = collectedMessages.first().content.toUpperCase()
+    if (receivedMsg === UserAnswers.N || receivedMsg === UserAnswers.NO) {
+      return message.channel.send(
+        `Game cancelled ): Come back when you are brave enough, ${player2}.`
+      )
+    }
 
     try {
       const { id } = message.guild
-      const guild = await app.guildService.getById(id)
+      const guild = await container.db.guildService.getById(id)
       guild.gameInstanceActive = true
       await guild.save()
 
@@ -85,7 +99,7 @@ export default class TicTacToeCommand extends Command {
           context: this.constructor.name,
         }
       )
-      return message.say(
+      return message.channel.send(
         'Error ): could not start game. Try again later :purple_heart:'
       )
     }
@@ -94,11 +108,7 @@ export default class TicTacToeCommand extends Command {
   /**
    * Manages the tictactoe game and its properties.
    */
-  async ticTacToeInstance(
-    message: CommandoMessage,
-    player1: User,
-    player2: User
-  ) {
+  async ticTacToeInstance(message: Message, player1: User, player2: User) {
     this.tictactoeBoard = Array(9).fill(this.defaultSymbol)
     const { id: guildId } = message.guild
 
@@ -114,9 +124,12 @@ export default class TicTacToeCommand extends Command {
       )
       .addField('Current turn', `It's your turn ${activePlayer.username}`)
 
-    const sentEmbedMessage = await message.embed(embedMessage)
-    const collector = message.channel.createMessageCollector(
-      (receivedMsg: Message) => {
+    const sentEmbedMessage = await message.channel.send({
+      embeds: [embedMessage],
+    })
+
+    const collector = message.channel.createMessageCollector({
+      filter: (receivedMsg: Message) => {
         if (receivedMsg.author.bot) {
           return false
         }
@@ -144,12 +157,10 @@ export default class TicTacToeCommand extends Command {
 
         return receivedMsg.author.id === activePlayer.id && validPlay
       },
-      {
-        max: 9,
-      }
-    )
+      max: 9,
+    })
 
-    collector.on('collect', async (m: CommandoMessage) => {
+    collector.on('collect', async (m: Message) => {
       const playedNumber = m.content
       try {
         // Deletes the message with the player's move.
@@ -206,9 +217,8 @@ export default class TicTacToeCommand extends Command {
 
             const score = 10
             let finalScore = score
-            const user: DocumentType<DbUser> = await app.userService.getById(
-              winner.id
-            )
+            const user: DocumentType<DbUser> =
+              await container.db.userService.getById(winner.id)
             if (user) {
               const guildDataIdx = user.guildsData.findIndex(
                 (guildData) => guildData.guildId === guildId
@@ -227,7 +237,7 @@ export default class TicTacToeCommand extends Command {
                 name: winner.username,
                 guildsData: [guildData],
               }
-              await app.userService.create(newUser)
+              await container.db.userService.create(newUser)
             }
 
             const authorGuildMember = await message.guild.members.fetch(
@@ -263,7 +273,7 @@ export default class TicTacToeCommand extends Command {
         }
 
         // Edits the embed tictactoe message.
-        await sentEmbedMessage.edit(newEmbedMessage)
+        await sentEmbedMessage.edit({ embeds: [newEmbedMessage] })
 
         // Stop message collection.
         collector.stop(stopReason)
@@ -281,14 +291,14 @@ export default class TicTacToeCommand extends Command {
           )
 
         // Edits the embed tictactoe message.
-        await sentEmbedMessage.edit(newEmbedMessage)
+        await sentEmbedMessage.edit({ embeds: [newEmbedMessage] })
       }
     })
 
     collector.on('end', async (_: any, reason: any) => {
       // Unlocks the game instance.
       try {
-        const guild = await app.guildService.getById(guildId)
+        const guild = await container.db.guildService.getById(guildId)
         guild.gameInstanceActive = false
         await guild.save()
       } catch (error) {
@@ -304,43 +314,6 @@ export default class TicTacToeCommand extends Command {
         context: this.constructor.name,
       })
     })
-  }
-
-  async resolveChallengedPlayerResponse(
-    message: CommandoMessage,
-    player1: User,
-    player2: User
-  ): Promise<CommandoMessage | string> {
-    const filter: CollectorFilter = (response) => {
-      const gameResponse = response.content.toUpperCase()
-      return (
-        response.author.id === player2.id &&
-        (gameResponse === UserAnswers.N || gameResponse === UserAnswers.Y)
-      )
-    }
-
-    await message.say(
-      `${player2} has been challenged by ${player1} to play #. Do you accept the challenge? (y/n)`
-    )
-
-    // Waits 15 seconds while player2 types a valid answer (y/n).
-    const collectedMessages = await message.channel.awaitMessages(filter, {
-      max: 1,
-      time: 15000,
-    })
-
-    if (!collectedMessages.first()) {
-      return message.say(
-        `Time's up! ${player2.username} doesn't want to play ):`
-      )
-    }
-
-    const receivedMsg = collectedMessages.first().content.toUpperCase()
-    if (receivedMsg === UserAnswers.N || receivedMsg === UserAnswers.NO) {
-      return message.say(
-        `Game cancelled ): Come back when you are brave enough, ${player2}.`
-      )
-    }
   }
 
   /**

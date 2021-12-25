@@ -1,7 +1,6 @@
 import { Message, MessageEmbed } from 'discord.js'
-import { Command, CommandoClient, CommandoMessage } from 'discord.js-commando'
+import { Command, container } from '@sapphire/framework'
 import { configuration } from '@/config'
-import { app } from '@/index'
 import {
   getNextAvailableRoleFromUser,
   getRole,
@@ -13,42 +12,41 @@ import {
 /**
  * Displays information about the role and score of an specific User.
  */
-export default class MyRoleCommand extends Command {
-  constructor(client: CommandoClient) {
-    super(client, {
+export class MyRoleCommand extends Command {
+  constructor(context: Command.Context, options: Command.Options) {
+    super(context, {
+      ...options,
       name: 'myrole',
       aliases: ['mr'],
-      group: 'roles',
-      memberName: 'myrole',
+      fullCategory: ['roles'],
       description: `Shows user's role and their score.`,
-      args: [],
     })
   }
 
   /**
    * It executes when someone types the "roles" command.
    */
-  async run(message: CommandoMessage): Promise<Message> {
+  async messageRun(message: Message): Promise<Message> {
     if (!message.guild) {
-      return message.say(`You don't have roles here.`)
+      return message.channel.send(`You don't have roles here.`)
     }
 
-    const activatedRolesError = `${configuration.appName}'s roles are not activated. First, you have to run ${configuration.prefix}activateroles.`
+    const activatedRolesError = `${configuration.appName}'s roles are not activated. First, you have to run \`${configuration.prefix}activateroles\``
 
     const { id: guildId } = message.guild
-    const cachedGuild = app.cache.get(guildId)
+    const cachedGuild = container.cache.get(guildId)
 
     if (cachedGuild && !cachedGuild.rolesActivated) {
-      return message.say(activatedRolesError)
+      return message.channel.send(activatedRolesError)
     }
 
     try {
-      const guild = await app.guildService.getById(guildId)
+      const guild = await container.db.guildService.getById(guildId)
       if (guild && !guild.rolesActivated) {
-        return message.say(activatedRolesError)
+        return message.channel.send(activatedRolesError)
       }
     } catch (error) {
-      return message.say(
+      return message.channel.send(
         'It occured an unexpected error :sweat: try again later.'
       )
     }
@@ -60,7 +58,7 @@ export default class MyRoleCommand extends Command {
 
     let score = 'Who knows D:'
     try {
-      const user = await app.userService.getById(id)
+      const user = await container.db.userService.getById(id)
       const guildData = user.guildsData.find(
         (guildData) => guildData.guildId === guildId
       )
@@ -104,6 +102,6 @@ export default class MyRoleCommand extends Command {
       )
     }
 
-    return message.say(embedMessage)
+    return message.channel.send({ embeds: [embedMessage] })
   }
 }

@@ -1,12 +1,12 @@
-import { BotCommandsGroup, GameCommand, MiscCommand } from '../types'
+import { BotCommandsCategories, GameCommand, MiscCommand } from '../types'
 
 export interface CommandsLinks {
-  [BotCommandsGroup.GAMES]: Record<GameCommand, any>
-  [BotCommandsGroup.MISC]: Record<MiscCommand, any>
+  [BotCommandsCategories.GAMES]: Record<GameCommand, any>
+  [BotCommandsCategories.MISC]: Record<MiscCommand, any>
 }
 
 export const commandsLinks: CommandsLinks = {
-  [BotCommandsGroup.GAMES]: {
+  [BotCommandsCategories.GAMES]: {
     tictactoe: {
       gifs: [
         'https://media.tenor.com/images/5d12401ee6fa62de116e70d3c99bb4cc/tenor.gif',
@@ -15,7 +15,7 @@ export const commandsLinks: CommandsLinks = {
     cancelGame: {},
     tictactoeleaderboard: {},
   },
-  [BotCommandsGroup.MISC]: {
+  [BotCommandsCategories.MISC]: {
     congratulate: {
       gifs: [
         'https://media1.tenor.com/images/78dcb7365d844e2cd0b8832366448dbf/tenor.gif',
@@ -31,14 +31,5 @@ export const commandsLinks: CommandsLinks = {
     help: {},
     iniChibiKnight: {},
     say: {},
-  },
-}
-
-// Questions and Answers for games.
-
-export const QandA = {
-  initiateGame: {
-    answers: ['y', 'n'],
-    ticTacToePositions: [0, 1, 2, 3, 4, 5, 6, 7, 8],
   },
 }

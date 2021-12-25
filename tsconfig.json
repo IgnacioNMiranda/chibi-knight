@@ -6,7 +6,7 @@
     "emitDecoratorMetadata": true,
     "experimentalDecorators": true,
     "allowSyntheticDefaultImports": true,
-    "target": "es6",
+    "target": "es2021",
     "allowJs": true,
     "sourceMap": true,
     "outDir": "./dist",
@@ -15,10 +15,13 @@
     "moduleResolution": "node",
     "esModuleInterop": true,
     "paths": {
-      "@/*": ["src/*"]
+      "@/config": ["src/config/index"],
+      "@/database": ["src/database/index"],
+      "@/utils": ["src/utils/index"],
     },
+    "skipLibCheck": true,
     "lib": [
-      "es6"
+      "es2021"
     ],
   },
   "include": ["src/**/*"]

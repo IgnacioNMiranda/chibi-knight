@@ -1,34 +1,24 @@
-import { createLogger, format, Logger, transports, addColors } from 'winston'
-const { combine, printf } = format
+import { container } from '@sapphire/framework'
 
-const customLevels = {
-  levels: {
-    error: 0,
-    warn: 1,
-    info: 2,
-    debug: 5,
-  },
-  colors: {
-    error: 'red',
-    warn: 'yellow',
-    info: 'green',
-    debug: 'blue',
-  },
+interface LoggerOptions {
+  context: string
 }
 
-const formatter = printf(({ level, message, context }) => {
-  return `[${level}] (${context}): ${message}`
-})
-
-addColors(customLevels.colors)
-
-const logger: Logger = createLogger({
-  levels: customLevels.levels,
-  format: combine(format.colorize(), formatter),
-  transports: [
-    // Displays logs in console
-    new transports.Console(),
-  ],
-})
-
-export { logger }
+export const logger = {
+  debug: (values: string, options?: LoggerOptions) =>
+    container.logger.debug(
+      `(${options.context}): ${values}` as unknown as unknown[]
+    ),
+  error: (values: string, options?: LoggerOptions) =>
+    container.logger.error(
+      `(${options.context}): ${values}` as unknown as unknown[]
+    ),
+  warn: (values: string, options?: LoggerOptions) =>
+    container.logger.warn(
+      `(${options.context}): ${values}` as unknown as unknown[]
+    ),
+  info: (values: string, options?: LoggerOptions) =>
+    container.logger.info(
+      `(${options.context}): ${values}` as unknown as unknown[]
+    ),
+}

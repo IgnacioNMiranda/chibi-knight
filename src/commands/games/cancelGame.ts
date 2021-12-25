@@ -1,46 +1,43 @@
-import { Message } from 'discord.js'
-import { Command, CommandoClient, CommandoMessage } from 'discord.js-commando'
-import { logger } from '@/utils'
+import { Command, container } from '@sapphire/framework'
+import type { Message } from 'discord.js'
 import { Guild } from '@/database'
-import { app } from '@/index'
+import { logger } from '@/utils'
 
 /**
  * Replies the receives message on command.
  */
-export default class CancelGameCommand extends Command {
-  constructor(client: CommandoClient) {
-    super(client, {
-      name: 'cancelgame',
+export class CancelGameCommand extends Command {
+  constructor(context: Command.Context, options: Command.Options) {
+    super(context, {
+      ...options,
       aliases: ['cg'],
-      group: 'games',
-      memberName: 'cancelgame',
+      fullCategory: ['games'],
       description: 'Cancels the active game.',
-      args: [],
     })
   }
 
   /**
    * It executes when someone types the "say" command.
    */
-  async run(message: CommandoMessage): Promise<Message> {
+  async messageRun(message: Message): Promise<Message<boolean>> {
     if (message.guild === null) {
-      return message.say('You cannot cancel a game in a private chat.')
+      return message.channel.send('You cannot cancel a game in a private chat.')
     }
     const { id } = message.guild
-    const cachedGuild = app.cache.get(id)
+    const cachedGuild = container.cache.get(id)
     if (cachedGuild) {
       if (!cachedGuild.gameInstanceActive) {
-        return message.say("There's no active game.")
+        return message.channel.send("There's no active game.")
       }
       cachedGuild.gameInstanceActive = false
-      app.cache.set(id, cachedGuild)
+      container.cache.set(id, cachedGuild)
     }
 
     try {
-      const guild = await app.guildService.getById(id)
+      const guild = await container.db.guildService.getById(id)
 
       if (guild && !guild.gameInstanceActive) {
-        return message.say("There's no active game.")
+        return message.channel.send("There's no active game.")
       }
 
       guild.gameInstanceActive = false
@@ -52,21 +49,18 @@ export default class CancelGameCommand extends Command {
         rolesActivated,
         gameInstanceActive,
       }
-      app.cache.set(guildId, newCachedGuild)
-      return message.say('Game cancelled.')
+      container.cache.set(guildId, newCachedGuild)
+      return message.channel.send('Game cancelled.')
     } catch (error) {
       logger.error(
-        `MongoDB Connection error. Could not change game instance state for '${message.guild.name}' server`,
-        {
-          context: this.constructor.name,
-        }
+        `(${this.constructor.name}): MongoDB Connection error. Could not change game instance state for '${message.guild.name}' server`
       )
     }
 
     if (cachedGuild) {
-      return message.say('Game cancelled.')
+      return message.channel.send('Game cancelled.')
     } else {
-      return message.say(
+      return message.channel.send(
         'It occured an unexpected error :sweat: try again later.'
       )
     }
