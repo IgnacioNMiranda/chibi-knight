@@ -69,13 +69,15 @@ export class ActivateRolesCommand extends Command {
         'chibiKnightLogo.png'
       )
       const embedMessage = new MessageEmbed()
-        .setImage('attachment://chibiKnightLogo.png')
-        .setAuthor(configuration.appName, 'attachment://chibiKnightLogo.png')
+        .setAuthor({
+          name: configuration.appName,
+          iconURL: 'attachment://chibiKnightLogo.png',
+        })
         .setThumbnail('attachment://chibiKnightLogo.png')
         .addField('The next roles will be added to your server:', rolesList)
         .setColor(configuration.embedMessageColor)
         .setFooter(
-          `Do you really want to activate ${configuration.appName}'s roles ? (yes/y/no/n)`
+          `**Do you really want to activate ${configuration.appName}'s roles ? (yes/y/no/n)**`
         )
       await message.channel.send({ embeds: [embedMessage], files: [botLogo] })
 

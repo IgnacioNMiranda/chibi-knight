@@ -21,7 +21,7 @@ export class RolesCommand extends Command {
    * It executes when someone types the "roles" command.
    */
   async messageRun(message: Message, args: Args): Promise<Message> {
-    const activatedRolesError = `${configuration.appName}'s roles are not activated. First, you have to run ${configuration.prefix}activateroles.`
+    const activatedRolesError = `${configuration.appName}'s roles are not activated. First, you have to run \`${configuration.prefix}activateroles\``
 
     let guildId: string
     if (message.guild) {

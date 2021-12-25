@@ -31,7 +31,7 @@ export class MyRoleCommand extends Command {
       return message.channel.send(`You don't have roles here.`)
     }
 
-    const activatedRolesError = `${configuration.appName}'s roles are not activated. First, you have to run ${configuration.prefix}activateroles.`
+    const activatedRolesError = `${configuration.appName}'s roles are not activated. First, you have to run \`${configuration.prefix}activateroles\``
 
     const { id: guildId } = message.guild
     const cachedGuild = container.cache.get(guildId)
