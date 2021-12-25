@@ -1,37 +1,35 @@
 {
   "name": "chibi-knight",
-  "version": "1.6.2",
+  "version": "2.0.0",
   "description": "A multipurpose discord bot",
   "main": "dist/index.js",
   "scripts": {
     "start": "node dist/index.js",
-    "dev": "NODE_ENV=development ts-node-dev --respawn --transpile-only -r tsconfig-paths/register ./src/index.ts",
-    "build": "rm -rf ./dist && tsc",
-    "builda": "rm -rf ./dist && tsc && tsc-alias",
+    "dev": "tsc-watch --onSuccess \"sh -c 'tsc-alias && node dist/index.js'\"",
+    "build": "rm -rf dist && tsc && tsc-alias",
     "test": "echo \"Error: no test specified\" && exit 1",
     "lint": "eslint \"{src, test}/**/*.ts\" --fix"
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/IgnacioNMiranda/Chibi-Knight"
+    "url": "https://github.com/IgnacioNMiranda/chibi-knight"
   },
   "author": "Ignacio Miranda F. (N)",
   "bugs": {
-    "url": "https://github.com/IgnacioNMiranda/Chibi-Knight/issues"
+    "url": "https://github.com/IgnacioNMiranda/chibi-knight/issues"
   },
-  "homepage": "https://github.com/IgnacioNMiranda/Chibi-Knight#readme",
+  "homepage": "https://github.com/IgnacioNMiranda/chibi-knight#readme",
   "engines": {
     "node": "~16.13.1",
     "npm": "~8.1.2"
   },
-  "types": "./dist/main.d.ts",
   "private": "true",
   "dependencies": {
-    "discord.js": "^12.5.3",
-    "discord.js-commando": "^0.12.3",
+    "@sapphire/framework": "^2.2.1",
+    "@sapphire/plugin-logger": "^2.1.1",
+    "discord.js": "^13.4.0",
     "dotenv": "^10.0.0",
-    "mongoose": "^6.1.3",
-    "winston": "^3.3.3"
+    "mongoose": "^6.1.3"
   },
   "devDependencies": {
     "@typegoose/typegoose": "^9.4.0",
@@ -46,11 +44,8 @@
     "eslint-plugin-node": "^11.1.0",
     "eslint-plugin-promise": "^5.2.0",
     "prettier": "^2.5.1",
-    "ts-loader": "^9.2.6",
-    "ts-node": "^10.4.0",
-    "ts-node-dev": "^1.1.8",
     "tsc-alias": "^1.5.0",
-    "tsconfig-paths": "^3.12.0",
+    "tsc-watch": "^4.6.0",
     "typescript": "^4.5.4"
   }
 }
