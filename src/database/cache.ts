@@ -1,32 +1,35 @@
-import { CommandoMessage } from 'discord.js-commando'
-import { app } from '@/index'
 import { logger } from '@/utils'
+import { container } from '@sapphire/framework'
 import { Guild } from './models'
 
 export class Cache {
-  cache: Map<string, Guild>
+  public static instance: Cache | null = null
+  public readonly cache: Map<string, Guild>
 
   constructor() {
     this.cache = new Map<string, Guild>()
+    setInterval(this.refresh, 1000 * 60 * 60)
   }
 
-  async initCache() {
-    if (this.cache) {
-      return this.cache
+  static async init() {
+    if (this.instance) {
+      return this.instance
     }
+
+    this.instance = new Cache()
 
     try {
       logger.info('Trying to init cache...', {
-        context: this.constructor.name,
+        context: container.client.constructor.name,
       })
-      const guilds = await app.guildService.getAll()
+      const guilds = await container.db.guildService.getAll()
       guilds.forEach((guild) => {
         const { guildId, rolesActivated } = guild
         const cachedGuild: Guild = {
           guildId,
           rolesActivated,
         }
-        this.set(guildId, cachedGuild)
+        this.instance.set(guildId, cachedGuild)
       })
     } catch (error) {
       logger.error(
@@ -36,11 +39,11 @@ export class Cache {
         }
       )
     }
-    return this.cache
+    return this.instance
   }
 
-  async refresh() {
-    this.cache = new Map<string, Guild>()
+  refresh() {
+    this.cache.clear()
   }
 
   get(resourceId: string): any {
