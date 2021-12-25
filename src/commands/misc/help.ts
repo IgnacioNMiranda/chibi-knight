@@ -1,52 +1,56 @@
-import { Command, CommandoClient, CommandoMessage } from 'discord.js-commando'
+import { Args, Command } from '@sapphire/framework'
 import { Message, MessageAttachment, MessageEmbed } from 'discord.js'
-import { groupsDescriptions } from './utils'
+import { BotChannel, commandsCategoriesDescriptions } from '@/utils'
 import { configuration } from '@/config'
 
 /**
  * Sends an embed message with information of every existing command.
  */
-export default class HelpCommand extends Command {
-  constructor(client: CommandoClient) {
-    super(client, {
+export class HelpCommand extends Command {
+  constructor(context: Command.Context, options: Command.Options) {
+    super(context, {
+      ...options,
       name: 'help',
       aliases: ['h'],
-      group: 'misc',
-      memberName: 'help',
+      fullCategory: ['misc'],
       description: 'Gives information about every existing command.',
-      args: [
-        {
-          key: 'command',
-          prompt: 'Do you wanna see help from what command?',
-          type: 'string',
-          default: 'null',
-        },
-      ],
     })
   }
 
   /**
    * It executes when someone types the "help" command.
    */
-  run(message: CommandoMessage, args: { command: string }): Promise<Message> {
+  async messageRun(message: Message, args: Args): Promise<Message<boolean>> {
     const botLogo = new MessageAttachment(
       './public/img/chibiKnightLogo.png',
       'chibiKnightLogo.png'
     )
     const embedMessage = new MessageEmbed()
-      .setAuthor(configuration.appName, 'attachment://chibiKnightLogo.png')
+      .setAuthor({
+        name: configuration.appName,
+        iconURL: 'attachment://chibiKnightLogo.png',
+      })
       .setThumbnail('attachment://chibiKnightLogo.png')
       .setColor(configuration.embedMessageColor)
 
-    const { command: commandName } = args
-    if (commandName !== 'null') {
-      const command: Command = this.client.registry.findCommands(
-        commandName,
-        true
-      )[0]
+    const commandName = await args.pick('string').catch(() => null)
 
-      if (command) {
-        let cmdArgs = ''
+    if (commandName) {
+      this.buildCommandHelp(commandName, message.channel)
+    }
+
+    return this.buildHelpForEveryCommand(embedMessage, message.channel, [
+      botLogo,
+    ])
+  }
+
+  buildCommandHelp(commandName: string, channel: BotChannel) {
+    const command = this.store.get(commandName) as Command
+    console.log(command)
+    // TODO: when implement localization
+
+    if (command) {
+      /* let cmdArgs = ''
         if (command.argsCollector) {
           const { args } = command.argsCollector
           if (args[0].type.id === 'user') cmdArgs = ' @User'
@@ -66,46 +70,51 @@ export default class HelpCommand extends Command {
         embedMessage.setFooter(
           `Type ${configuration.prefix}help to see a list with every available command.`
         )
-        return message.say({ embed: embedMessage, files: [botLogo] })
-      }
-
-      return message.say(
-        `Unknown command!! There are no commands with that name ):`
-      )
+        return message.channel.send({ embeds: [embedMessage], files: [botLogo] }) */
     }
 
-    embedMessage.setDescription(
+    return channel.send(
+      `Unknown command!! There are no commands with that name ):`
+    )
+  }
+
+  buildHelpForEveryCommand(
+    message: MessageEmbed,
+    channel: BotChannel,
+    files: MessageAttachment[]
+  ) {
+    message.setDescription(
       `:crossed_swords: These are the available commands for Chibi Knight n.n`
     )
 
-    const { groups } = this.client.registry
-    groups.forEach((group) => {
-      const commandsList = group.commands
-        .filter((cmd: Command) => !cmd.hidden && cmd.isUsable(message))
-        .map((cmd: Command) => {
-          let cmdArgs = ''
-          const argsCollector = cmd.argsCollector
-          if (argsCollector?.args.length > 0) {
-            const args = argsCollector.args
-            if (args[0].type.id === 'user') {
-              args[0].default === 'null'
-                ? (cmdArgs = ' {@User}')
-                : (cmdArgs = ' @User')
-            } else if (args[0].type.id === 'string') {
-              cmdArgs = ` {${args[0].key}}`
-            }
-          }
-          return `**${configuration.prefix}${cmd.name}${cmdArgs}:** ${cmd.description}`
-        })
-      if (commandsList && commandsList.length) {
-        const groupTitle = groupsDescriptions[group.id]
-        embedMessage.addField(groupTitle, commandsList.join('\n'))
+    const commands = this.store.container.stores.get('commands')
+    const categories = new Set<string>()
+
+    new Array(...commands.values()).forEach((command) => {
+      if (command.enabled && !categories.has(command.category)) {
+        categories.add(command.category)
       }
     })
 
-    embedMessage.setFooter(
+    const fields = [...categories.values()].map((category) => ({
+      category: commandsCategoriesDescriptions[category],
+      commands: commands
+        .filter((command) => command.category === category && command.enabled)
+        .map(
+          (cmd) =>
+            `**${configuration.prefix}${cmd.name}** → ${
+              cmd.description ?? 'No description was provided'
+            }`
+        ),
+    }))
+
+    fields.forEach((field) => {
+      message.addField(field.category, field.commands.join('\n'))
+    })
+
+    message.setFooter(
       `Type ${configuration.prefix}help {command} to see information about an specific command.`
     )
-    return message.say({ embed: embedMessage, files: [botLogo] })
+    return channel.send({ embeds: [message], files })
   }
 }

@@ -1,6 +1,5 @@
 import { Message, MessageEmbed } from 'discord.js'
-import { Command, CommandoClient, CommandoMessage } from 'discord.js-commando'
-import { app } from '@/index'
+import { Command, container } from '@sapphire/framework'
 import { configuration } from '@/config'
 import { logger } from '@/utils'
 import { User } from '@/database'
@@ -8,13 +7,13 @@ import { User } from '@/database'
 /**
  * Displays the tictactoe game leaderboard.
  */
-export default class TicTacToeLeaderBoardCommand extends Command {
-  constructor(client: CommandoClient) {
-    super(client, {
+export class TicTacToeLeaderBoardCommand extends Command {
+  constructor(context: Command.Context, options: Command.Options) {
+    super(context, {
+      ...options,
       name: 'tttleaderboard',
       aliases: ['tttlb'],
-      group: 'games',
-      memberName: 'tttleaderboard',
+      fullCategory: ['games'],
       description: 'Displays the tictactoe leaderboard.',
     })
   }
@@ -22,14 +21,16 @@ export default class TicTacToeLeaderBoardCommand extends Command {
   /**
    * It executes when someone types the "tictactoeleaderboard" command.
    */
-  async run(message: CommandoMessage): Promise<Message> {
+  async messageRun(message: Message): Promise<Message> {
     try {
       if (!message.guild) {
-        return message.say(`We don't have a tictactoe leaderboard here ¬¬`)
+        return message.channel.send(
+          `We don't have a tictactoe leaderboard here ¬¬`
+        )
       }
 
       const { id: guildId } = message.guild
-      const topUsers = await app.userService.getByNestedFilter(
+      const topUsers = await container.db.userService.getByNestedFilter(
         'guildsData',
         { 'guildsData.guildId': guildId },
         10,
@@ -65,16 +66,15 @@ export default class TicTacToeLeaderBoardCommand extends Command {
       leaderboard.addField('Positioning', usernamesList.join('\n'), true)
       leaderboard.addField('Victories', scoreList.join('\n'), true)
 
-      return message.embed(leaderboard)
+      return message.channel.send({ embeds: [leaderboard] })
     } catch (error) {
-      logger.error(error)
       logger.error(
         `MongoDB Connection error. Could not retrieve tictactoe leaderboard for '${message.guild.name}' server`,
         {
           context: this.constructor.name,
         }
       )
-      return message.say(
+      return message.channel.send(
         `Sorry ): I couldn't retrieve tictactoe leaderboard. I failed you :sweat:`
       )
     }
