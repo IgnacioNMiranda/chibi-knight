@@ -24,14 +24,6 @@ export class CancelGameCommand extends Command {
       return message.channel.send('You cannot cancel a game in a private chat.')
     }
     const { id } = message.guild
-    const cachedGuild = container.cache.get(id)
-    if (cachedGuild) {
-      if (!cachedGuild.gameInstanceActive) {
-        return message.channel.send("There's no active game.")
-      }
-      cachedGuild.gameInstanceActive = false
-      container.cache.set(id, cachedGuild)
-    }
 
     try {
       const guild = await container.db.guildService.getById(id)
@@ -42,14 +34,6 @@ export class CancelGameCommand extends Command {
 
       guild.gameInstanceActive = false
       await guild.save()
-
-      const { guildId, rolesActivated, gameInstanceActive } = guild
-      const newCachedGuild: Guild = {
-        guildId,
-        rolesActivated,
-        gameInstanceActive,
-      }
-      container.cache.set(guildId, newCachedGuild)
       return message.channel.send('Game cancelled.')
     } catch (error) {
       logger.error(
@@ -57,12 +41,8 @@ export class CancelGameCommand extends Command {
       )
     }
 
-    if (cachedGuild) {
-      return message.channel.send('Game cancelled.')
-    } else {
-      return message.channel.send(
-        'It occured an unexpected error :sweat: try again later.'
-      )
-    }
+    return message.channel.send(
+      'It occured an unexpected error :sweat: try again later.'
+    )
   }
 }

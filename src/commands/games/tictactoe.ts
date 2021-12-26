@@ -1,19 +1,46 @@
-import type { Message } from 'discord.js'
+import {
+  Message,
+  MessageActionRow,
+  MessageEmbed,
+  User,
+  CollectorFilter,
+  MessageComponentInteraction,
+  ButtonInteraction,
+} from 'discord.js'
 import { Command, Args, container } from '@sapphire/framework'
-import { MessageEmbed, User, CollectorFilter } from 'discord.js'
+
 import { configuration } from '@/config'
 import { DocumentType } from '@typegoose/typegoose'
 import { User as DbUser, GuildData } from '@/database'
-import { commandsLinks, logger, defineRoles, UserAnswers } from '@/utils'
-
-const BOARD_POSITIONS = [0, 1, 2, 3, 4, 5, 6, 7, 8]
+import {
+  commandsLinks,
+  logger,
+  defineRoles,
+  UserActions,
+  TicTacToeMoveResolverParams,
+  GameFinalState,
+  TicTacToeButtonId,
+  getButton,
+  getTttMoveButton,
+  getCancelGameButton,
+  tttGameResults,
+} from '@/utils'
 
 /**
  * Starts a tic-tac-toe game.
  */
 export class TicTacToeCommand extends Command {
-  defaultSymbol: string
-  tictactoeBoard: string[]
+  private readonly defaultSymbol = ':purple_square:'
+  private readonly squaresNumber = 9
+  private board: string[]
+  private moveResolver: Record<
+    UserActions,
+    (_: TicTacToeMoveResolverParams) => Promise<Message<boolean> | void>
+  > = {
+    [UserActions.IGNORE]: this.ignore.bind(this),
+    [UserActions.REJECT]: this.reject.bind(this),
+    [UserActions.ACCEPT]: this.accept.bind(this),
+  }
 
   constructor(context: Command.Context, options: Command.Options) {
     super(context, {
@@ -22,9 +49,6 @@ export class TicTacToeCommand extends Command {
       fullCategory: ['games'],
       description: 'Initiates a tictactoe game.',
     })
-
-    // Default symbol of the board.
-    this.defaultSymbol = ':purple_square:'
   }
 
   /**
@@ -44,54 +68,75 @@ export class TicTacToeCommand extends Command {
         `There's already a game in course ${player1}!`
       )
     }
-    if (player1.id === player2.id) {
+    /* if (player1.id === player2.id) {
       return message.channel.send('You cannot challenge yourself ¬¬ ...')
-    }
+    } */
     if (player2.bot) {
       return message.channel.send(
         "You cannot challenge me :anger: I'm a superior being... I would destroy you n.n :purple_heart:"
       )
     }
 
-    const filter: CollectorFilter<Message[]> = (response) => {
-      const gameResponse = response.content.toUpperCase()
-      return (
-        response.author.id === player2.id &&
-        (gameResponse === UserAnswers.N || gameResponse === UserAnswers.Y)
-      )
-    }
+    const filter: CollectorFilter<[MessageComponentInteraction<'cached'>]> = (
+      btnInteraction
+    ) => btnInteraction.user.id === player2.id
 
-    await message.channel.send(
-      `${player2} has been challenged by ${player1} to play #. Do you accept the challenge? (y/n)`
+    const buttons = new MessageActionRow().addComponents(
+      getButton(TicTacToeButtonId.ACCEPT, 'YES', 'SUCCESS'),
+      getButton(TicTacToeButtonId.REJECT, 'NO', 'DANGER')
     )
 
-    // Waits 15 seconds while player2 types a valid answer (y/n).
-    const collectedMessages = await message.channel.awaitMessages({
-      filter,
-      max: 1,
-      time: 15000,
+    const actionMessage = await message.channel.send({
+      content: `${player2} has been challenged by ${player1} to play #. Do you accept the challenge?`,
+      components: [buttons],
     })
 
-    if (!collectedMessages.first()) {
-      return message.channel.send(
-        `Time's up! ${player2.username} doesn't want to play ):`
-      )
-    }
+    // Waits 15 seconds while player2 clicks button.
+    const collector = message.channel.createMessageComponentCollector({
+      filter,
+      max: 1,
+      time: 1000 * 15,
+    })
 
-    const receivedMsg = collectedMessages.first().content.toUpperCase()
-    if (receivedMsg === UserAnswers.N || receivedMsg === UserAnswers.NO) {
-      return message.channel.send(
-        `Game cancelled ): Come back when you are brave enough, ${player2}.`
-      )
-    }
+    let player2Action = UserActions.IGNORE
+    collector.on('end', async (collection) => {
+      if (collection.first()?.customId === TicTacToeButtonId.REJECT) {
+        player2Action = UserActions.REJECT
+      } else if (collection.first()?.customId === TicTacToeButtonId.ACCEPT) {
+        player2Action = UserActions.ACCEPT
+      }
 
+      this.moveResolver[player2Action]({ message, player2, player1 }).then(
+        (message?: Message) => {
+          actionMessage.delete().catch()
+          setTimeout(() => {
+            message?.delete().catch()
+          }, 1000 * 3)
+        }
+      )
+    })
+  }
+
+  async ignore({ message, player2 }: TicTacToeMoveResolverParams) {
+    return message.channel.send(
+      `Time's up! ${player2.username} doesn't want to play ):`
+    )
+  }
+
+  reject({ message, player2 }: TicTacToeMoveResolverParams) {
+    return message.channel.send(
+      `Game cancelled ): Come back when you are brave enough, ${player2}.`
+    )
+  }
+
+  async accept({ message, player2, player1 }: TicTacToeMoveResolverParams) {
     try {
       const { id } = message.guild
       const guild = await container.db.guildService.getById(id)
       guild.gameInstanceActive = true
       await guild.save()
 
-      this.ticTacToeInstance(message, player1, player2)
+      this.runTtt(message, player1, player2)
     } catch (error) {
       logger.error(
         `MongoDB Connection error. Could not register change game instance active state for ${message.guild.name}`,
@@ -108,15 +153,14 @@ export class TicTacToeCommand extends Command {
   /**
    * Manages the tictactoe game and its properties.
    */
-  async ticTacToeInstance(message: Message, player1: User, player2: User) {
-    this.tictactoeBoard = Array(9).fill(this.defaultSymbol)
+  async runTtt(message: Message, player1: User, player2: User) {
+    const availableMoves = [...Array(this.squaresNumber).keys()]
+    this.board = Array(this.squaresNumber).fill(this.defaultSymbol)
     const { id: guildId } = message.guild
 
-    const random = Math.random() < 0.5
-    let activePlayer = random ? player1 : player2
-    let otherPlayer = random ? player2 : player1
+    let { activePlayer, otherPlayer } = this.getInitialOrder(player1, player2)
 
-    const embedMessage = this.embedDefaultTicTacToeBoard(player1, player2)
+    const embedMessage = this.embedDefaultboard(player1, player2)
       .addField(
         'Instructions',
         'Type the number where you want to make your move.',
@@ -124,92 +168,84 @@ export class TicTacToeCommand extends Command {
       )
       .addField('Current turn', `It's your turn ${activePlayer.username}`)
 
+    const firstMovesRow = new MessageActionRow().addComponents(
+      availableMoves
+        .slice(0, (availableMoves.length + 1) / 2)
+        .map(getTttMoveButton)
+    )
+
+    const secondMovesRow = new MessageActionRow()
+      .addComponents(
+        availableMoves
+          .slice((availableMoves.length + 1) / 2, availableMoves.length)
+          .map(getTttMoveButton)
+      )
+      .addComponents(getCancelGameButton(TicTacToeButtonId.CANCEL))
+
     const sentEmbedMessage = await message.channel.send({
       embeds: [embedMessage],
+      components: [firstMovesRow, secondMovesRow],
     })
 
-    const collector = message.channel.createMessageCollector({
-      filter: (receivedMsg: Message) => {
-        if (receivedMsg.author.bot) {
-          return false
-        }
+    const moveFilter: CollectorFilter<
+      [MessageComponentInteraction<'cached'>]
+    > = (btnInteraction) => {
+      const playerId = [player1.id, player2.id].find(
+        (id) => id === btnInteraction.user.id
+      )
+      if (!playerId) return false
+      if (btnInteraction.customId === TicTacToeButtonId.CANCEL) {
+        collector.stop('Game cancelled.')
+        return true
+      }
 
-        // if the receivedMsg is the cancel game command, passes the filter for later collector ends.
-        const possibleCancelledGame = receivedMsg.content
-          .split(' ')[0]
-          .split(configuration.prefix)[1]
+      return btnInteraction.user.id === activePlayer.id
+    }
 
-        const gameCancelled =
-          possibleCancelledGame === 'cg' ||
-          possibleCancelledGame === 'cancelGame'
-        if (gameCancelled) {
-          collector.stop('Cancel game command executed.')
-        }
-
-        // Checks if the played position is valid.
-        const playedPosition = receivedMsg.content
-        const validPlay =
-          !Number.isInteger(playedPosition) &&
-          BOARD_POSITIONS.some(
-            (position: number) => position === parseInt(playedPosition)
-          ) &&
-          this.tictactoeBoard[playedPosition] === this.defaultSymbol
-
-        return receivedMsg.author.id === activePlayer.id && validPlay
-      },
+    const collector = message.channel.createMessageComponentCollector({
+      filter: moveFilter,
       max: 9,
     })
 
-    collector.on('collect', async (m: Message) => {
-      const playedNumber = m.content
-      try {
-        // Deletes the message with the player's move.
-        await m.delete()
-      } catch (error) {}
+    collector.on('collect', async (i: ButtonInteraction) => {
+      const playedNumber = parseInt(i.component.label)
 
-      // If player1 made a move, the mark is :x:. If it was player2, the mark is a :o:.
+      // If player1 made a move, the mark is :x:. If it was player2, the mark is :o:
       activePlayer.id === player1.id
-        ? (this.tictactoeBoard[playedNumber] = ':x:')
-        : (this.tictactoeBoard[playedNumber] = ':o:')
+        ? (this.board[playedNumber] = ':x:')
+        : (this.board[playedNumber] = ':o:')
 
       // Change the play turn.
       ;[activePlayer, otherPlayer] = [otherPlayer, activePlayer]
 
+      const updatedButtons = sentEmbedMessage.components.map((row) => {
+        return {
+          ...row,
+          components: row.components.filter(
+            (btn) => btn.customId !== i.customId
+          ),
+        }
+      })
+
       // Creates the new embed message with the new mark.
-      const newEmbedMessage = this.embedDefaultTicTacToeBoard(player1, player2)
+      const newEmbedMessage = this.embedDefaultboard(player1, player2)
 
       // Obtains the current state of the game.
-      const gameState = this.obtainGameState(parseInt(playedNumber))
+      const gameState = this.obtainGameState(playedNumber)
 
-      if (gameState !== -1) {
-        // Game was tied or a player won.
-        let result: string
-        let stopReason: string
+      if (gameState !== GameFinalState.UNDEFINED) {
         let winner: User
         let loser: User
-        switch (gameState) {
-          case 0:
-            result = 'The game was a tie! :confetti_ball: Thanks for play (:'
-            stopReason = `Tictactoe game between ${player1.username} and ${player2.username} ends!`
-            break
-          case 1:
-            result = `:tada: CONGRATULATIONS ${player1}! You have won! :tada:`
-            stopReason = `${player1.username} won on TicTacToe against ${player2.username}!`
-            winner = player1
-            loser = player2
-            break
-          case 2:
-            result = `:tada: CONGRATULATIONS ${player2}! You have won! :tada:`
-            stopReason = `${player2.username} won on TicTacToe against ${player1.username}!`
-            winner = player2
-            loser = player1
-            break
-        }
+
+        if (gameState === GameFinalState.PLAYER1_VICTORY)
+          [winner, loser] = [player1, player2]
+        else if (gameState === GameFinalState.PLAYER2_VICTORY)
+          [winner, loser] = [player2, player1]
 
         if (winner) {
           try {
             logger.info(
-              `Registering ${winner.username}'s tictactoe victory in '${m.guild.name}' guild...`,
+              `Registering ${winner.username}'s tictactoe victory in '${i.guild.name}' guild...`,
               {
                 context: this.constructor.name,
               }
@@ -257,6 +293,11 @@ export class TicTacToeCommand extends Command {
           }
         }
 
+        const { result, stopReason } = tttGameResults[gameState]({
+          player1,
+          player2,
+        })
+
         newEmbedMessage.addField('Result :trophy:', result, false)
         if (winner && loser) {
           newEmbedMessage.addField(
@@ -273,7 +314,10 @@ export class TicTacToeCommand extends Command {
         }
 
         // Edits the embed tictactoe message.
-        await sentEmbedMessage.edit({ embeds: [newEmbedMessage] })
+        await i.update({
+          embeds: [newEmbedMessage],
+          components: [],
+        })
 
         // Stop message collection.
         collector.stop(stopReason)
@@ -290,12 +334,18 @@ export class TicTacToeCommand extends Command {
             false
           )
 
-        // Edits the embed tictactoe message.
-        await sentEmbedMessage.edit({ embeds: [newEmbedMessage] })
+        // Edits the embed message.
+        await i.update({
+          embeds: [newEmbedMessage],
+          components: updatedButtons,
+        })
       }
     })
 
     collector.on('end', async (_: any, reason: any) => {
+      setTimeout(() => {
+        sentEmbedMessage.delete().catch()
+      }, 1000 * 10)
       // Unlocks the game instance.
       try {
         const guild = await container.db.guildService.getById(guildId)
@@ -319,7 +369,7 @@ export class TicTacToeCommand extends Command {
   /**
    * Creates a generic tictactoe board.
    */
-  embedDefaultTicTacToeBoard(player1: User, player2: User): MessageEmbed {
+  embedDefaultboard(player1: User, player2: User): MessageEmbed {
     return new MessageEmbed()
       .setTitle(`:x::o: Gato:3 :x::o:`)
       .setColor(configuration.embedMessageColor)
@@ -334,9 +384,9 @@ export class TicTacToeCommand extends Command {
       .addField(
         'Board',
         `
-        ${this.tictactoeBoard[0]}${this.tictactoeBoard[1]}${this.tictactoeBoard[2]}
-        ${this.tictactoeBoard[3]}${this.tictactoeBoard[4]}${this.tictactoeBoard[5]}
-        ${this.tictactoeBoard[6]}${this.tictactoeBoard[7]}${this.tictactoeBoard[8]}
+        ${this.board[0]}${this.board[1]}${this.board[2]}
+        ${this.board[3]}${this.board[4]}${this.board[5]}
+        ${this.board[6]}${this.board[7]}${this.board[8]}
         `,
         true
       )
@@ -351,120 +401,58 @@ export class TicTacToeCommand extends Command {
       )
   }
 
+  getInitialOrder(player1: User, player2: User) {
+    const random = Math.random() < 0.5
+    return {
+      activePlayer: random ? player1 : player2,
+      otherPlayer: random ? player2 : player1,
+    }
+  }
+
   /**
    * It resolves if the game is a tie or if someone has won.
-   * (-1) : No one has won yet.
-   * (0) : Tied.
-   * (1) : Player 1 won.
-   * (2) : Player 2 won.
    */
-  obtainGameState(playedNumber: number): number {
-    let Xcounter = 0
-    let Ocounter = 0
+  obtainGameState(playedNumber: number): GameFinalState {
+    // WHen game is cancelled
+    if (isNaN(playedNumber)) return GameFinalState.TIE
 
-    let initialRowPosition = -1
-    // Depending of the played number, we have to check certain row.
-    if (playedNumber >= 0 && playedNumber <= 2) initialRowPosition = 0
-    else if (playedNumber >= 3 && playedNumber <= 5) initialRowPosition = 3
-    else initialRowPosition = 6
+    const playedMark = this.board[playedNumber]
 
-    // Checks for played row.
-    for (let i = initialRowPosition; i < initialRowPosition + 3; i++) {
-      if (this.tictactoeBoard[i] === this.defaultSymbol) {
-        // If there's no :x: or :o: on a row slot, it cannot be a winning row.
-        break
-      }
+    // Depending of the played number, we check some row and column.
+    const initRowPos = playedNumber - (playedNumber % 3)
+    const initColPos = playedNumber % 3
 
-      if (this.tictactoeBoard[i] === ':x:') Xcounter++
-      else Ocounter++
+    const rowPositions = [
+      this.board[initRowPos],
+      this.board[initRowPos + 1],
+      this.board[initRowPos + 2],
+    ]
 
-      // If the entire row was checked.
-      if (i + 1 === initialRowPosition + 3) {
-        // If a row is completed marked with :x: or :o: its a winning play.
-        if (Xcounter === 3) return 1
-        else if (Ocounter === 3) return 2
-      }
-    }
+    const colPositions = [
+      this.board[initColPos],
+      this.board[initColPos + 3],
+      this.board[initColPos + 6],
+    ]
 
-    // Reset counters.
-    Xcounter = 0
-    Ocounter = 0
+    const leftDiagonalPositions = [this.board[0], this.board[4], this.board[8]]
+    const rightDiagonalPositions = [this.board[2], this.board[4], this.board[6]]
 
-    let initialColPosition = -1
-    // Depending of the played number, we have to check certain column.
-    if (playedNumber === 0 || playedNumber === 3 || playedNumber === 6)
-      initialColPosition = 0
-    else if (playedNumber === 1 || playedNumber === 4 || playedNumber === 7)
-      initialColPosition = 1
-    else initialColPosition = 2
-
-    // Checks for played column.
-    for (let i = initialColPosition; i < 9; i += 3) {
-      if (this.tictactoeBoard[i] === this.defaultSymbol) {
-        // If there's no :x: or :o: on a column slot, it cannot be a winning column.
-        break
-      }
-
-      if (this.tictactoeBoard[i] === ':x:') Xcounter++
-      else Ocounter++
-
-      // If the entire column was checked.
-      if (i === 6 || i === 7 || i === 8) {
-        // If a column is completed marked with :x: or :o: its a winning play.
-        if (Xcounter === 3) return 1
-        else if (Ocounter === 3) return 2
-      }
-    }
-
-    // Reset counters.
-    Xcounter = 0
-    Ocounter = 0
-
-    // Check for left diagonal.
-    for (let i = 0; i < 9; i += 4) {
-      if (this.tictactoeBoard[i] === this.defaultSymbol) {
-        // If there's no :x: or :o: on a slot, it cannot be a winning diagonal.
-        break
-      }
-
-      if (this.tictactoeBoard[i] === ':x:') Xcounter++
-      else Ocounter++
-
-      // If the entire diagonal was checked.
-      if (i === 8) {
-        // If the diagonal is completed marked with a :x: or with a :o: its a winning play.
-        if (Xcounter === 3) return 1
-        else if (Ocounter === 3) return 2
-      }
-    }
-
-    // Reset counters.
-    Xcounter = 0
-    Ocounter = 0
-
-    // Checks for right diagonal.
-    for (let i = 2; i < 9; i += 2) {
-      if (this.tictactoeBoard[i] === this.defaultSymbol) {
-        // If there's no mark on a diagonal slot, it cannot be a winning diagonal.
-        break
-      }
-
-      if (this.tictactoeBoard[i] === ':x:') Xcounter++
-      else Ocounter++
-
-      // If the entire diagonal was checked.
-      if (i === 6) {
-        // If the diagonal is completed marked with a :x: or with a :o: its a winning play.
-        if (Xcounter === 3) return 1
-        else if (Ocounter === 3) return 2
-      }
+    if (
+      rowPositions.every((pos) => pos === playedMark) ||
+      colPositions.every((pos) => pos === playedMark) ||
+      leftDiagonalPositions.every((pos) => pos === playedMark) ||
+      rightDiagonalPositions.every((pos) => pos === playedMark)
+    ) {
+      return playedMark === ':x:'
+        ? GameFinalState.PLAYER1_VICTORY
+        : GameFinalState.PLAYER2_VICTORY
     }
 
     // Every slot is marked and no one has won.
-    if (this.tictactoeBoard.every((mark) => mark !== this.defaultSymbol)) {
-      return 0
+    if (this.board.every((mark) => mark !== this.defaultSymbol)) {
+      return GameFinalState.TIE
     }
 
-    return -1
+    return GameFinalState.UNDEFINED
   }
 }

@@ -1,18 +1,43 @@
 import {
+  CacheType,
+  CollectorFilter,
   GuildMember,
   Message,
+  MessageActionRow,
   MessageAttachment,
+  MessageComponentInteraction,
   MessageEmbed,
 } from 'discord.js'
 import { Command, container } from '@sapphire/framework'
-import { initRoles, logger, roles, UserAnswers } from '@/utils'
+import {
+  ActivateRolesResolverParams,
+  botLogoURL,
+  getBotLogo,
+  getButton,
+  initRoles,
+  logger,
+  roles,
+  RolesButtonId,
+  UserActions,
+} from '@/utils'
 import { configuration } from '@/config'
 import { Guild } from '@/database'
+import { DocumentType } from '@typegoose/typegoose'
+import { BeAnObject } from '@typegoose/typegoose/lib/types'
 
 /**
  * Activate roles functionality.
  */
 export class ActivateRolesCommand extends Command {
+  private resolver: Record<
+    UserActions,
+    (_: ActivateRolesResolverParams) => Promise<ActivateRolesResolverParams>
+  > = {
+    [UserActions.ACCEPT]: this.activate.bind(this),
+    [UserActions.REJECT]: this.reject.bind(this),
+    [UserActions.IGNORE]: this.ignore.bind(this),
+  }
+
   constructor(context: Command.Context, options: Command.Options) {
     super(context, {
       ...options,
@@ -61,80 +86,63 @@ export class ActivateRolesCommand extends Command {
       let rolesList = ''
       const everyRole = Object.values(roles)
       everyRole.forEach((role) => {
-        rolesList += `• ${role.name} \n`
+        rolesList += `• ${role.name}\n`
       })
 
-      const botLogo = new MessageAttachment(
-        './public/img/chibiKnightLogo.png',
-        'chibiKnightLogo.png'
-      )
       const embedMessage = new MessageEmbed()
         .setAuthor({
           name: configuration.appName,
-          iconURL: 'attachment://chibiKnightLogo.png',
+          iconURL: botLogoURL,
         })
-        .setThumbnail('attachment://chibiKnightLogo.png')
+        .setThumbnail(botLogoURL)
         .addField('The next roles will be added to your server:', rolesList)
         .setColor(configuration.embedMessageColor)
         .setFooter(
-          `**Do you really want to activate ${configuration.appName}'s roles ? (yes/y/no/n)**`
+          `> Do you really want to activate ${configuration.appName}'s roles ?`
         )
-      await message.channel.send({ embeds: [embedMessage], files: [botLogo] })
 
-      const filter = (response: Message) => {
-        const validAnswer = /yes|y|no|n/.test(response.content.toLowerCase())
-        return response.author.id === message.author.id && validAnswer
-      }
+      const buttons = new MessageActionRow().addComponents(
+        getButton(RolesButtonId.ACCEPT, 'ACCEPT', 'SUCCESS'),
+        getButton(RolesButtonId.REJECT, 'REJECT', 'DANGER')
+      )
 
-      // Waits 15 seconds while types a valid answer (yes/y/no/n).
-      const collectedMessages = await message.channel.awaitMessages({
-        filter,
-        max: 1,
-        time: 15000,
+      const activateRolesEmbedMessage = await message.channel.send({
+        embeds: [embedMessage],
+        files: [getBotLogo()],
+        components: [buttons],
       })
 
-      if (!collectedMessages.first()) {
-        return message.channel.send(`Time's up! Try again later ):`)
-      }
+      const filter: CollectorFilter<[MessageComponentInteraction<'cached'>]> = (
+        btnInteraction
+      ) => btnInteraction.user.id === message.author.id
 
-      const receivedResponse = collectedMessages.first().content.toUpperCase()
-      if (
-        receivedResponse === UserAnswers.N ||
-        receivedResponse === UserAnswers.NO
-      ) {
-        return message.channel.send('Okay! (:')
-      } else if (
-        receivedResponse !== UserAnswers.Y &&
-        receivedResponse !== UserAnswers.YES
-      ) {
-        return message.channel.send(
-          'You typed an invalid answer so I suppose you dont want to activate roles (:'
-        )
-      }
+      // Waits 15 seconds for response.
+      const collector = message.channel.createMessageComponentCollector({
+        filter,
+        max: 1,
+        time: 1000 * 15,
+      })
 
-      await message.channel.send(
-        `Okay, we're working for you, meanwhile take a nap n.n`
-      )
+      let authorAction = UserActions.IGNORE
+      collector.on('end', (collection) => {
+        if (collection.first()?.customId === RolesButtonId.REJECT) {
+          authorAction = UserActions.REJECT
+        } else if (collection.first()?.customId === RolesButtonId.ACCEPT) {
+          authorAction = UserActions.ACCEPT
+        }
 
-      const rolesCreated = await initRoles(message)
-      if (!rolesCreated) {
-        return message.channel.send(
-          `Error while trying to create roles, maybe I don't have enough permissions :sweat:`
-        )
-      }
-
-      guild.rolesActivated = true
-      await guild.save()
-
-      const newCachedGuild: Guild = {
-        guildId: message.guild.id,
-        rolesActivated: true,
-      }
-      container.cache.set(message.guild.id, newCachedGuild)
-
-      return message.channel.send(
-        `Roles created successfully :purple_heart: Try to see yours with **${configuration.prefix}myroles** command.`
-      )
+        this.resolver[authorAction]({
+          message,
+          interaction: collection.first(),
+          guild,
+        }).then(({ message, interaction }) => {
+          activateRolesEmbedMessage.delete().catch()
+          setTimeout(() => {
+            interaction?.deleteReply().catch()
+            message?.delete().catch()
+          }, 1000 * 7)
+        })
+      })
     } catch (error) {
       logger.error(
         `MongoDB Connection error. Could not initiate roles game for '${message.guild.name}' server`,
@@ -144,5 +152,45 @@ export class ActivateRolesCommand extends Command {
         'It occured an unexpected error, roles could not be created ): Try again later :sweat:'
       )
     }
+  }
+
+  async activate({ message, interaction, guild }: ActivateRolesResolverParams) {
+    const activatingRolesMsg = await message.channel.send(
+      `Okay, we're working for you, meanwhile take a nap n.n`
+    )
+
+    const rolesCreated = await initRoles(message)
+    if (!rolesCreated) {
+      interaction.reply(
+        `Error while trying to create roles, maybe I don't have enough permissions :sweat:`
+      )
+      return { interaction }
+    }
+
+    guild.rolesActivated = true
+    await guild.save()
+
+    const newCachedGuild: Guild = {
+      guildId: message.guild.id,
+      rolesActivated: true,
+    }
+    container.cache.set(message.guild.id, newCachedGuild)
+
+    interaction.reply(
+      `Roles created successfully :purple_heart: Try to see yours with **${configuration.prefix}myroles** command.`
+    )
+    return { message: activatingRolesMsg, interaction }
+  }
+
+  async reject({ interaction }: ActivateRolesResolverParams) {
+    await interaction.reply(`Okay! we're not gonna create any role (:`)
+    return { interaction }
+  }
+
+  async ignore({ message }: ActivateRolesResolverParams) {
+    const timesUpMessage = await message.channel.send(
+      `Time's up! Try again later ):`
+    )
+    return { message: timesUpMessage }
   }
 }

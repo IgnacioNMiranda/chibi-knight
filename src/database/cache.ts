@@ -8,7 +8,6 @@ export class Cache {
 
   constructor() {
     this.cache = new Map<string, Guild>()
-    setInterval(this.refresh, 1000 * 60 * 60)
   }
 
   static async init() {
@@ -40,10 +39,6 @@ export class Cache {
       )
     }
     return this.instance
-  }
-
-  refresh() {
-    this.cache.clear()
   }
 
   get(resourceId: string): any {
