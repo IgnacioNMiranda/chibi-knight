@@ -1,5 +1,3 @@
 export * from './games'
-export * from './channel'
 export * from './commands'
 export * from './roles'
-export * from './user'
