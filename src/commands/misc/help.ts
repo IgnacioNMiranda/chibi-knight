@@ -1,6 +1,11 @@
 import { Args, Command } from '@sapphire/framework'
 import { Message, MessageAttachment, MessageEmbed } from 'discord.js'
-import { BotChannel, commandsCategoriesDescriptions } from '@/utils'
+import {
+  BotChannel,
+  botLogoURL,
+  commandsCategoriesDescriptions,
+  getBotLogo,
+} from '@/utils'
 import { configuration } from '@/config'
 
 /**
@@ -21,16 +26,12 @@ export class HelpCommand extends Command {
    * It executes when someone types the "help" command.
    */
   async messageRun(message: Message, args: Args): Promise<Message<boolean>> {
-    const botLogo = new MessageAttachment(
-      './public/img/chibiKnightLogo.png',
-      'chibiKnightLogo.png'
-    )
     const embedMessage = new MessageEmbed()
       .setAuthor({
         name: configuration.appName,
-        iconURL: 'attachment://chibiKnightLogo.png',
+        iconURL: botLogoURL,
       })
-      .setThumbnail('attachment://chibiKnightLogo.png')
+      .setThumbnail(botLogoURL)
       .setColor(configuration.embedMessageColor)
 
     const commandName = await args.pick('string').catch(() => null)
@@ -40,13 +41,12 @@ export class HelpCommand extends Command {
     }
 
     return this.buildHelpForEveryCommand(embedMessage, message.channel, [
-      botLogo,
+      getBotLogo(),
     ])
   }
 
   buildCommandHelp(commandName: string, channel: BotChannel) {
     const command = this.store.get(commandName) as Command
-    console.log(command)
     // TODO: when implement localization
 
     if (command) {
@@ -90,7 +90,7 @@ export class HelpCommand extends Command {
     const commands = this.store.container.stores.get('commands')
     const categories = new Set<string>()
 
-    new Array(...commands.values()).forEach((command) => {
+    Array(...commands.values()).forEach((command) => {
       if (command.enabled && !categories.has(command.category)) {
         categories.add(command.category)
       }
