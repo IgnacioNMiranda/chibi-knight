@@ -1,8 +1,5 @@
 <p align="center">
-  🏴󠁵󠁳󠁡󠁳󠁿This application has been built with Commando framework.
-</p>
-<p align="center">
-  🏴󠁵󠁳󠁡󠁳󠁿Esta aplicación ha sido construida con JS utilizando el framework Discord.js Commando.
+  🏴󠁵󠁳󠁡󠁳󠁿This application has been built with Sapphire framework.
 </p>
 
 <p align="center">
@@ -13,13 +10,13 @@
 
 # Chibi Knight
 
-## Description | Descripción
+## Description
 
 This application is a Discord bot that allows to do simple tasks like send messages or play minigames.
 
 </br>
 
-## Installation | Instalación
+## Installation
 
 ```bash
 # with npm
@@ -28,7 +25,7 @@ npm install
 yarn
 ```
 
-## Running the app | Ejecutando la aplicación
+## Running the app
 
 ```bash
 # development

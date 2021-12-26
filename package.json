@@ -1,11 +1,11 @@
 {
   "name": "chibi-knight",
-  "version": "2.0.0",
+  "version": "2.1.0",
   "description": "A multipurpose discord bot",
-  "main": "dist/index.js",
+  "main": "dist/app.js",
   "scripts": {
-    "start": "node dist/index.js",
-    "dev": "tsc-watch --onSuccess \"sh -c 'tsc-alias && node dist/index.js'\"",
+    "start": "node dist/app.js",
+    "dev": "tsc-watch --onSuccess \"sh -c 'tsc-alias && node dist/app.js'\"",
     "build": "rm -rf dist && tsc && tsc-alias",
     "test": "echo \"Error: no test specified\" && exit 1",
     "lint": "eslint \"{src, test}/**/*.ts\" --fix"
