@@ -1,10 +1,7 @@
 import {
-  CacheType,
   CollectorFilter,
-  GuildMember,
   Message,
   MessageActionRow,
-  MessageAttachment,
   MessageComponentInteraction,
   MessageEmbed,
 } from 'discord.js'
@@ -22,8 +19,6 @@ import {
 } from '@/utils'
 import { configuration } from '@/config'
 import { Guild } from '@/database'
-import { DocumentType } from '@typegoose/typegoose'
-import { BeAnObject } from '@typegoose/typegoose/lib/types'
 
 /**
  * Activate roles functionality.
@@ -45,44 +40,17 @@ export class ActivateRolesCommand extends Command {
       aliases: ['ar'],
       fullCategory: ['roles'],
       description: 'Activates bot roles.',
+      preconditions: ['AdminOnly', 'BotInitializeOnly', 'RolesNotActiveOnly'],
+      requiredUserPermissions: ['ADMINISTRATOR'],
+      requiredClientPermissions: ['MANAGE_ROLES'],
     })
   }
 
   /**
-   * It executes when someone types the "activaterolesgame" command.
+   * It executes when someone types the "activateroles" command.
    */
   async messageRun(message: Message): Promise<Message> {
     try {
-      if (!message.guild) {
-        return message.channel.send(`We cannot have roles here ¬¬`)
-      }
-      const user: GuildMember = await message.guild.members.fetch(
-        message.author.id
-      )
-      if (!user.permissions.has('ADMINISTRATOR')) {
-        return message.channel.send(
-          `You don't have permissions to run this command. Contact with an Administrator :sweat:`
-        )
-      }
-
-      const { id: guildId } = message.guild
-      const activatedRolesError = `You already have initialize ${configuration.appName}'s roles :relieved: Check yours with **${configuration.prefix}myroles**.`
-      const cachedGuild = container.cache.get(guildId)
-      if (cachedGuild?.rolesActivated) {
-        return message.channel.send(activatedRolesError)
-      }
-
-      const guild = await container.db.guildService.getById(guildId)
-      if (!guild) {
-        return message.channel.send(
-          `You have not run **${configuration.prefix}init** command. You cannot activate roles before that.`
-        )
-      }
-
-      if (guild.rolesActivated) {
-        return message.channel.send(activatedRolesError)
-      }
-
       let rolesList = ''
       const everyRole = Object.values(roles)
       everyRole.forEach((role) => {
@@ -134,7 +102,6 @@ export class ActivateRolesCommand extends Command {
         this.resolver[authorAction]({
           message,
           interaction: collection.first(),
-          guild,
         }).then(({ message, interaction }) => {
           activateRolesEmbedMessage.delete().catch()
           setTimeout(() => {
@@ -154,7 +121,7 @@ export class ActivateRolesCommand extends Command {
     }
   }
 
-  async activate({ message, interaction, guild }: ActivateRolesResolverParams) {
+  async activate({ message, interaction }: ActivateRolesResolverParams) {
     const activatingRolesMsg = await message.channel.send(
       `Okay, we're working for you, meanwhile take a nap n.n`
     )
@@ -167,6 +134,8 @@ export class ActivateRolesCommand extends Command {
       return { interaction }
     }
 
+    const { id: guildId } = message.guild
+    const guild = await container.db.guildService.getById(guildId)
     guild.rolesActivated = true
     await guild.save()
 

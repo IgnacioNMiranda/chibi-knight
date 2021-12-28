@@ -1,6 +1,3 @@
-import { DocumentType } from '@typegoose/typegoose'
-import { BeAnObject } from '@typegoose/typegoose/lib/types'
-import { Guild } from '@/database'
 import { CacheType, Message, MessageComponentInteraction } from 'discord.js'
 import { BotCommandsCategories } from '.'
 
@@ -34,5 +31,4 @@ export enum RolesButtonId {
 export type ActivateRolesResolverParams = {
   message: Message
   interaction?: MessageComponentInteraction<CacheType>
-  guild?: DocumentType<Guild, BeAnObject>
 }

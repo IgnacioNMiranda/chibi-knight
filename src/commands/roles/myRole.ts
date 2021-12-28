@@ -20,6 +20,8 @@ export class MyRoleCommand extends Command {
       aliases: ['mr'],
       fullCategory: ['roles'],
       description: `Shows user's role and their score.`,
+      preconditions: ['RolesActiveOnly'],
+      runIn: ['GUILD_ANY'],
     })
   }
 
@@ -27,30 +29,7 @@ export class MyRoleCommand extends Command {
    * It executes when someone types the "roles" command.
    */
   async messageRun(message: Message): Promise<Message> {
-    if (!message.guild) {
-      return message.channel.send(`You don't have roles here.`)
-    }
-
-    const activatedRolesError = `${configuration.appName}'s roles are not activated. First, you have to run \`${configuration.prefix}activateroles\``
-
     const { id: guildId } = message.guild
-    const cachedGuild = container.cache.get(guildId)
-
-    if (cachedGuild && !cachedGuild.rolesActivated) {
-      return message.channel.send(activatedRolesError)
-    }
-
-    try {
-      const guild = await container.db.guildService.getById(guildId)
-      if (guild && !guild.rolesActivated) {
-        return message.channel.send(activatedRolesError)
-      }
-    } catch (error) {
-      return message.channel.send(
-        'It occured an unexpected error :sweat: try again later.'
-      )
-    }
-
     const {
       author: { id },
     } = message

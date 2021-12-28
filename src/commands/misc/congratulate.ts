@@ -13,6 +13,7 @@ export class CongratulateCommand extends Command {
       aliases: ['c'],
       fullCategory: ['misc'],
       description: 'Congratulates some @User.',
+      runIn: ['GUILD_ANY'],
     })
   }
 

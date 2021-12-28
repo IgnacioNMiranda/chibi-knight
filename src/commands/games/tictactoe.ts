@@ -48,6 +48,8 @@ export class TicTacToeCommand extends Command {
       aliases: ['ttt'],
       fullCategory: ['games'],
       description: 'Initiates a tictactoe game.',
+      preconditions: ['BotInitializeOnly'],
+      runIn: ['GUILD_ANY'],
     })
   }
 

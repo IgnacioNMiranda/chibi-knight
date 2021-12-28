@@ -15,6 +15,8 @@ export class TicTacToeLeaderBoardCommand extends Command {
       aliases: ['tttlb'],
       fullCategory: ['games'],
       description: 'Displays the tictactoe leaderboard.',
+      preconditions: ['BotInitializeOnly'],
+      runIn: ['GUILD_ANY'],
     })
   }
 
@@ -23,17 +25,10 @@ export class TicTacToeLeaderBoardCommand extends Command {
    */
   async messageRun(message: Message): Promise<Message> {
     try {
-      if (!message.guild) {
-        return message.channel.send(
-          `We don't have a tictactoe leaderboard here ¬¬`
-        )
-      }
-
       const { id: guildId } = message.guild
       const topUsers = await container.db.userService.getByNestedFilter(
         'guildsData',
         { 'guildsData.guildId': guildId },
-        10,
         { 'guildsData.tictactoeWins': -1 }
       )
 

@@ -1,5 +1,5 @@
 import { Command, container } from '@sapphire/framework'
-import { GuildMember, Message } from 'discord.js'
+import { Message } from 'discord.js'
 import { configuration } from '@/config'
 import { logger } from '@/utils'
 import { Guild, User, GuildData } from '@/database'
@@ -15,6 +15,8 @@ export class InitChibiKnightCommand extends Command {
       aliases: ['i'],
       fullCategory: ['misc'],
       description: 'Initialize Chibi Knight funcionalities.',
+      preconditions: ['AdminOnly', 'BotNotInitializeOnly'],
+      requiredUserPermissions: ['ADMINISTRATOR'],
     })
   }
 
@@ -22,29 +24,8 @@ export class InitChibiKnightCommand extends Command {
    * It executes when someone types the "init" command.
    */
   async messageRun(message: Message): Promise<Message> {
-    if (!message.guild) {
-      return message.channel.send(
-        `You cannot initialize my features in a DM channel.`
-      )
-    }
-
     try {
-      const user: GuildMember = await message.guild.members.fetch(
-        message.author.id
-      )
-      if (!user.permissions.has('ADMINISTRATOR')) {
-        return message.channel.send(
-          `You don't have permissions to run this command. Contact with an Administrator :sweat:`
-        )
-      }
-
       const { id: guildId, members } = message.guild
-      const guild = await container.db.guildService.getById(guildId)
-      if (guild) {
-        return message.channel.send(
-          `${configuration.appName} has already been initialize n.n`
-        )
-      }
 
       logger.info(`Trying to register new server '${message.guild.name}'...`, {
         context: this.constructor.name,
