@@ -6,3 +6,18 @@ declare module '@sapphire/pieces' {
     cache: Cache
   }
 }
+
+declare module '@sapphire/framework' {
+  interface Preconditions {
+    /** Roles */
+    RolesNotActiveOnly: never
+    RolesActiveOnly: never
+
+    /** Server */
+    BotNotInitializeOnly: never
+    BotInitializeOnly: never
+
+    /** User */
+    AdminOnly: never
+  }
+}
