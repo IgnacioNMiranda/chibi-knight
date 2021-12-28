@@ -14,6 +14,7 @@ export class ShameOnYouCommand extends Command {
       aliases: ['soy'],
       fullCategory: ['misc'],
       description: 'Disrespects some @User.',
+      runIn: ['GUILD_ANY'],
     })
   }
 

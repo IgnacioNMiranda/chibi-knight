@@ -34,5 +34,4 @@ export enum RolesButtonId {
 export type ActivateRolesResolverParams = {
   message: Message
   interaction?: MessageComponentInteraction<CacheType>
-  guild?: DocumentType<Guild, BeAnObject>
 }

@@ -32,8 +32,8 @@ export class UserService {
   async getByNestedFilter(
     unwind: string,
     filter: any,
-    limit = 10,
-    sort: any
+    sort: any,
+    limit = 10
   ): Promise<Aggregate<User[]>> {
     return await this.userRepository.aggregate([
       { $unwind: `$${unwind}` },

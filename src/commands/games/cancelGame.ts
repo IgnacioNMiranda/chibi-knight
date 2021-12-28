@@ -13,6 +13,8 @@ export class CancelGameCommand extends Command {
       aliases: ['cg'],
       fullCategory: ['games'],
       description: 'Cancels the active game.',
+      preconditions: ['BotInitializeOnly'],
+      runIn: ['GUILD_ANY'],
     })
   }
 
@@ -20,9 +22,6 @@ export class CancelGameCommand extends Command {
    * It executes when someone types the "say" command.
    */
   async messageRun(message: Message): Promise<Message<boolean>> {
-    if (message.guild === null) {
-      return message.channel.send('You cannot cancel a game in a private chat.')
-    }
     const { id } = message.guild
 
     try {
