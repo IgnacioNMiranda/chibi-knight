@@ -1,9 +1,5 @@
-import {
-  Command,
-  CommandOptionsRunTypeEnum,
-  container,
-} from '@sapphire/framework'
-import { GuildMember, Message } from 'discord.js'
+import { Command, container } from '@sapphire/framework'
+import { Message } from 'discord.js'
 import { configuration } from '@/config'
 import { logger } from '@/utils'
 import { Guild, User, GuildData } from '@/database'

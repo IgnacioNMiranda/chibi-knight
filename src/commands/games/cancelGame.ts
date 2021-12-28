@@ -1,6 +1,5 @@
 import { Command, container } from '@sapphire/framework'
 import type { Message } from 'discord.js'
-import { Guild } from '@/database'
 import { logger } from '@/utils'
 
 /**
