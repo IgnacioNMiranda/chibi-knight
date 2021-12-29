@@ -1,7 +1,8 @@
-import { Args, Command } from '@sapphire/framework'
+import { Args, Command, CommandOptionsRunTypeEnum } from '@sapphire/framework'
 import { Message, MessageEmbed } from 'discord.js'
 import { configuration } from '@/config'
-import { commandsLinks } from '@/utils'
+import { commandsLinks, languageKeys } from '@/utils'
+import { resolveKey } from '@sapphire/plugin-i18next'
 
 /**
  * Sends an embed message with congratulations to certain User and a celebration image.
@@ -11,9 +12,8 @@ export class CongratulateCommand extends Command {
     super(context, {
       ...options,
       aliases: ['c'],
-      fullCategory: ['misc'],
-      description: 'Congratulates some @User.',
-      runIn: ['GUILD_ANY'],
+      description: languageKeys.commands.misc.congratulate.description,
+      runIn: [CommandOptionsRunTypeEnum.GuildAny],
     })
   }
 
@@ -26,8 +26,14 @@ export class CongratulateCommand extends Command {
     const { gifs } = commandsLinks.misc.congratulate
     const randIndex = Math.floor(Math.random() * gifs.length)
 
+    const embedMessageDescription = await resolveKey(
+      message,
+      languageKeys.commands.misc.congratulate.embedMessageDescription,
+      { username: congratulatedPerson.username }
+    )
+
     const embedMessage = new MessageEmbed()
-      .setDescription(`Congratulations ${congratulatedPerson.username} !!`)
+      .setDescription(embedMessageDescription)
       .setColor(configuration.embedMessageColor)
       .setImage(gifs[randIndex])
 

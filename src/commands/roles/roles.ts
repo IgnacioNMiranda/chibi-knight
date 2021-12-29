@@ -1,7 +1,7 @@
 import { Message, MessageEmbed } from 'discord.js'
-import { Args, Command, container } from '@sapphire/framework'
+import { Args, Command, CommandOptionsRunTypeEnum, container } from '@sapphire/framework'
 import { configuration } from '@/config'
-import { getRoleFromUser, roles } from '@/utils'
+import { getRoleFromUser, roles, CustomPrecondition } from '@/utils'
 
 /**
  * Displays information about roles and their respective scores.
@@ -14,8 +14,8 @@ export class RolesCommand extends Command {
       aliases: ['r'],
       fullCategory: ['roles'],
       description: `Shows every registered ${configuration.appName}'s roles or specific @User's role.`,
-      preconditions: ['RolesActiveOnly'],
-      runIn: ['GUILD_ANY'],
+      preconditions: [CustomPrecondition.RolesActiveOnly],
+      runIn: [CommandOptionsRunTypeEnum.GuildAny],
     })
   }
 
@@ -25,9 +25,7 @@ export class RolesCommand extends Command {
   async messageRun(message: Message, args: Args): Promise<Message> {
     const { id: guildId } = message.guild
 
-    const embedMessage = new MessageEmbed().setColor(
-      configuration.embedMessageColor
-    )
+    const embedMessage = new MessageEmbed().setColor(configuration.embedMessageColor)
 
     const user = await args.pick('user').catch(() => null)
     if (!!user && !user.bot) {
@@ -40,24 +38,18 @@ export class RolesCommand extends Command {
         embedMessage.addField('Current Role', 'None')
       }
 
-      embedMessage.setDescription(
-        `:jack_o_lantern: ${user.username} :jack_o_lantern:`
-      )
+      embedMessage.setDescription(`:jack_o_lantern: ${user.username} :jack_o_lantern:`)
 
       let score = 'Who knows D:'
       try {
         const userDb = await container.db.userService.getById(user.id)
-        const guildData = userDb.guildsData.find(
-          (guildData) => guildData.guildId === guildId
-        )
+        const guildData = userDb.guildsData.find((guildData) => guildData.guildId === guildId)
         score = guildData.participationScore.toString()
       } catch (error) {}
 
       embedMessage.addField('Current Score', score)
     } else {
-      embedMessage.setDescription(
-        `:jack_o_lantern: Available ${configuration.appName}'s Roles :jack_o_lantern:`
-      )
+      embedMessage.setDescription(`:jack_o_lantern: Available ${configuration.appName}'s Roles :jack_o_lantern:`)
 
       let rolesList = ''
       let scoresList = ''
@@ -69,9 +61,7 @@ export class RolesCommand extends Command {
 
       embedMessage.addField('Roles', rolesList, true)
       embedMessage.addField('Required scores', scoresList, true)
-      embedMessage.setFooter(
-        'You can increase your score being participatory and interacting with other users n.n'
-      )
+      embedMessage.setFooter('You can increase your score being participatory and interacting with other users n.n')
     }
 
     return message.channel.send({ embeds: [embedMessage] })

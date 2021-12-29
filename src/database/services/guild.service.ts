@@ -1,8 +1,4 @@
-import {
-  DocumentType,
-  ReturnModelType,
-  getModelForClass,
-} from '@typegoose/typegoose'
+import { DocumentType, ReturnModelType, getModelForClass } from '@typegoose/typegoose'
 import { Guild } from '../models'
 
 export class GuildService {

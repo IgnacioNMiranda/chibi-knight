@@ -1,12 +1,8 @@
 import { Args, Command } from '@sapphire/framework'
 import { Message, MessageAttachment, MessageEmbed } from 'discord.js'
-import {
-  BotChannel,
-  botLogoURL,
-  commandsCategoriesDescriptions,
-  getBotLogo,
-} from '@/utils'
+import { BotChannel, botLogoURL, commandsCategoriesDescriptions, getBotLogo, languageKeys } from '@/utils'
 import { configuration } from '@/config'
+import { resolveKey } from '@sapphire/plugin-i18next'
 
 /**
  * Sends an embed message with information of every existing command.
@@ -15,10 +11,8 @@ export class HelpCommand extends Command {
   constructor(context: Command.Context, options: Command.Options) {
     super(context, {
       ...options,
-      name: 'help',
       aliases: ['h'],
-      fullCategory: ['misc'],
-      description: 'Gives information about every existing command.',
+      description: languageKeys.commands.misc.help.description,
     })
   }
 
@@ -37,15 +31,13 @@ export class HelpCommand extends Command {
     const commandName = await args.pick('string').catch(() => null)
 
     if (commandName) {
-      this.buildCommandHelp(commandName, message.channel)
+      return this.buildCommandHelp(commandName, message.channel)
     }
 
-    return this.buildHelpForEveryCommand(embedMessage, message.channel, [
-      getBotLogo(),
-    ])
+    return this.buildHelpForEveryCommand(embedMessage, message.channel, [getBotLogo()])
   }
 
-  buildCommandHelp(commandName: string, channel: BotChannel) {
+  async buildCommandHelp(commandName: string, channel: BotChannel) {
     const command = this.store.get(commandName) as Command
     // TODO: when implement localization
 
@@ -73,19 +65,19 @@ export class HelpCommand extends Command {
         return message.channel.send({ embeds: [embedMessage], files: [botLogo] }) */
     }
 
-    return channel.send(
-      `Unknown command!! There are no commands with that name ):`
-    )
+    const unknownCommandMessage = await resolveKey(channel, languageKeys.commands.misc.help.unknownCommandError, {
+      prefix: configuration.prefix,
+    })
+
+    return channel.send(unknownCommandMessage)
   }
 
-  buildHelpForEveryCommand(
-    message: MessageEmbed,
-    channel: BotChannel,
-    files: MessageAttachment[]
-  ) {
-    message.setDescription(
-      `:crossed_swords: These are the available commands for Chibi Knight n.n`
-    )
+  async buildHelpForEveryCommand(message: MessageEmbed, channel: BotChannel, files: MessageAttachment[]) {
+    const { appName, prefix } = configuration
+    const description = await resolveKey(channel, languageKeys.commands.misc.help.everyCommandEmbedMessageDescription, {
+      appName,
+    })
+    message.setDescription(description)
 
     const commands = this.store.container.stores.get('commands')
     const categories = new Set<string>()
@@ -96,25 +88,31 @@ export class HelpCommand extends Command {
       }
     })
 
-    const fields = [...categories.values()].map((category) => ({
-      category: commandsCategoriesDescriptions[category],
-      commands: commands
+    const noCommandDescription = await resolveKey(channel, languageKeys.commands.misc.help.commandWithoutDescription)
+    const fieldsBuilder = [...categories.values()].map(async (category) => {
+      const commandsParsers = commands
         .filter((command) => command.category === category && command.enabled)
-        .map(
-          (cmd) =>
-            `**${configuration.prefix}${cmd.name}** → ${
-              cmd.description ?? 'No description was provided'
-            }`
-        ),
-    }))
+        .map(async (cmd) => {
+          const commandDescription = (await resolveKey(channel, cmd.description)) ?? noCommandDescription
+          return `**${configuration.prefix}${cmd.name}** → ${commandDescription}`
+        })
+      const parsedCommands = await Promise.all(commandsParsers)
+      return {
+        category: commandsCategoriesDescriptions[category],
+        commands: parsedCommands,
+      }
+    })
+
+    const fields = await Promise.all(fieldsBuilder)
 
     fields.forEach((field) => {
       message.addField(field.category, field.commands.join('\n'))
     })
 
-    message.setFooter(
-      `Type ${configuration.prefix}help {command} to see information about an specific command.`
-    )
+    const footer = await resolveKey(channel, languageKeys.commands.misc.help.everyCommandEmbedMessageFooter, {
+      prefix,
+    })
+    message.setFooter(footer)
     return channel.send({ embeds: [message], files })
   }
 }

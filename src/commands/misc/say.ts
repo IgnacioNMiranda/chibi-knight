@@ -1,5 +1,6 @@
 import type { Message } from 'discord.js'
 import { Command, Args } from '@sapphire/framework'
+import { languageKeys } from '@/utils'
 
 /**
  * Replies the receives message on command.
@@ -9,8 +10,7 @@ export class SayCommand extends Command {
     super(context, {
       ...options,
       aliases: ['s'],
-      fullCategory: ['misc'],
-      description: 'Replies with the received message.',
+      description: languageKeys.commands.misc.say.description,
     })
   }
 

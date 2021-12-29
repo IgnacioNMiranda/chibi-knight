@@ -5,9 +5,7 @@ import { GuildData, User as DbUser } from '@/database'
 import { defineRoles, logger } from '@/utils'
 import { DocumentType } from '@typegoose/typegoose'
 
-export class MessageCreateListener extends Listener<
-  typeof Events.MessageCreate
-> {
+export class MessageCreateListener extends Listener<typeof Events.MessageCreate> {
   public async run(message: Message) {
     const notAllowedPrefix = ['>', '#', '$', '!', ';', 'rpg']
     const { content, author, guild } = message
@@ -42,9 +40,7 @@ export class MessageCreateListener extends Listener<
 
     // Give points to valid messages.
     let score = 0
-    const validWords = messageWords.filter(
-      (word) => word.length >= 2 && !word.match(userRegex)
-    ).length
+    const validWords = messageWords.filter((word) => word.length >= 2 && !word.match(userRegex)).length
     if (validWords >= 3) {
       score += 3
     }
@@ -59,29 +55,21 @@ export class MessageCreateListener extends Listener<
             score += 2
           }
         } catch (error) {
-          logger.error(
-            'There was a problem registering score from user interaction',
-            {
-              context: container.client.constructor.name,
-            }
-          )
+          logger.error('There was a problem registering score from user interaction', {
+            context: container.client.constructor.name,
+          })
         }
       }
     })
 
     try {
-      const user: DocumentType<DbUser> = await container.db.userService.getById(
-        author.id
-      )
+      const user: DocumentType<DbUser> = await container.db.userService.getById(author.id)
 
       let finalParticipationScore = score
       if (user) {
-        const guildDataIdx = user.guildsData.findIndex(
-          (guildData) => guildData.guildId === guildId
-        )
+        const guildDataIdx = user.guildsData.findIndex((guildData) => guildData.guildId === guildId)
         user.guildsData[guildDataIdx].participationScore += score
-        finalParticipationScore =
-          user.guildsData[guildDataIdx].participationScore
+        finalParticipationScore = user.guildsData[guildDataIdx].participationScore
         await user.save()
       } else {
         const guildData: GuildData = {
@@ -99,12 +87,9 @@ export class MessageCreateListener extends Listener<
       const authorGuildMember = await message.guild.members.fetch(author.id)
       defineRoles(finalParticipationScore, authorGuildMember, message)
     } catch (error) {
-      logger.error(
-        `MongoDB Connection error. Could not register ${author.username}'s words points`,
-        {
-          context: container.client.constructor.name,
-        }
-      )
+      logger.error(`MongoDB Connection error. Could not register ${author.username}'s words points`, {
+        context: container.client.constructor.name,
+      })
     }
   }
 }

@@ -7,7 +7,7 @@ import {
   MessageComponentInteraction,
   ButtonInteraction,
 } from 'discord.js'
-import { Command, Args, container } from '@sapphire/framework'
+import { Command, Args, container, CommandOptionsRunTypeEnum } from '@sapphire/framework'
 
 import { configuration } from '@/config'
 import { DocumentType } from '@typegoose/typegoose'
@@ -24,6 +24,7 @@ import {
   getTttMoveButton,
   getCancelGameButton,
   tttGameResults,
+  CustomPrecondition,
 } from '@/utils'
 
 /**
@@ -33,10 +34,7 @@ export class TicTacToeCommand extends Command {
   private readonly defaultSymbol = ':purple_square:'
   private readonly squaresNumber = 9
   private board: string[]
-  private moveResolver: Record<
-    UserActions,
-    (_: TicTacToeMoveResolverParams) => Promise<Message<boolean> | void>
-  > = {
+  private moveResolver: Record<UserActions, (_: TicTacToeMoveResolverParams) => Promise<Message<boolean> | void>> = {
     [UserActions.IGNORE]: this.ignore.bind(this),
     [UserActions.REJECT]: this.reject.bind(this),
     [UserActions.ACCEPT]: this.accept.bind(this),
@@ -48,8 +46,8 @@ export class TicTacToeCommand extends Command {
       aliases: ['ttt'],
       fullCategory: ['games'],
       description: 'Initiates a tictactoe game.',
-      preconditions: ['BotInitializeOnly'],
-      runIn: ['GUILD_ANY'],
+      preconditions: [CustomPrecondition.BotInitializeOnly],
+      runIn: [CommandOptionsRunTypeEnum.GuildAny],
     })
   }
 
@@ -61,27 +59,22 @@ export class TicTacToeCommand extends Command {
     const { author: player1 } = message
     const player2 = await args.pick('user')
 
-    const gameInstanceActive = (
-      await container.db.guildService.getById(message.guild.id)
-    ).gameInstanceActive
+    const gameInstanceActive = (await container.db.guildService.getById(message.guild.id)).gameInstanceActive
 
     if (gameInstanceActive) {
-      return message.channel.send(
-        `There's already a game in course ${player1}!`
-      )
+      return message.channel.send(`There's already a game in course ${player1}!`)
     }
-    /* if (player1.id === player2.id) {
+    if (player1.id === player2.id) {
       return message.channel.send('You cannot challenge yourself ¬¬ ...')
-    } */
+    }
     if (player2.bot) {
       return message.channel.send(
         "You cannot challenge me :anger: I'm a superior being... I would destroy you n.n :purple_heart:"
       )
     }
 
-    const filter: CollectorFilter<[MessageComponentInteraction<'cached'>]> = (
-      btnInteraction
-    ) => btnInteraction.user.id === player2.id
+    const filter: CollectorFilter<[MessageComponentInteraction<'cached'>]> = (btnInteraction) =>
+      btnInteraction.user.id === player2.id
 
     const buttons = new MessageActionRow().addComponents(
       getButton(TicTacToeButtonId.ACCEPT, 'YES', 'SUCCESS'),
@@ -108,27 +101,21 @@ export class TicTacToeCommand extends Command {
         player2Action = UserActions.ACCEPT
       }
 
-      this.moveResolver[player2Action]({ message, player2, player1 }).then(
-        (message?: Message) => {
-          actionMessage.delete().catch()
-          setTimeout(() => {
-            message?.delete().catch()
-          }, 1000 * 3)
-        }
-      )
+      this.moveResolver[player2Action]({ message, player2, player1 }).then((message?: Message) => {
+        actionMessage.delete().catch()
+        setTimeout(() => {
+          message?.delete().catch()
+        }, 1000 * 3)
+      })
     })
   }
 
   async ignore({ message, player2 }: TicTacToeMoveResolverParams) {
-    return message.channel.send(
-      `Time's up! ${player2.username} doesn't want to play ):`
-    )
+    return message.channel.send(`Time's up! ${player2.username} doesn't want to play ):`)
   }
 
   reject({ message, player2 }: TicTacToeMoveResolverParams) {
-    return message.channel.send(
-      `Game cancelled ): Come back when you are brave enough, ${player2}.`
-    )
+    return message.channel.send(`Game cancelled ): Come back when you are brave enough, ${player2}.`)
   }
 
   async accept({ message, player2, player1 }: TicTacToeMoveResolverParams) {
@@ -140,15 +127,17 @@ export class TicTacToeCommand extends Command {
 
       this.runTtt(message, player1, player2)
     } catch (error) {
+      console.log({
+        error,
+      })
+
       logger.error(
         `MongoDB Connection error. Could not register change game instance active state for ${message.guild.name}`,
         {
           context: this.constructor.name,
         }
       )
-      return message.channel.send(
-        'Error ): could not start game. Try again later :purple_heart:'
-      )
+      return message.channel.send('Error ): could not start game. Try again later :purple_heart:')
     }
   }
 
@@ -163,25 +152,15 @@ export class TicTacToeCommand extends Command {
     let { activePlayer, otherPlayer } = this.getInitialOrder(player1, player2)
 
     const embedMessage = this.embedDefaultboard(player1, player2)
-      .addField(
-        'Instructions',
-        'Type the number where you want to make your move.',
-        false
-      )
+      .addField('Instructions', 'Type the number where you want to make your move.', false)
       .addField('Current turn', `It's your turn ${activePlayer.username}`)
 
     const firstMovesRow = new MessageActionRow().addComponents(
-      availableMoves
-        .slice(0, (availableMoves.length + 1) / 2)
-        .map(getTttMoveButton)
+      availableMoves.slice(0, (availableMoves.length + 1) / 2).map(getTttMoveButton)
     )
 
     const secondMovesRow = new MessageActionRow()
-      .addComponents(
-        availableMoves
-          .slice((availableMoves.length + 1) / 2, availableMoves.length)
-          .map(getTttMoveButton)
-      )
+      .addComponents(availableMoves.slice((availableMoves.length + 1) / 2, availableMoves.length).map(getTttMoveButton))
       .addComponents(getCancelGameButton(TicTacToeButtonId.CANCEL))
 
     const sentEmbedMessage = await message.channel.send({
@@ -189,12 +168,8 @@ export class TicTacToeCommand extends Command {
       components: [firstMovesRow, secondMovesRow],
     })
 
-    const moveFilter: CollectorFilter<
-      [MessageComponentInteraction<'cached'>]
-    > = (btnInteraction) => {
-      const playerId = [player1.id, player2.id].find(
-        (id) => id === btnInteraction.user.id
-      )
+    const moveFilter: CollectorFilter<[MessageComponentInteraction<'cached'>]> = (btnInteraction) => {
+      const playerId = [player1.id, player2.id].find((id) => id === btnInteraction.user.id)
       if (!playerId) return false
       if (btnInteraction.customId === TicTacToeButtonId.CANCEL) {
         collector.stop('Game cancelled.')
@@ -213,9 +188,7 @@ export class TicTacToeCommand extends Command {
       const playedNumber = parseInt(i.component.label)
 
       // If player1 made a move, the mark is :x:. If it was player2, the mark is :o:
-      activePlayer.id === player1.id
-        ? (this.board[playedNumber] = ':x:')
-        : (this.board[playedNumber] = ':o:')
+      activePlayer.id === player1.id ? (this.board[playedNumber] = ':x:') : (this.board[playedNumber] = ':o:')
 
       // Change the play turn.
       ;[activePlayer, otherPlayer] = [otherPlayer, activePlayer]
@@ -223,9 +196,7 @@ export class TicTacToeCommand extends Command {
       const updatedButtons = sentEmbedMessage.components.map((row) => {
         return {
           ...row,
-          components: row.components.filter(
-            (btn) => btn.customId !== i.customId
-          ),
+          components: row.components.filter((btn) => btn.customId !== i.customId),
         }
       })
 
@@ -239,28 +210,20 @@ export class TicTacToeCommand extends Command {
         let winner: User
         let loser: User
 
-        if (gameState === GameFinalState.PLAYER1_VICTORY)
-          [winner, loser] = [player1, player2]
-        else if (gameState === GameFinalState.PLAYER2_VICTORY)
-          [winner, loser] = [player2, player1]
+        if (gameState === GameFinalState.PLAYER1_VICTORY) [winner, loser] = [player1, player2]
+        else if (gameState === GameFinalState.PLAYER2_VICTORY) [winner, loser] = [player2, player1]
 
         if (winner) {
           try {
-            logger.info(
-              `Registering ${winner.username}'s tictactoe victory in '${i.guild.name}' guild...`,
-              {
-                context: this.constructor.name,
-              }
-            )
+            logger.info(`Registering ${winner.username}'s tictactoe victory in '${i.guild.name}' guild...`, {
+              context: this.constructor.name,
+            })
 
             const score = 10
             let finalScore = score
-            const user: DocumentType<DbUser> =
-              await container.db.userService.getById(winner.id)
+            const user: DocumentType<DbUser> = await container.db.userService.getById(winner.id)
             if (user) {
-              const guildDataIdx = user.guildsData.findIndex(
-                (guildData) => guildData.guildId === guildId
-              )
+              const guildDataIdx = user.guildsData.findIndex((guildData) => guildData.guildId === guildId)
               user.guildsData[guildDataIdx].participationScore += score
               user.guildsData[guildDataIdx].tictactoeWins += 1
               finalScore = user.guildsData[guildDataIdx].participationScore
@@ -278,20 +241,15 @@ export class TicTacToeCommand extends Command {
               await container.db.userService.create(newUser)
             }
 
-            const authorGuildMember = await message.guild.members.fetch(
-              winner.id
-            )
+            const authorGuildMember = await message.guild.members.fetch(winner.id)
             defineRoles(finalScore, authorGuildMember, message)
             logger.info('Victory registered successfully', {
               context: this.constructor.name,
             })
           } catch (error) {
-            logger.error(
-              `MongoDB Connection error. Could not register ${winner.username}'s tictactoe victory`,
-              {
-                context: this.constructor.name,
-              }
-            )
+            logger.error(`MongoDB Connection error. Could not register ${winner.username}'s tictactoe victory`, {
+              context: this.constructor.name,
+            })
           }
         }
 
@@ -302,16 +260,10 @@ export class TicTacToeCommand extends Command {
 
         newEmbedMessage.addField('Result :trophy:', result, false)
         if (winner && loser) {
-          newEmbedMessage.addField(
-            'Consolation prize :second_place:',
-            `Don't worry ${loser}, this is for you:`
-          )
+          newEmbedMessage.addField('Consolation prize :second_place:', `Don't worry ${loser}, this is for you:`)
           newEmbedMessage.setImage(commandsLinks.games.tictactoe.gifs[0])
         } else if (!winner && !loser) {
-          newEmbedMessage.addField(
-            'Consolation prize :woozy_face:',
-            `You two are so bad, this is for you <3`
-          )
+          newEmbedMessage.addField('Consolation prize :woozy_face:', `You two are so bad, this is for you <3`)
           newEmbedMessage.setImage(commandsLinks.games.tictactoe.gifs[0])
         }
 
@@ -325,16 +277,8 @@ export class TicTacToeCommand extends Command {
         collector.stop(stopReason)
       } else {
         newEmbedMessage
-          .addField(
-            'Instructions',
-            'Type the number where you want to make your move.',
-            false
-          )
-          .addField(
-            'Current turn',
-            `It's your turn ${activePlayer.username}`,
-            false
-          )
+          .addField('Instructions', 'Type the number where you want to make your move.', false)
+          .addField('Current turn', `It's your turn ${activePlayer.username}`, false)
 
         // Edits the embed message.
         await i.update({
@@ -375,14 +319,8 @@ export class TicTacToeCommand extends Command {
     return new MessageEmbed()
       .setTitle(`:x::o: Gato:3 :x::o:`)
       .setColor(configuration.embedMessageColor)
-      .setDescription(
-        'Tres en raya | Michi | Triqui | Gato | Cuadritos | Tictactoe | Whatever'
-      )
-      .addField(
-        'Challengers',
-        `${player1.username} V/S ${player2.username}`,
-        false
-      )
+      .setDescription('Tres en raya | Michi | Triqui | Gato | Cuadritos | Tictactoe | Whatever')
+      .addField('Challengers', `${player1.username} V/S ${player2.username}`, false)
       .addField(
         'Board',
         `
@@ -424,17 +362,9 @@ export class TicTacToeCommand extends Command {
     const initRowPos = playedNumber - (playedNumber % 3)
     const initColPos = playedNumber % 3
 
-    const rowPositions = [
-      this.board[initRowPos],
-      this.board[initRowPos + 1],
-      this.board[initRowPos + 2],
-    ]
+    const rowPositions = [this.board[initRowPos], this.board[initRowPos + 1], this.board[initRowPos + 2]]
 
-    const colPositions = [
-      this.board[initColPos],
-      this.board[initColPos + 3],
-      this.board[initColPos + 6],
-    ]
+    const colPositions = [this.board[initColPos], this.board[initColPos + 3], this.board[initColPos + 6]]
 
     const leftDiagonalPositions = [this.board[0], this.board[4], this.board[8]]
     const rightDiagonalPositions = [this.board[2], this.board[4], this.board[6]]
@@ -445,9 +375,7 @@ export class TicTacToeCommand extends Command {
       leftDiagonalPositions.every((pos) => pos === playedMark) ||
       rightDiagonalPositions.every((pos) => pos === playedMark)
     ) {
-      return playedMark === ':x:'
-        ? GameFinalState.PLAYER1_VICTORY
-        : GameFinalState.PLAYER2_VICTORY
+      return playedMark === ':x:' ? GameFinalState.PLAYER1_VICTORY : GameFinalState.PLAYER2_VICTORY
     }
 
     // Every slot is marked and no one has won.

@@ -1,14 +1,16 @@
 import { configuration } from '@/config'
 import { container, SapphireClient } from '@sapphire/framework'
 import { Cache, MongoDatabase } from '@/database'
-import { logger } from '@/utils'
+import { i18nConfig, logger } from '@/utils'
 import '@sapphire/plugin-logger/register'
+import '@sapphire/plugin-i18next/register'
 
 const main = async () => {
   const client = new SapphireClient({
     defaultPrefix: configuration.prefix,
     intents: ['GUILDS', 'GUILD_MEMBERS', 'GUILD_MESSAGES'],
     loadDefaultErrorListeners: false,
+    i18n: i18nConfig,
   })
 
   logger.info(`Initializing application...`, {
@@ -39,7 +41,7 @@ const main = async () => {
 }
 
 main().catch(() =>
-  logger.error('Bot initialization failed', {
+  logger.error('Bot initialization failed.', {
     context: container.client.constructor.name,
   })
 )

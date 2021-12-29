@@ -18,4 +18,10 @@ export class Guild {
     default: false,
   })
   public gameInstanceActive?: boolean
+
+  @prop({
+    type: String,
+    default: 'en-US',
+  })
+  public guildLanguage?: string
 }

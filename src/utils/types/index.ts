@@ -1,5 +1,6 @@
 export * from './games'
 export * from './channel'
 export * from './commands'
+export * from './preconditions'
 export * from './roles'
 export * from './user'

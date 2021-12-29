@@ -1,7 +1,7 @@
 import { Message, MessageEmbed } from 'discord.js'
-import { Command, container } from '@sapphire/framework'
+import { Command, CommandOptionsRunTypeEnum, container } from '@sapphire/framework'
 import { configuration } from '@/config'
-import { logger } from '@/utils'
+import { logger, CustomPrecondition } from '@/utils'
 import { User } from '@/database'
 
 /**
@@ -15,8 +15,8 @@ export class TicTacToeLeaderBoardCommand extends Command {
       aliases: ['tttlb'],
       fullCategory: ['games'],
       description: 'Displays the tictactoe leaderboard.',
-      preconditions: ['BotInitializeOnly'],
-      runIn: ['GUILD_ANY'],
+      preconditions: [CustomPrecondition.BotInitializeOnly],
+      runIn: [CommandOptionsRunTypeEnum.GuildAny],
     })
   }
 
@@ -69,9 +69,7 @@ export class TicTacToeLeaderBoardCommand extends Command {
           context: this.constructor.name,
         }
       )
-      return message.channel.send(
-        `Sorry ): I couldn't retrieve tictactoe leaderboard. I failed you :sweat:`
-      )
+      return message.channel.send(`Sorry ): I couldn't retrieve tictactoe leaderboard. I failed you :sweat:`)
     }
   }
 }

@@ -9,8 +9,7 @@ export const configuration = {
   clientId: process.env.CLIENT_ID,
   token: process.env.BOT_TOKEN,
   prefix: process.env.BOT_PREFIX,
-  embedMessageColor: (process.env.EMBED_MESSAGE_COLOR ||
-    '#57a7ef') as ColorResolvable,
+  embedMessageColor: (process.env.EMBED_MESSAGE_COLOR || '#57a7ef') as ColorResolvable,
   mongodb: {
     connection_url: process.env.MONGODB_CONNECTION,
   },

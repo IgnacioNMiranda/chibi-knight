@@ -1,11 +1,6 @@
 export type GameCommand = 'cancelGame' | 'tictactoe' | 'tictactoeleaderboard'
 
-export type MiscCommand =
-  | 'congratulate'
-  | 'help'
-  | 'iniChibiKnight'
-  | 'say'
-  | 'shameonyou'
+export type MiscCommand = 'congratulate' | 'help' | 'iniChibiKnight' | 'say' | 'shameonyou'
 
 export type RoleCommand = 'activateRoles' | 'myRole' | 'roles'
 

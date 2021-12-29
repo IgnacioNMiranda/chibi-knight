@@ -1,10 +1,4 @@
-import {
-  CollectorFilter,
-  Message,
-  MessageActionRow,
-  MessageComponentInteraction,
-  MessageEmbed,
-} from 'discord.js'
+import { CollectorFilter, Message, MessageActionRow, MessageComponentInteraction, MessageEmbed } from 'discord.js'
 import { Command, container } from '@sapphire/framework'
 import {
   ActivateRolesResolverParams,
@@ -16,6 +10,7 @@ import {
   roles,
   RolesButtonId,
   UserActions,
+  CustomPrecondition,
 } from '@/utils'
 import { configuration } from '@/config'
 import { Guild } from '@/database'
@@ -24,10 +19,7 @@ import { Guild } from '@/database'
  * Activate roles functionality.
  */
 export class ActivateRolesCommand extends Command {
-  private resolver: Record<
-    UserActions,
-    (_: ActivateRolesResolverParams) => Promise<ActivateRolesResolverParams>
-  > = {
+  private resolver: Record<UserActions, (_: ActivateRolesResolverParams) => Promise<ActivateRolesResolverParams>> = {
     [UserActions.ACCEPT]: this.activate.bind(this),
     [UserActions.REJECT]: this.reject.bind(this),
     [UserActions.IGNORE]: this.ignore.bind(this),
@@ -40,7 +32,11 @@ export class ActivateRolesCommand extends Command {
       aliases: ['ar'],
       fullCategory: ['roles'],
       description: 'Activates bot roles.',
-      preconditions: ['AdminOnly', 'BotInitializeOnly', 'RolesNotActiveOnly'],
+      preconditions: [
+        CustomPrecondition.AdminOnly,
+        CustomPrecondition.BotInitializeOnly,
+        CustomPrecondition.RolesNotActiveOnly,
+      ],
       requiredUserPermissions: ['ADMINISTRATOR'],
       requiredClientPermissions: ['MANAGE_ROLES'],
     })
@@ -65,9 +61,7 @@ export class ActivateRolesCommand extends Command {
         .setThumbnail(botLogoURL)
         .addField('The next roles will be added to your server:', rolesList)
         .setColor(configuration.embedMessageColor)
-        .setFooter(
-          `> Do you really want to activate ${configuration.appName}'s roles ?`
-        )
+        .setFooter(`> Do you really want to activate ${configuration.appName}'s roles ?`)
 
       const buttons = new MessageActionRow().addComponents(
         getButton(RolesButtonId.ACCEPT, 'ACCEPT', 'SUCCESS'),
@@ -80,9 +74,8 @@ export class ActivateRolesCommand extends Command {
         components: [buttons],
       })
 
-      const filter: CollectorFilter<[MessageComponentInteraction<'cached'>]> = (
-        btnInteraction
-      ) => btnInteraction.user.id === message.author.id
+      const filter: CollectorFilter<[MessageComponentInteraction<'cached'>]> = (btnInteraction) =>
+        btnInteraction.user.id === message.author.id
 
       // Waits 15 seconds for response.
       const collector = message.channel.createMessageComponentCollector({
@@ -111,10 +104,9 @@ export class ActivateRolesCommand extends Command {
         })
       })
     } catch (error) {
-      logger.error(
-        `MongoDB Connection error. Could not initiate roles game for '${message.guild.name}' server`,
-        { context: this.constructor.name }
-      )
+      logger.error(`MongoDB Connection error. Could not initiate roles game for '${message.guild.name}' server`, {
+        context: this.constructor.name,
+      })
       return message.channel.send(
         'It occured an unexpected error, roles could not be created ): Try again later :sweat:'
       )
@@ -122,15 +114,11 @@ export class ActivateRolesCommand extends Command {
   }
 
   async activate({ message, interaction }: ActivateRolesResolverParams) {
-    const activatingRolesMsg = await message.channel.send(
-      `Okay, we're working for you, meanwhile take a nap n.n`
-    )
+    const activatingRolesMsg = await message.channel.send(`Okay, we're working for you, meanwhile take a nap n.n`)
 
     const rolesCreated = await initRoles(message)
     if (!rolesCreated) {
-      interaction.reply(
-        `Error while trying to create roles, maybe I don't have enough permissions :sweat:`
-      )
+      interaction.reply(`Error while trying to create roles, maybe I don't have enough permissions :sweat:`)
       return { interaction }
     }
 
@@ -157,9 +145,7 @@ export class ActivateRolesCommand extends Command {
   }
 
   async ignore({ message }: ActivateRolesResolverParams) {
-    const timesUpMessage = await message.channel.send(
-      `Time's up! Try again later ):`
-    )
+    const timesUpMessage = await message.channel.send(`Time's up! Try again later ):`)
     return { message: timesUpMessage }
   }
 }

@@ -5,9 +5,7 @@ import { configuration } from '@/config'
 export class GuildCreateListener extends Listener<typeof Events.GuildCreate> {
   public run(guild: Guild) {
     const channel = guild.channels.cache.find(
-      (channel) =>
-        channel.type === 'GUILD_TEXT' &&
-        channel.permissionsFor(guild.me).has('SEND_MESSAGES')
+      (channel) => channel.type === 'GUILD_TEXT' && channel.permissionsFor(guild.me).has('SEND_MESSAGES')
     )
 
     if (channel) {

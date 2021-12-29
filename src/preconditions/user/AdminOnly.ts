@@ -3,9 +3,7 @@ import { GuildMember, Message } from 'discord.js'
 
 export class AdminOnlyPrecondition extends Precondition {
   public async run(message: Message) {
-    const user: GuildMember = await message.guild.members.fetch(
-      message.author.id
-    )
+    const user: GuildMember = await message.guild.members.fetch(message.author.id)
 
     return user.permissions.has('ADMINISTRATOR')
       ? this.ok()

@@ -1,4 +1,5 @@
 import { MongoDatabase, Cache } from '@/database'
+import { ICustomPreconditions } from './preconditions'
 
 declare module '@sapphire/pieces' {
   interface Container {
@@ -8,16 +9,5 @@ declare module '@sapphire/pieces' {
 }
 
 declare module '@sapphire/framework' {
-  interface Preconditions {
-    /** Roles */
-    RolesNotActiveOnly: never
-    RolesActiveOnly: never
-
-    /** Server */
-    BotNotInitializeOnly: never
-    BotInitializeOnly: never
-
-    /** User */
-    AdminOnly: never
-  }
+  interface Preconditions extends ICustomPreconditions {}
 }
