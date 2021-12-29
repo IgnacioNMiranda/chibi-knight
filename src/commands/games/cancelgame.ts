@@ -1,0 +1,44 @@
+import { Command, CommandOptionsRunTypeEnum, container } from '@sapphire/framework'
+import type { Message } from 'discord.js'
+import { logger, CustomPrecondition } from '@/utils'
+
+/**
+ * Replies the receives message on command.
+ */
+export class CancelGameCommand extends Command {
+  constructor(context: Command.Context, options: Command.Options) {
+    super(context, {
+      ...options,
+      aliases: ['cg'],
+      fullCategory: ['games'],
+      description: 'Cancels the active game.',
+      preconditions: [CustomPrecondition.BotInitializeOnly],
+      runIn: [CommandOptionsRunTypeEnum.GuildAny],
+    })
+  }
+
+  /**
+   * It executes when someone types the "say" command.
+   */
+  async messageRun(message: Message): Promise<Message<boolean>> {
+    const { id } = message.guild
+
+    try {
+      const guild = await container.db.guildService.getById(id)
+
+      if (guild && !guild.gameInstanceActive) {
+        return message.channel.send("There's no active game.")
+      }
+
+      guild.gameInstanceActive = false
+      await guild.save()
+      return message.channel.send('Game cancelled.')
+    } catch (error) {
+      logger.error(
+        `(${this.constructor.name}): MongoDB Connection error. Could not change game instance state for '${message.guild.name}' server`
+      )
+    }
+
+    return message.channel.send('It occured an unexpected error :sweat: try again later.')
+  }
+}
