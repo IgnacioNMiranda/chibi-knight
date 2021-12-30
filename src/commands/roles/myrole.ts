@@ -22,7 +22,7 @@ export class MyRoleCommand extends CustomCommand {
       ...options,
       aliases: ['mr'],
       description: languageKeys.commands.roles.myrole.description,
-      preconditions: [CustomPrecondition.RolesActiveOnly],
+      preconditions: [CustomPrecondition.RolesActivatedOnly],
       runIn: [CommandOptionsRunTypeEnum.GuildAny],
     })
   }

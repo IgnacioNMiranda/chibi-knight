@@ -35,8 +35,8 @@ export class ActivateRolesCommand extends CustomCommand {
       description: languageKeys.commands.roles.activateroles.description,
       preconditions: [
         CustomPrecondition.AdminOnly,
-        CustomPrecondition.BotInitializeOnly,
-        CustomPrecondition.RolesNotActiveOnly,
+        CustomPrecondition.BotInitializedOnly,
+        CustomPrecondition.RolesDeactivatedOnly,
       ],
       requiredUserPermissions: ['ADMINISTRATOR'],
       requiredClientPermissions: ['MANAGE_ROLES'],

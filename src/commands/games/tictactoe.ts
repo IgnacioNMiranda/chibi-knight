@@ -49,7 +49,7 @@ export class TicTacToeCommand extends CustomCommand {
       ...options,
       aliases: ['ttt'],
       description: languageKeys.commands.games.tictactoe.description,
-      preconditions: [CustomPrecondition.BotInitializeOnly],
+      preconditions: [CustomPrecondition.BotInitializedOnly],
       runIn: [CommandOptionsRunTypeEnum.GuildAny],
     })
   }

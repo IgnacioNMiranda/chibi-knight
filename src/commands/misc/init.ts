@@ -13,7 +13,7 @@ export class InitChibiKnightCommand extends CustomCommand {
       ...options,
       aliases: ['i'],
       description: languageKeys.commands.misc.init.description,
-      preconditions: [CustomPrecondition.AdminOnly, CustomPrecondition.BotNotInitializeOnly],
+      preconditions: [CustomPrecondition.AdminOnly, CustomPrecondition.BotNotInitializedOnly],
       requiredUserPermissions: ['ADMINISTRATOR'],
     })
   }

@@ -12,7 +12,7 @@ export class RolesCommand extends CustomCommand {
       ...options,
       aliases: ['r'],
       description: languageKeys.commands.roles.roles.description,
-      preconditions: [CustomPrecondition.RolesActiveOnly],
+      preconditions: [CustomPrecondition.RolesActivatedOnly],
       runIn: [CommandOptionsRunTypeEnum.GuildAny],
     })
   }

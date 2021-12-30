@@ -14,7 +14,7 @@ export class TicTacToeLeaderBoardCommand extends CustomCommand {
       name: 'tttleaderboard',
       aliases: ['tttlb'],
       description: languageKeys.commands.games.tictactoeleaderboard.description,
-      preconditions: [CustomPrecondition.BotInitializeOnly],
+      preconditions: [CustomPrecondition.BotInitializedOnly],
       runIn: [CommandOptionsRunTypeEnum.GuildAny],
     })
   }

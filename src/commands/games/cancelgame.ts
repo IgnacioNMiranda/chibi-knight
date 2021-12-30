@@ -11,7 +11,7 @@ export class CancelGameCommand extends CustomCommand {
       ...options,
       aliases: ['cg'],
       description: languageKeys.commands.games.cancelgame.description,
-      preconditions: [CustomPrecondition.BotInitializeOnly],
+      preconditions: [CustomPrecondition.BotInitializedOnly],
       runIn: [CommandOptionsRunTypeEnum.GuildAny],
     })
   }
