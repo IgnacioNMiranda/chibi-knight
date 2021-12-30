@@ -1,8 +1,8 @@
 export enum CustomPrecondition {
   RolesNotActiveOnly = 'RolesNotActiveOnly',
   RolesActiveOnly = 'RolesActiveOnly',
-  BotNotInitializeOnly = 'BotNotInitializeOnly',
-  BotInitializeOnly = 'BotInitializeOnly',
+  BotNotInitializedOnly = 'BotNotInitializedOnly',
+  BotInitializedOnly = 'BotInitializedOnly',
   AdminOnly = 'AdminOnly',
 }
 
@@ -12,8 +12,8 @@ export interface ICustomPreconditions {
   [CustomPrecondition.RolesActiveOnly]: never
 
   /** Server */
-  [CustomPrecondition.BotNotInitializeOnly]: never
-  [CustomPrecondition.BotInitializeOnly]: never
+  [CustomPrecondition.BotNotInitializedOnly]: never
+  [CustomPrecondition.BotInitializedOnly]: never
 
   /** User */
   [CustomPrecondition.AdminOnly]: never

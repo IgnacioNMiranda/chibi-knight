@@ -1,5 +1,7 @@
 import { Precondition } from '@sapphire/framework'
+import { resolveKey } from '@sapphire/plugin-i18next'
 import { GuildMember, Message } from 'discord.js'
+import { languageKeys } from '@/utils'
 
 export class AdminOnlyPrecondition extends Precondition {
   public async run(message: Message) {
@@ -8,7 +10,7 @@ export class AdminOnlyPrecondition extends Precondition {
     return user.permissions.has('ADMINISTRATOR')
       ? this.ok()
       : this.error({
-          message: `You don't have permissions to run this command. Contact with an Administrator :sweat:`,
+          message: await resolveKey(message, languageKeys.preconditions.user.adminOnlyErrorMessage),
         })
   }
 }

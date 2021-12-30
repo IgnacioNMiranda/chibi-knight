@@ -1,0 +1,4 @@
+{
+  "botInitializedOnly_errorMessage": "First you have to initialize me running **{{prefix}}init** command.",
+  "botNotInitializeOnly_errorMessage": "{{appName}} has already been initialized n.n"
+}
