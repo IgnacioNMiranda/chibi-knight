@@ -1,6 +1,7 @@
 import type { Message } from 'discord.js'
 import { Command, Args } from '@sapphire/framework'
 import { languageKeys } from '@/utils'
+import { fetchT } from '@sapphire/plugin-i18next'
 
 /**
  * Replies the receives message on command.

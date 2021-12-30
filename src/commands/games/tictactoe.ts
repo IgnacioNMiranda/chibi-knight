@@ -7,7 +7,7 @@ import {
   MessageComponentInteraction,
   ButtonInteraction,
 } from 'discord.js'
-import { Command, Args, container, CommandOptionsRunTypeEnum } from '@sapphire/framework'
+import { Command, container, CommandOptionsRunTypeEnum } from '@sapphire/framework'
 
 import { configuration } from '@/config'
 import { DocumentType } from '@typegoose/typegoose'
@@ -25,12 +25,16 @@ import {
   getCancelGameButton,
   tttGameResults,
   CustomPrecondition,
+  languageKeys,
+  CustomArgs,
+  CustomCommand,
 } from '@/utils'
+import { TFunction } from '@sapphire/plugin-i18next'
 
 /**
  * Starts a tic-tac-toe game.
  */
-export class TicTacToeCommand extends Command {
+export class TicTacToeCommand extends CustomCommand {
   private readonly defaultSymbol = ':purple_square:'
   private readonly squaresNumber = 9
   private board: string[]
@@ -44,8 +48,7 @@ export class TicTacToeCommand extends Command {
     super(context, {
       ...options,
       aliases: ['ttt'],
-      fullCategory: ['games'],
-      description: 'Initiates a tictactoe game.',
+      description: languageKeys.commands.games.tictactoe.description,
       preconditions: [CustomPrecondition.BotInitializeOnly],
       runIn: [CommandOptionsRunTypeEnum.GuildAny],
     })
@@ -54,35 +57,42 @@ export class TicTacToeCommand extends Command {
   /**
    * It executes when someone types the "tictactoe" command.
    */
-  async messageRun(message: Message, args: Args): Promise<Message> {
+  async messageRun(message: Message, args: CustomArgs): Promise<Message> {
     // Obtains the challenging player instance.
     const { author: player1 } = message
     const player2 = await args.pick('user')
 
-    const gameInstanceActive = (await container.db.guildService.getById(message.guild.id)).gameInstanceActive
+    const isGameInstanceActive = (await container.db.guildService.getById(message.guild.id)).gameInstanceActive
 
-    if (gameInstanceActive) {
-      return message.channel.send(`There's already a game in course ${player1}!`)
+    const {
+      activeGameInstance,
+      challengeYourself,
+      challengeBot,
+      acceptChallengeButtonLabel,
+      rejectChallengeButtonLabel,
+      startGameQuestion,
+    } = languageKeys.commands.games.tictactoe
+
+    if (isGameInstanceActive) {
+      return message.channel.send(args.t(activeGameInstance, { player1 }))
     }
     if (player1.id === player2.id) {
-      return message.channel.send('You cannot challenge yourself ¬¬ ...')
+      return message.channel.send(args.t(challengeYourself))
     }
     if (player2.bot) {
-      return message.channel.send(
-        "You cannot challenge me :anger: I'm a superior being... I would destroy you n.n :purple_heart:"
-      )
+      return message.channel.send(args.t(challengeBot))
     }
 
     const filter: CollectorFilter<[MessageComponentInteraction<'cached'>]> = (btnInteraction) =>
       btnInteraction.user.id === player2.id
 
     const buttons = new MessageActionRow().addComponents(
-      getButton(TicTacToeButtonId.ACCEPT, 'YES', 'SUCCESS'),
-      getButton(TicTacToeButtonId.REJECT, 'NO', 'DANGER')
+      getButton(TicTacToeButtonId.ACCEPT, args.t(acceptChallengeButtonLabel), 'SUCCESS'),
+      getButton(TicTacToeButtonId.REJECT, args.t(rejectChallengeButtonLabel), 'DANGER')
     )
 
     const actionMessage = await message.channel.send({
-      content: `${player2} has been challenged by ${player1} to play #. Do you accept the challenge?`,
+      content: args.t(startGameQuestion, { player1, player2 }),
       components: [buttons],
     })
 
@@ -110,22 +120,24 @@ export class TicTacToeCommand extends Command {
     })
   }
 
-  async ignore({ message, player2 }: TicTacToeMoveResolverParams) {
-    return message.channel.send(`Time's up! ${player2.username} doesn't want to play ):`)
+  async ignore({ message, player2, t }: TicTacToeMoveResolverParams) {
+    return message.channel.send(
+      t(languageKeys.commands.games.tictactoe.ignoreChallengeMessage, { player2Username: player2.username })
+    )
   }
 
-  reject({ message, player2 }: TicTacToeMoveResolverParams) {
-    return message.channel.send(`Game cancelled ): Come back when you are brave enough, ${player2}.`)
+  async reject({ message, player2, t }: TicTacToeMoveResolverParams) {
+    return message.channel.send(t(languageKeys.commands.games.tictactoe.ignoreChallengeMessage, { player2 }))
   }
 
-  async accept({ message, player2, player1 }: TicTacToeMoveResolverParams) {
+  async accept({ message, player2, player1, t }: TicTacToeMoveResolverParams) {
     try {
       const { id } = message.guild
       const guild = await container.db.guildService.getById(id)
       guild.gameInstanceActive = true
       await guild.save()
 
-      this.runTtt(message, player1, player2)
+      this.runTtt(message, player1, player2, t)
     } catch (error) {
       console.log({
         error,
@@ -137,23 +149,35 @@ export class TicTacToeCommand extends Command {
           context: this.constructor.name,
         }
       )
-      return message.channel.send('Error ): could not start game. Try again later :purple_heart:')
+      return message.channel.send(t(languageKeys.commands.games.tictactoe.errorMessage))
     }
   }
 
   /**
    * Manages the tictactoe game and its properties.
    */
-  async runTtt(message: Message, player1: User, player2: User) {
+  async runTtt(message: Message, player1: User, player2: User, t: TFunction) {
     const availableMoves = [...Array(this.squaresNumber).keys()]
     this.board = Array(this.squaresNumber).fill(this.defaultSymbol)
     const { id: guildId } = message.guild
 
     let { activePlayer, otherPlayer } = this.getInitialOrder(player1, player2)
 
-    const embedMessage = this.embedDefaultboard(player1, player2)
-      .addField('Instructions', 'Type the number where you want to make your move.', false)
-      .addField('Current turn', `It's your turn ${activePlayer.username}`)
+    const {
+      instructionsTitle,
+      instructionsText,
+      currentTurnTitle,
+      currentTurnText,
+      resultText,
+      consolationPrizeTitleOneLoser,
+      consolationPrizeTextOneLoser,
+      consolationPrizeTitleTwoLosers,
+      consolationPrizeTextTwoLosers,
+    } = languageKeys.commands.games.tictactoe
+
+    const embedMessage = this.embedDefaultboard(player1, player2, t)
+      .addField(t(instructionsTitle), t(instructionsText), false)
+      .addField(t(currentTurnTitle), t(currentTurnText))
 
     const firstMovesRow = new MessageActionRow().addComponents(
       availableMoves.slice(0, (availableMoves.length + 1) / 2).map(getTttMoveButton)
@@ -201,7 +225,7 @@ export class TicTacToeCommand extends Command {
       })
 
       // Creates the new embed message with the new mark.
-      const newEmbedMessage = this.embedDefaultboard(player1, player2)
+      const newEmbedMessage = this.embedDefaultboard(player1, player2, t)
 
       // Obtains the current state of the game.
       const gameState = this.obtainGameState(playedNumber)
@@ -257,13 +281,12 @@ export class TicTacToeCommand extends Command {
           player1,
           player2,
         })
-
-        newEmbedMessage.addField('Result :trophy:', result, false)
+        newEmbedMessage.addField(t(resultText), result, false)
         if (winner && loser) {
-          newEmbedMessage.addField('Consolation prize :second_place:', `Don't worry ${loser}, this is for you:`)
+          newEmbedMessage.addField(t(consolationPrizeTitleOneLoser), t(consolationPrizeTextOneLoser, { loser }))
           newEmbedMessage.setImage(commandsLinks.games.tictactoe.gifs[0])
         } else if (!winner && !loser) {
-          newEmbedMessage.addField('Consolation prize :woozy_face:', `You two are so bad, this is for you <3`)
+          newEmbedMessage.addField(t(consolationPrizeTitleTwoLosers), t(consolationPrizeTextTwoLosers))
           newEmbedMessage.setImage(commandsLinks.games.tictactoe.gifs[0])
         }
 
@@ -277,8 +300,8 @@ export class TicTacToeCommand extends Command {
         collector.stop(stopReason)
       } else {
         newEmbedMessage
-          .addField('Instructions', 'Type the number where you want to make your move.', false)
-          .addField('Current turn', `It's your turn ${activePlayer.username}`, false)
+          .addField(t(instructionsTitle), t(instructionsText), false)
+          .addField(t(currentTurnTitle), t(currentTurnText, { activePlayerUsername: activePlayer.username }), false)
 
         // Edits the embed message.
         await i.update({
@@ -315,14 +338,20 @@ export class TicTacToeCommand extends Command {
   /**
    * Creates a generic tictactoe board.
    */
-  embedDefaultboard(player1: User, player2: User): MessageEmbed {
+  embedDefaultboard(player1: User, player2: User, t: TFunction): MessageEmbed {
+    const { gameTitle, gameDescription, challengersTitle, challengersText, boardTitle, positionsReferenceTitle } =
+      languageKeys.commands.games.tictactoe
     return new MessageEmbed()
-      .setTitle(`:x::o: Gato:3 :x::o:`)
+      .setTitle(t(gameTitle))
       .setColor(configuration.embedMessageColor)
-      .setDescription('Tres en raya | Michi | Triqui | Gato | Cuadritos | Tictactoe | Whatever')
-      .addField('Challengers', `${player1.username} V/S ${player2.username}`, false)
+      .setDescription(t(gameDescription))
       .addField(
-        'Board',
+        t(challengersTitle),
+        t(challengersText, { player1: player1.username, player2: player2.username }),
+        false
+      )
+      .addField(
+        t(boardTitle),
         `
         ${this.board[0]}${this.board[1]}${this.board[2]}
         ${this.board[3]}${this.board[4]}${this.board[5]}
@@ -331,7 +360,7 @@ export class TicTacToeCommand extends Command {
         true
       )
       .addField(
-        'Positions reference',
+        t(positionsReferenceTitle),
         `
         :zero::one::two:
         :three::four::five:

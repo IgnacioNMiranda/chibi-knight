@@ -1,20 +1,19 @@
 import { Message, MessageEmbed } from 'discord.js'
 import { Command, CommandOptionsRunTypeEnum, container } from '@sapphire/framework'
 import { configuration } from '@/config'
-import { logger, CustomPrecondition } from '@/utils'
+import { logger, CustomPrecondition, languageKeys, CustomCommand, CustomArgs } from '@/utils'
 import { User } from '@/database'
 
 /**
  * Displays the tictactoe game leaderboard.
  */
-export class TicTacToeLeaderBoardCommand extends Command {
+export class TicTacToeLeaderBoardCommand extends CustomCommand {
   constructor(context: Command.Context, options: Command.Options) {
     super(context, {
       ...options,
       name: 'tttleaderboard',
       aliases: ['tttlb'],
-      fullCategory: ['games'],
-      description: 'Displays the tictactoe leaderboard.',
+      description: languageKeys.commands.games.tictactoeleaderboard.description,
       preconditions: [CustomPrecondition.BotInitializeOnly],
       runIn: [CommandOptionsRunTypeEnum.GuildAny],
     })
@@ -23,7 +22,10 @@ export class TicTacToeLeaderBoardCommand extends Command {
   /**
    * It executes when someone types the "tictactoeleaderboard" command.
    */
-  async messageRun(message: Message): Promise<Message> {
+  async messageRun(message: Message, { t }: CustomArgs): Promise<Message> {
+    const { messageTitle, messageDescription, positioningLabel, victoriesLabel, errorMessage } =
+      languageKeys.commands.games.tictactoeleaderboard
+
     try {
       const { id: guildId } = message.guild
       const topUsers = await container.db.userService.getByNestedFilter(
@@ -33,9 +35,9 @@ export class TicTacToeLeaderBoardCommand extends Command {
       )
 
       const leaderboard = new MessageEmbed()
-        .setTitle(`❌⭕ TicTacToe Leaderboard ❌⭕`)
+        .setTitle(t(messageTitle))
         .setColor(configuration.embedMessageColor)
-        .setDescription('Scoreboard of TicTacToe based on victories')
+        .setDescription(t(messageDescription))
 
       const usernamesList: string[] = []
       const scoreList = []
@@ -58,8 +60,9 @@ export class TicTacToeLeaderBoardCommand extends Command {
         scoreList.push(guildsData.tictactoeWins)
         position += 1
       })
-      leaderboard.addField('Positioning', usernamesList.join('\n'), true)
-      leaderboard.addField('Victories', scoreList.join('\n'), true)
+
+      leaderboard.addField(t(positioningLabel), usernamesList.join('\n'), true)
+      leaderboard.addField(t(victoriesLabel), scoreList.join('\n'), true)
 
       return message.channel.send({ embeds: [leaderboard] })
     } catch (error) {
@@ -69,7 +72,7 @@ export class TicTacToeLeaderBoardCommand extends Command {
           context: this.constructor.name,
         }
       )
-      return message.channel.send(`Sorry ): I couldn't retrieve tictactoe leaderboard. I failed you :sweat:`)
+      return message.channel.send(t(errorMessage))
     }
   }
 }

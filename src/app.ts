@@ -9,7 +9,6 @@ const main = async () => {
   const client = new SapphireClient({
     defaultPrefix: configuration.prefix,
     intents: ['GUILDS', 'GUILD_MEMBERS', 'GUILD_MESSAGES'],
-    loadDefaultErrorListeners: false,
     i18n: i18nConfig,
   })
 
@@ -20,14 +19,9 @@ const main = async () => {
   logger.info(`Trying to connect to mongo database...`, {
     context: client.constructor.name,
   })
-  try {
-    container.db = await MongoDatabase.connect()
-    container.cache = await Cache.init()
-  } catch (error) {
-    logger.error(`Database connection error. Could not connect to databases`, {
-      context: client.constructor.name,
-    })
-  }
+
+  container.db = await MongoDatabase.connect()
+  container.cache = await Cache.init()
 
   try {
     logger.info('Logging in...', {
@@ -40,8 +34,8 @@ const main = async () => {
   }
 }
 
-main().catch(() =>
+main().catch(() => {
   logger.error('Bot initialization failed.', {
     context: container.client.constructor.name,
   })
-)
+})

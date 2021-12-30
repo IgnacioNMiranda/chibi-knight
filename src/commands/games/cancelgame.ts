@@ -1,17 +1,16 @@
 import { Command, CommandOptionsRunTypeEnum, container } from '@sapphire/framework'
 import type { Message } from 'discord.js'
-import { logger, CustomPrecondition } from '@/utils'
+import { logger, CustomPrecondition, languageKeys, CustomCommand, CustomArgs } from '@/utils'
 
 /**
  * Replies the receives message on command.
  */
-export class CancelGameCommand extends Command {
+export class CancelGameCommand extends CustomCommand {
   constructor(context: Command.Context, options: Command.Options) {
     super(context, {
       ...options,
       aliases: ['cg'],
-      fullCategory: ['games'],
-      description: 'Cancels the active game.',
+      description: languageKeys.commands.games.cancelgame.description,
       preconditions: [CustomPrecondition.BotInitializeOnly],
       runIn: [CommandOptionsRunTypeEnum.GuildAny],
     })
@@ -20,25 +19,25 @@ export class CancelGameCommand extends Command {
   /**
    * It executes when someone types the "say" command.
    */
-  async messageRun(message: Message): Promise<Message<boolean>> {
+  async messageRun(message: Message, { t }: CustomArgs): Promise<Message<boolean>> {
     const { id } = message.guild
 
     try {
       const guild = await container.db.guildService.getById(id)
 
       if (guild && !guild.gameInstanceActive) {
-        return message.channel.send("There's no active game.")
+        return message.channel.send(t(languageKeys.commands.games.cancelgame.noActiveGame))
       }
 
       guild.gameInstanceActive = false
       await guild.save()
-      return message.channel.send('Game cancelled.')
+      return message.channel.send(t(languageKeys.commands.games.cancelgame.gameCancelled))
     } catch (error) {
       logger.error(
         `(${this.constructor.name}): MongoDB Connection error. Could not change game instance state for '${message.guild.name}' server`
       )
     }
 
-    return message.channel.send('It occured an unexpected error :sweat: try again later.')
+    return message.channel.send(t(languageKeys.errors.unexpectedError))
   }
 }
