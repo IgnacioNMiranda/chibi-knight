@@ -1,0 +1,4 @@
+{
+  "rolesActiveOnly_deactivatedRolesError": "{{appName}} no tiene los roles activados. Para hacerlo debes ejecutar `{{prefix}}activateroles`",
+  "rolesNotActiveOnly_activatedRolesError": "{{appName}} ya tiene los roles inicializados :relieved: revisa los tuyos ejecutando **{{prefix}}myroles**."
+}
