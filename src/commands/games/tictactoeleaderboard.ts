@@ -36,7 +36,7 @@ export class TicTacToeLeaderBoardCommand extends CustomCommand {
 
       const leaderboard = new MessageEmbed()
         .setTitle(t(messageTitle))
-        .setColor(configuration.embedMessageColor)
+        .setColor(configuration.client.embedMessageColor)
         .setDescription(t(messageDescription))
 
       const usernamesList: string[] = []

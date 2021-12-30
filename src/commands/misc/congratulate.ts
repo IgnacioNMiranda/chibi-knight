@@ -31,7 +31,7 @@ export class CongratulateCommand extends CustomCommand {
           username: congratulatedPerson.username,
         })
       )
-      .setColor(configuration.embedMessageColor)
+      .setColor(configuration.client.embedMessageColor)
       .setImage(gifs[randIndex])
 
     try {

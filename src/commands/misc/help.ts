@@ -34,7 +34,7 @@ export class HelpCommand extends CustomCommand {
         iconURL: botLogoURL,
       })
       .setThumbnail(botLogoURL)
-      .setColor(configuration.embedMessageColor)
+      .setColor(configuration.client.embedMessageColor)
 
     const commandName = await args.pick('string').catch(() => null)
 
@@ -77,7 +77,10 @@ export class HelpCommand extends CustomCommand {
   }
 
   async buildHelpForEveryCommand(message: MessageEmbed, channel: BotChannel, files: MessageAttachment[], t: TFunction) {
-    const { appName, prefix } = configuration
+    const {
+      appName,
+      client: { defaultPrefix: prefix },
+    } = configuration
     const { everyCommandEmbedMessageDescription, commandWithoutDescription, everyCommandEmbedMessageFooter } =
       languageKeys.commands.misc.help
     message.setDescription(t(everyCommandEmbedMessageDescription, { appName }))
@@ -96,7 +99,7 @@ export class HelpCommand extends CustomCommand {
         .filter((command) => command.category === category && command.enabled)
         .map(async (cmd) => {
           const commandDescription = t(cmd.description) ?? t(commandWithoutDescription)
-          return `**${configuration.prefix}${cmd.name}** → ${commandDescription}`
+          return `**${configuration.client.defaultPrefix}${cmd.name}** → ${commandDescription}`
         })
       const parsedCommands = await Promise.all(commandsParsers)
       return {

@@ -57,7 +57,7 @@ export class MyRoleCommand extends CustomCommand {
     } = languageKeys.commands.roles.myrole
 
     const embedMessage = new MessageEmbed()
-      .setColor(configuration.embedMessageColor)
+      .setColor(configuration.client.embedMessageColor)
       .setDescription(t(embedMessageDescription, { username: message.author.username }))
 
     const discordRole = getRoleFromUser(user)

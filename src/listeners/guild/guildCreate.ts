@@ -13,7 +13,7 @@ export class GuildCreateListener extends Listener<typeof Events.GuildCreate> {
     if (channel) {
       const textChannel = channel as TextChannel
       const welcomeMessage = await resolveKey(guild, languageKeys.listeners.guild.welcomeMessage, {
-        prefix: configuration.prefix,
+        prefix: configuration.client.defaultPrefix,
       })
       textChannel.send(welcomeMessage)
     }

@@ -5,7 +5,7 @@ import { utilLinks } from './links'
 import { languageKeys, roles } from '.'
 import { resolveKey } from '@sapphire/plugin-i18next'
 
-const ROLE_COLOR = configuration.embedMessageColor
+const ROLE_COLOR = configuration.client.embedMessageColor
 const CONTEXT = 'RoleUtil'
 
 export const defineRoles = (participationPoints: number, user: GuildMember, message: Message) => {

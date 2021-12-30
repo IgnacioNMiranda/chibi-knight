@@ -13,7 +13,7 @@ export class BotInitializedOnlyPrecondition extends Precondition {
       ? this.ok()
       : this.error({
           message: await resolveKey(message, languageKeys.preconditions.server.botInitializedOnlyErrorMessage, {
-            prefix: configuration.prefix,
+            prefix: configuration.client.defaultPrefix,
           }),
         })
   }

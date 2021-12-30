@@ -14,7 +14,7 @@ export class UserListener extends Listener<typeof Events.CommandError> {
     else helperMessage = await resolveKey(message, languageKeys.listeners.commands.fallbackErrorMessage)
 
     helperMessage += await resolveKey(message, languageKeys.listeners.commands.helperMessageExtension, {
-      prefix: configuration.prefix,
+      prefix: configuration.client.defaultPrefix,
       commandName: command.name,
     })
     return message.channel.send(helperMessage)

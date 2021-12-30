@@ -349,7 +349,7 @@ export class TicTacToeCommand extends CustomCommand {
       languageKeys.commands.games.tictactoe
     return new MessageEmbed()
       .setTitle(t(gameTitle))
-      .setColor(configuration.embedMessageColor)
+      .setColor(configuration.client.embedMessageColor)
       .setDescription(t(gameDescription))
       .addField(
         t(challengersTitle),

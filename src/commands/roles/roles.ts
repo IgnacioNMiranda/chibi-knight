@@ -23,7 +23,7 @@ export class RolesCommand extends CustomCommand {
   async messageRun(message: Message, args: CustomArgs): Promise<Message> {
     const { id: guildId } = message.guild
 
-    const embedMessage = new MessageEmbed().setColor(configuration.embedMessageColor)
+    const embedMessage = new MessageEmbed().setColor(configuration.client.embedMessageColor)
 
     const user = await args.pick('user').catch(() => null)
     if (!!user && !user.bot) {

@@ -30,7 +30,7 @@ export class ShameOnYouCommand extends CustomCommand {
       .setDescription(
         args.t(languageKeys.commands.misc.shameonyou.embedMessageDescription, { username: disrespectedPerson.username })
       )
-      .setColor(configuration.embedMessageColor)
+      .setColor(configuration.client.embedMessageColor)
       .setImage(gifs[randIndex])
 
     try {

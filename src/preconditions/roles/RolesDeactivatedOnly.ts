@@ -7,7 +7,10 @@ import { languageKeys } from '@/utils'
 export class RolesDeactivatedOnlyPrecondition extends Precondition {
   public async run(message: Message) {
     const { id: guildId } = message.guild
-    const { appName, prefix } = configuration
+    const {
+      appName,
+      client: { defaultPrefix: prefix },
+    } = configuration
     const activatedRolesError = await resolveKey(
       message,
       languageKeys.preconditions.roles.rolesNotActiveOnlyActivatedRolesError,

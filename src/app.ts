@@ -7,7 +7,7 @@ import '@sapphire/plugin-i18next/register'
 
 const main = async () => {
   const client = new SapphireClient({
-    defaultPrefix: configuration.prefix,
+    ...configuration.client,
     intents: ['GUILDS', 'GUILD_MEMBERS', 'GUILD_MESSAGES'],
     i18n: i18nConfig,
   })
@@ -27,7 +27,7 @@ const main = async () => {
     logger.info('Logging in...', {
       context: client.constructor.name,
     })
-    await client.login(configuration.token)
+    await client.login(configuration.client.token)
   } catch (error) {
     const { code, method, path } = error
     console.error(`Error ${code} trying to ${method} to ${path} path`)

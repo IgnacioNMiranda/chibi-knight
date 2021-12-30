@@ -12,7 +12,7 @@ export class MessageCreateListener extends Listener<typeof Events.MessageCreate>
 
     if (
       author.bot ||
-      content.startsWith(configuration.prefix) ||
+      content.startsWith(configuration.client.defaultPrefix) ||
       guild === null ||
       notAllowedPrefix.some((prefix) => content.startsWith(prefix))
     ) {

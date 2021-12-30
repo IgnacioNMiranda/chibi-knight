@@ -66,7 +66,7 @@ export class ActivateRolesCommand extends CustomCommand {
         })
         .setThumbnail(botLogoURL)
         .addField(t(rolesListText), rolesList)
-        .setColor(configuration.embedMessageColor)
+        .setColor(configuration.client.embedMessageColor)
         .setFooter(t(messageFooter, { appName }))
 
       const buttons = new MessageActionRow().addComponents(
@@ -139,7 +139,7 @@ export class ActivateRolesCommand extends CustomCommand {
     }
     container.cache.set(message.guild.id, newCachedGuild)
 
-    interaction.reply(t(rolesCreationSuccessful, { prefix: configuration.prefix }))
+    interaction.reply(t(rolesCreationSuccessful, { prefix: configuration.client.defaultPrefix }))
     return { message: activatingRolesMsg, interaction }
   }
 

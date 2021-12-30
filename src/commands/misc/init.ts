@@ -29,7 +29,10 @@ export class InitChibiKnightCommand extends CustomCommand {
     })
 
     const newGuild: Guild = { guildId }
-    const { appName, prefix } = configuration
+    const {
+      appName,
+      client: { defaultPrefix: prefix },
+    } = configuration
     try {
       await container.db.guildService.create(newGuild)
 
