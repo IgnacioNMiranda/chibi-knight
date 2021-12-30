@@ -1,13 +1,14 @@
 import { container } from '@sapphire/framework'
 import { Guild } from '@/database'
 import { InternationalizationContext } from '@sapphire/plugin-i18next'
-import { LocaleCode } from './locales'
+import { LocaleCodes } from './locales'
 
 export * as languageKeys from './keys'
+export * from './locales'
 
 export const i18nConfig = {
   fetchLanguage: async ({ guild }: InternationalizationContext) => {
-    if (!guild) return LocaleCode.DEFAULT
+    if (!guild) return LocaleCodes.DEFAULT
 
     const cachedGuild: Guild = container.cache.get(guild.id)
     if (cachedGuild?.guildLanguage) {
@@ -19,6 +20,7 @@ export const i18nConfig = {
       return dbGuild.guildLanguage
     }
 
-    return LocaleCode.DEFAULT
+    return LocaleCodes.DEFAULT
   },
+  defaultName: LocaleCodes.DEFAULT,
 }

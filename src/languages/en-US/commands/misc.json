@@ -14,6 +14,11 @@
 
   "sayDescription": "Replies with the received message.",
 
+  "selectLanguageCommandDescription": "Allows to select the language that {{appName}} will use",
+  "selectLanguageMessageContent": "Select your language:",
+  "selectLanguageIgnoreMessage": "Time's up! the server language remains the same",
+  "selectLanguage_LanguageChangedMessage": "Now the language is **{{language}}**",
+
   "shameonyouDescription": "Disrespects some @User.",
   "shameonyouEmbedMessageDescription": "Shame on you, {{username}}!!"
 }
