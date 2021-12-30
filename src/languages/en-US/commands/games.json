@@ -28,11 +28,15 @@
   "tictactoeChallengersText": "{{player1}} V/S {{player2}}",
   "tictactoeBoardTitle": "Board",
   "tictactoePositionsReferenceTitle": "Positions reference",
+  "tictactoeVictoryResult": ":tada: CONGRATULATIONS {{username}}! You have won! :tada:",
+  "tictactoeTieResult": "The game was a tie! :confetti_ball: Thanks for play (:",
 
   "tictactoeleaderboardDescription": "Displays the tictactoe leaderboard.",
   "tictactoeleaderboardMessageTitle": ":x::o: TicTacToe Leaderboard :x::o:",
   "tictactoeleaderboardMessageDescription": "Scoreboard of TicTacToe based on victories",
   "tictactoeleaderboardPositioningLabel": "Positioning",
   "tictactoeleaderboardVictoriesLabel": "Victories",
-  "tictactoeleaderboardErrorMessage": "Sorry ): I couldn't retrieve tictactoe leaderboard. I failed you :sweat:"
+  "tictactoeleaderboardErrorMessage": "Sorry ): I couldn't retrieve tictactoe leaderboard. I failed you :sweat:",
+
+  "cancelGameButtonLabel": "CANCEL GAME"
 }

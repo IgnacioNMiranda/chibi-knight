@@ -111,7 +111,7 @@ export class TicTacToeCommand extends CustomCommand {
         player2Action = UserActions.ACCEPT
       }
 
-      this.moveResolver[player2Action]({ message, player2, player1 }).then((message?: Message) => {
+      this.moveResolver[player2Action]({ message, player2, player1, t: args.t }).then((message?: Message) => {
         actionMessage.delete().catch()
         setTimeout(() => {
           message?.delete().catch()
@@ -185,7 +185,7 @@ export class TicTacToeCommand extends CustomCommand {
 
     const secondMovesRow = new MessageActionRow()
       .addComponents(availableMoves.slice((availableMoves.length + 1) / 2, availableMoves.length).map(getTttMoveButton))
-      .addComponents(getCancelGameButton(TicTacToeButtonId.CANCEL))
+      .addComponents(getCancelGameButton(TicTacToeButtonId.CANCEL, t))
 
     const sentEmbedMessage = await message.channel.send({
       embeds: [embedMessage],
@@ -280,6 +280,7 @@ export class TicTacToeCommand extends CustomCommand {
         const { result, stopReason } = tttGameResults[gameState]({
           player1,
           player2,
+          t,
         })
         newEmbedMessage.addField(t(resultText), result, false)
         if (winner && loser) {

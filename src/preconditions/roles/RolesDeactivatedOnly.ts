@@ -4,7 +4,7 @@ import { configuration } from '@/config'
 import { resolveKey } from '@sapphire/plugin-i18next'
 import { languageKeys } from '@/utils'
 
-export class RolesNotActiveOnlyPrecondition extends Precondition {
+export class RolesDeactivatedOnlyPrecondition extends Precondition {
   public async run(message: Message) {
     const { id: guildId } = message.guild
     const { appName, prefix } = configuration

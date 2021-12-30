@@ -5,12 +5,13 @@ export type TicTacToeMoveResolverParams = {
   message: Message
   player1?: User
   player2: User
-  t?: TFunction
+  t: TFunction
 }
 
 export type TicTacToeResultsParams = {
   player1: User
   player2: User
+  t: TFunction
 }
 
 export enum TicTacToeButtonId {

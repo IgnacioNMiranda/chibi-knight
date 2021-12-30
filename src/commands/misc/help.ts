@@ -100,7 +100,7 @@ export class HelpCommand extends CustomCommand {
         })
       const parsedCommands = await Promise.all(commandsParsers)
       return {
-        category: commandsCategoriesDescriptions[category],
+        category: commandsCategoriesDescriptions[category](t),
         commands: parsedCommands,
       }
     })

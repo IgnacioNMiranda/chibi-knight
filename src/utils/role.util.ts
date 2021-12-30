@@ -2,10 +2,11 @@ import { Guild, GuildMember, Message, MessageEmbed, Role } from 'discord.js'
 import { logger } from './logger'
 import { configuration } from '@/config'
 import { utilLinks } from './links'
-import { roles } from '.'
+import { languageKeys, roles } from '.'
+import { resolveKey } from '@sapphire/plugin-i18next'
 
-export const ROLE_COLOR = configuration.embedMessageColor
-export const CONTEXT = 'RoleUtil'
+const ROLE_COLOR = configuration.embedMessageColor
+const CONTEXT = 'RoleUtil'
 
 export const defineRoles = (participationPoints: number, user: GuildMember, message: Message) => {
   const nextAvailableRole = getNextAvailableRoleFromUser(user)
@@ -84,14 +85,20 @@ export const applyRole = async (role: Role, previousRole: Role, user: GuildMembe
       await user.roles.remove(previousRole)
     }
     await user.roles.add(role)
+    const getNewRoleMsg = await resolveKey(message, languageKeys.rolesAssignment.userObtainsNewRole, {
+      username: user.user.username,
+      roleName: role.name,
+    })
     const embedMessage = new MessageEmbed()
       .setColor(ROLE_COLOR)
       .setImage(utilLinks.roles.upgradeRole)
-      .setDescription(`Congratulations ${user}, you have obtain the '${role.name}' role!`)
+      .setDescription(getNewRoleMsg)
     message.channel.send({ embeds: [embedMessage] })
   } catch (error) {
     if (error.code === 50013) {
-      const errMessage = `Failed '${role.name}' role assignation. I guess I need more permissions ):`
+      const errMessage = await resolveKey(message, languageKeys.rolesAssignment.newRoleAssignmentError, {
+        roleName: role.name,
+      })
       logger.error(errMessage, { context: CONTEXT })
       message.channel.send(errMessage)
     }

@@ -25,3 +25,5 @@ export const challengersTitle = `${BASE_PATH}:tictactoeChallengersTitle`
 export const challengersText = `${BASE_PATH}:tictactoeChallengersText`
 export const boardTitle = `${BASE_PATH}:tictactoeBoardTitle`
 export const positionsReferenceTitle = `${BASE_PATH}:tictactoePositionsReferenceTitle`
+export const victoryResult = `${BASE_PATH}:tictactoeVictoryResult`
+export const tieResult = `${BASE_PATH}:tictactoeTieResult`
