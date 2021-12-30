@@ -1,14 +1,13 @@
 import { Command, container } from '@sapphire/framework'
 import { Message } from 'discord.js'
 import { configuration } from '@/config'
-import { logger, CustomPrecondition, languageKeys } from '@/utils'
+import { logger, CustomPrecondition, languageKeys, CustomCommand, CustomArgs } from '@/utils'
 import { Guild, User, GuildData } from '@/database'
-import { resolveKey } from '@sapphire/plugin-i18next'
 
 /**
  * Initialize bot funcionalities setting cache and adding server to BD.
  */
-export class InitChibiKnightCommand extends Command {
+export class InitChibiKnightCommand extends CustomCommand {
   constructor(context: Command.Context, options: Command.Options) {
     super(context, {
       ...options,
@@ -22,7 +21,7 @@ export class InitChibiKnightCommand extends Command {
   /**
    * It executes when someone types the "init" command.
    */
-  async messageRun(message: Message): Promise<Message> {
+  async messageRun(message: Message, { t }: CustomArgs): Promise<Message> {
     const { id: guildId, members } = message.guild
 
     logger.info(`Trying to register new server '${message.guild.name}'...`, {
@@ -62,17 +61,10 @@ export class InitChibiKnightCommand extends Command {
         context: this.constructor.name,
       })
 
-      const successfulMessage = await resolveKey(message, languageKeys.commands.misc.init.initSuccessfullyEvent, {
-        appName,
-        prefix,
-      })
-      return message.channel.send(successfulMessage)
+      return message.channel.send(t(languageKeys.commands.misc.init.initSuccessfullyEvent, { appName, prefix }))
     } catch (error) {
       logger.error(error, { context: this.constructor.name })
-      const failureMessage = await resolveKey(message, languageKeys.commands.misc.init.initSuccessfullyEvent, {
-        appName,
-      })
-      return message.channel.send(failureMessage)
+      return message.channel.send(t(languageKeys.commands.misc.init.initSuccessfullyEvent, { appName }))
     }
   }
 }

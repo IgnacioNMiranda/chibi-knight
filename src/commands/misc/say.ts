@@ -1,12 +1,11 @@
 import type { Message } from 'discord.js'
-import { Command, Args } from '@sapphire/framework'
-import { languageKeys } from '@/utils'
-import { fetchT } from '@sapphire/plugin-i18next'
+import { Command } from '@sapphire/framework'
+import { languageKeys, CustomCommand, CustomArgs } from '@/utils'
 
 /**
  * Replies the receives message on command.
  */
-export class SayCommand extends Command {
+export class SayCommand extends CustomCommand {
   public constructor(context: Command.Context, options: Command.Options) {
     super(context, {
       ...options,
@@ -18,7 +17,7 @@ export class SayCommand extends Command {
   /**
    * It executes when someone types the "say" command.
    */
-  async messageRun(message: Message, args: Args): Promise<Message<boolean>> {
+  async messageRun(message: Message, args: CustomArgs): Promise<Message<boolean>> {
     try {
       const text = await args.pick('string')
       await message.channel.send(text)

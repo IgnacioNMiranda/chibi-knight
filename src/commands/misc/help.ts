@@ -1,13 +1,21 @@
-import { Args, Command } from '@sapphire/framework'
+import { Command } from '@sapphire/framework'
 import { Message, MessageAttachment, MessageEmbed } from 'discord.js'
-import { BotChannel, botLogoURL, commandsCategoriesDescriptions, getBotLogo, languageKeys } from '@/utils'
+import {
+  BotChannel,
+  botLogoURL,
+  commandsCategoriesDescriptions,
+  CustomCommand,
+  CustomArgs,
+  getBotLogo,
+  languageKeys,
+} from '@/utils'
 import { configuration } from '@/config'
-import { resolveKey } from '@sapphire/plugin-i18next'
+import { TFunction } from '@sapphire/plugin-i18next'
 
 /**
  * Sends an embed message with information of every existing command.
  */
-export class HelpCommand extends Command {
+export class HelpCommand extends CustomCommand {
   constructor(context: Command.Context, options: Command.Options) {
     super(context, {
       ...options,
@@ -19,7 +27,7 @@ export class HelpCommand extends Command {
   /**
    * It executes when someone types the "help" command.
    */
-  async messageRun(message: Message, args: Args): Promise<Message<boolean>> {
+  async messageRun(message: Message, args: CustomArgs): Promise<Message<boolean>> {
     const embedMessage = new MessageEmbed()
       .setAuthor({
         name: configuration.appName,
@@ -31,13 +39,13 @@ export class HelpCommand extends Command {
     const commandName = await args.pick('string').catch(() => null)
 
     if (commandName) {
-      return this.buildCommandHelp(commandName, message.channel)
+      return this.buildCommandHelp(commandName, message.channel, args.t)
     }
 
-    return this.buildHelpForEveryCommand(embedMessage, message.channel, [getBotLogo()])
+    return this.buildHelpForEveryCommand(embedMessage, message.channel, [getBotLogo()], args.t)
   }
 
-  async buildCommandHelp(commandName: string, channel: BotChannel) {
+  async buildCommandHelp(commandName: string, channel: BotChannel, t: TFunction) {
     const command = this.store.get(commandName) as Command
     // TODO: when implement localization
 
@@ -65,19 +73,14 @@ export class HelpCommand extends Command {
         return message.channel.send({ embeds: [embedMessage], files: [botLogo] }) */
     }
 
-    const unknownCommandMessage = await resolveKey(channel, languageKeys.commands.misc.help.unknownCommandError, {
-      prefix: configuration.prefix,
-    })
-
-    return channel.send(unknownCommandMessage)
+    return channel.send(t(languageKeys.commands.misc.help.unknownCommandError))
   }
 
-  async buildHelpForEveryCommand(message: MessageEmbed, channel: BotChannel, files: MessageAttachment[]) {
+  async buildHelpForEveryCommand(message: MessageEmbed, channel: BotChannel, files: MessageAttachment[], t: TFunction) {
     const { appName, prefix } = configuration
-    const description = await resolveKey(channel, languageKeys.commands.misc.help.everyCommandEmbedMessageDescription, {
-      appName,
-    })
-    message.setDescription(description)
+    const { everyCommandEmbedMessageDescription, commandWithoutDescription, everyCommandEmbedMessageFooter } =
+      languageKeys.commands.misc.help
+    message.setDescription(t(everyCommandEmbedMessageDescription, { appName }))
 
     const commands = this.store.container.stores.get('commands')
     const categories = new Set<string>()
@@ -88,12 +91,11 @@ export class HelpCommand extends Command {
       }
     })
 
-    const noCommandDescription = await resolveKey(channel, languageKeys.commands.misc.help.commandWithoutDescription)
     const fieldsBuilder = [...categories.values()].map(async (category) => {
       const commandsParsers = commands
         .filter((command) => command.category === category && command.enabled)
         .map(async (cmd) => {
-          const commandDescription = (await resolveKey(channel, cmd.description)) ?? noCommandDescription
+          const commandDescription = t(cmd.description) ?? t(commandWithoutDescription)
           return `**${configuration.prefix}${cmd.name}** → ${commandDescription}`
         })
       const parsedCommands = await Promise.all(commandsParsers)
@@ -109,10 +111,7 @@ export class HelpCommand extends Command {
       message.addField(field.category, field.commands.join('\n'))
     })
 
-    const footer = await resolveKey(channel, languageKeys.commands.misc.help.everyCommandEmbedMessageFooter, {
-      prefix,
-    })
-    message.setFooter(footer)
+    message.setFooter(t(everyCommandEmbedMessageFooter, { prefix }))
     return channel.send({ embeds: [message], files })
   }
 }
