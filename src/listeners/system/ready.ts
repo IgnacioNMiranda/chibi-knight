@@ -13,7 +13,7 @@ export class ReadyListener extends Listener<typeof Events.ClientReady> {
 
   public run(client: Client) {
     client.user.setActivity(`${configuration.client.defaultPrefix}help`)
-    logger.info(`${client.user.username} is online n.n`, {
+    logger.info(`${client.user.username} is online.`, {
       context: client.constructor.name,
     })
   }

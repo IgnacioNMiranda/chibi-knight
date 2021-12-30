@@ -19,23 +19,17 @@ const main = async () => {
   logger.info(`Trying to connect to mongo database...`, {
     context: client.constructor.name,
   })
-
   container.db = await MongoDatabase.connect()
   container.cache = await Cache.init()
 
-  try {
-    logger.info('Logging in...', {
-      context: client.constructor.name,
-    })
-    await client.login(configuration.client.token)
-  } catch (error) {
-    const { code, method, path } = error
-    console.error(`Error ${code} trying to ${method} to ${path} path`)
-  }
+  logger.info('Logging in...', {
+    context: client.constructor.name,
+  })
+  await client.login(configuration.client.token)
 }
 
-main().catch(() => {
-  logger.error('Bot initialization failed.', {
+main().catch((reason) => {
+  logger.error(`Bot initialization failed. Error: ${reason}`, {
     context: container.client.constructor.name,
   })
 })

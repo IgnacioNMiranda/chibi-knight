@@ -57,11 +57,14 @@ export class SelectLanguageCommand extends CustomCommand {
 
     languageCollector.on('end', async (collection) => {
       if (!collection.first()) {
-        await selectLanguageMsg.edit(t(languageKeys.commands.misc.selectlanguage.ignoreMessage))
+        await selectLanguageMsg.edit({
+          content: t(languageKeys.commands.misc.selectlanguage.ignoreMessage),
+          components: [],
+        })
       }
       setTimeout(async () => {
         await selectLanguageMsg.delete().catch()
-      }, 5000)
+      }, 1000 * 7)
     })
   }
 }

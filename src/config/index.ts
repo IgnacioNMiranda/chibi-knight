@@ -7,7 +7,7 @@ export const configuration = {
   env: process.env.NODE_ENV || 'development',
   appName: process.env.APP_NAME || 'Chibi Knight',
   client: {
-    clientId: process.env.CLIENT_ID,
+    id: process.env.CLIENT_ID,
     token: process.env.BOT_TOKEN,
     defaultPrefix: process.env.BOT_PREFIX,
     embedMessageColor: (process.env.EMBED_MESSAGE_COLOR || '#57a7ef') as ColorResolvable,
