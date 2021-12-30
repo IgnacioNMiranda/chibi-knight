@@ -1,0 +1,6 @@
+{
+  "argumentErrorMessage": "That argument is not valid!",
+  "userErrorMessage": "You need to write more parameters!",
+  "fallbackErrorMessage": "You need to write more parameters!",
+  "helperMessageExtension": "\n> **Tip**: You can do `{{prefix}}help {{commandName}}` to find out how to use this command."
+}

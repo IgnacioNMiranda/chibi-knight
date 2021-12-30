@@ -1,23 +1,23 @@
 import type { Message } from 'discord.js'
-import { Command, Args } from '@sapphire/framework'
+import { Command } from '@sapphire/framework'
+import { languageKeys, CustomCommand, CustomArgs } from '@/utils'
 
 /**
  * Replies the receives message on command.
  */
-export class SayCommand extends Command {
+export class SayCommand extends CustomCommand {
   public constructor(context: Command.Context, options: Command.Options) {
     super(context, {
       ...options,
       aliases: ['s'],
-      fullCategory: ['misc'],
-      description: 'Replies with the received message.',
+      description: languageKeys.commands.misc.say.description,
     })
   }
 
   /**
    * It executes when someone types the "say" command.
    */
-  async messageRun(message: Message, args: Args): Promise<Message<boolean>> {
+  async messageRun(message: Message, args: CustomArgs): Promise<Message<boolean>> {
     try {
       const text = await args.pick('string')
       await message.channel.send(text)

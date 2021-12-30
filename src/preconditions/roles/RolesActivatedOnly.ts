@@ -1,11 +1,21 @@
 import { container, Precondition } from '@sapphire/framework'
 import { Message } from 'discord.js'
 import { configuration } from '@/config'
+import { resolveKey } from '@sapphire/plugin-i18next'
+import { languageKeys } from '@/utils'
 
-export class RolesActiveOnlyPrecondition extends Precondition {
+export class RolesActivatedOnlyPrecondition extends Precondition {
   public async run(message: Message) {
     const { id: guildId } = message.guild
-    const deactiveRolesError = `${configuration.appName}'s roles are not activated. First, you have to run \`${configuration.prefix}activateroles\``
+    const {
+      appName,
+      client: { defaultPrefix: prefix },
+    } = configuration
+    const deactiveRolesError = await resolveKey(
+      message,
+      languageKeys.preconditions.roles.rolesActiveOnlyDeactivatedRolesError,
+      { appName, prefix }
+    )
     const cachedGuild = container.cache.get(guildId)
     if (cachedGuild && !cachedGuild.rolesActivated) {
       return this.error({ message: deactiveRolesError })
@@ -17,8 +27,9 @@ export class RolesActiveOnlyPrecondition extends Precondition {
         return this.error({ message: deactiveRolesError })
       }
     } catch (error) {
+      const unexpectedErrorMessage = await resolveKey(message, languageKeys.errors.unexpectedError)
       return this.error({
-        message: 'It occured an unexpected error :sweat: try again later.',
+        message: unexpectedErrorMessage,
       })
     }
 

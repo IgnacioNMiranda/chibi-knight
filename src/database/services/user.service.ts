@@ -1,8 +1,4 @@
-import {
-  DocumentType,
-  ReturnModelType,
-  getModelForClass,
-} from '@typegoose/typegoose'
+import { DocumentType, ReturnModelType, getModelForClass } from '@typegoose/typegoose'
 import { Aggregate } from 'mongoose'
 import { User } from '../models'
 
@@ -21,20 +17,11 @@ export class UserService {
     return this.userRepository.find().exec()
   }
 
-  async getByFilter(
-    filter: any,
-    limit = 10,
-    sort = 1
-  ): Promise<DocumentType<User>[]> {
+  async getByFilter(filter: any, limit = 10, sort = 1): Promise<DocumentType<User>[]> {
     return this.userRepository.find(filter).limit(limit).sort(sort).exec()
   }
 
-  async getByNestedFilter(
-    unwind: string,
-    filter: any,
-    sort: any,
-    limit = 10
-  ): Promise<Aggregate<User[]>> {
+  async getByNestedFilter(unwind: string, filter: any, sort: any, limit = 10): Promise<Aggregate<User[]>> {
     return await this.userRepository.aggregate([
       { $unwind: `$${unwind}` },
       { $match: filter },

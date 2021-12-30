@@ -1,0 +1,37 @@
+{
+  "activaterolesCommandDescription": "Activates bot roles.",
+  "activaterolesRolesListText": "The next roles will be added to your server:",
+  "activaterolesMessageFooter": "> Do you really want to activate {{appName}}'s roles ?",
+  "activaterolesAcceptButtonLabel": "ACCEPT",
+  "activaterolesRejectButtonLabel": "REJECT",
+  "activaterolesUnexpectedError": "It occured an unexpected error, roles could not be created ): Try again later :sweat:",
+  "activaterolesActivateMessage": "Okay, we're working for you, meanwhile just relax n.n",
+  "activaterolesRolesCreationError": "Error while trying to create roles, maybe I don't have enough permissions :sweat:",
+  "activaterolesRolesCreationSuccessful": "Roles created successfully :purple_heart: See yours with **{{prefix}}myroles** command.",
+  "activaterolesRejectMessage": "Okay! I'am not gonna create any role (:",
+  "activaterolesIgnoreMessage": "Time's up! roles won't be created",
+
+  "myroleCommandDescription": "Shows your role and your current score.",
+  "myroleEmbedMessageDescription": "{{username}}'s Role",
+  "myroleFollowingRoleTitle": "You have the following role:",
+  "myroleHaveNoRoleTitle": "You don't have any role",
+  "myroleHaveNoRoleText": "Try to be more participatory n.n",
+  "myroleCurrentScoreTitle": "Current Score",
+  "myroleCurrentScoreText": "{{points}} points",
+  "myroleUndefinedScoreText": "some",
+  "myroleMessageFooter": "You need {{points}} more points to get '{{role}}' role.",
+  "myroleMessageFooterMaxPoints": "You are {{maxRole}}, you have reached the absolute supremacy!!",
+
+
+  "rolesCommandDescription": "Shows every registered role or specific @User's role.",
+  "rolesCurrentRoleTitle": "Current Role",
+  "rolesNoCurrentRoleText": "None",
+  "rolesUserRolesMessageDescription": ":jack_o_lantern: {{username}} :jack_o_lantern:",
+  "rolesCurrentScoreTitle": "Current Score",
+  "rolesCurrentScoreText": "{{points}} points",
+  "rolesUndefinedScoreText": "some",
+  "rolesEveryRoleMessageDescription": ":jack_o_lantern: Available {{appName}}'s Roles :jack_o_lantern:",
+  "rolesRolesTitle": "Roles",
+  "rolesRequiredScoresTitle": "Required scores",
+  "rolesMessageFooter": "You can increase your score being participatory and interacting with other users n.n"
+}

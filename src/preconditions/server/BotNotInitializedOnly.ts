@@ -1,8 +1,10 @@
 import { container, Precondition } from '@sapphire/framework'
 import { Message } from 'discord.js'
 import { configuration } from '@/config'
+import { resolveKey } from '@sapphire/plugin-i18next'
+import { languageKeys } from '@/utils'
 
-export class BotNotInitializeOnlyPrecondition extends Precondition {
+export class BotNotInitializedOnlyPrecondition extends Precondition {
   public async run(message: Message) {
     const { id: guildId } = message.guild
     const guild = await container.db.guildService.getById(guildId)
@@ -10,7 +12,9 @@ export class BotNotInitializeOnlyPrecondition extends Precondition {
     return !guild
       ? this.ok()
       : this.error({
-          message: `${configuration.appName} has already been initialize n.n`,
+          message: await resolveKey(message, languageKeys.preconditions.server.botNotInitializedOnlyErrorMessage, {
+            appName: configuration.appName,
+          }),
         })
   }
 }

@@ -19,12 +19,9 @@ export class MongoDatabase {
       return this.instance
     }
 
-    const connection = await mongoose.connect(
-      configuration.mongodb.connection_url,
-      {
-        serverSelectionTimeoutMS: 4000,
-      }
-    )
+    const connection = await mongoose.connect(configuration.mongodb.connection_url, {
+      serverSelectionTimeoutMS: 4000,
+    })
 
     return new MongoDatabase(connection)
   }

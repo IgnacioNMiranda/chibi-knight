@@ -2,27 +2,19 @@ import { Guild, GuildMember, Message, MessageEmbed, Role } from 'discord.js'
 import { logger } from './logger'
 import { configuration } from '@/config'
 import { utilLinks } from './links'
-import { roles } from '.'
+import { languageKeys, roles } from '.'
+import { resolveKey } from '@sapphire/plugin-i18next'
 
-export const ROLE_COLOR = configuration.embedMessageColor
-export const CONTEXT = 'RoleUtil'
+const ROLE_COLOR = configuration.client.embedMessageColor
+const CONTEXT = 'RoleUtil'
 
-export const defineRoles = (
-  participationPoints: number,
-  user: GuildMember,
-  message: Message
-) => {
+export const defineRoles = (participationPoints: number, user: GuildMember, message: Message) => {
   const nextAvailableRole = getNextAvailableRoleFromUser(user)
 
-  if (
-    nextAvailableRole &&
-    participationPoints >= nextAvailableRole.requiredPoints
-  ) {
+  if (nextAvailableRole && participationPoints >= nextAvailableRole.requiredPoints) {
     // User accomplish requirements to gain a new role.
     const existingRoles = message.guild.roles.cache
-    const existingRoleInServer = existingRoles.find(
-      (role) => role.name === nextAvailableRole.name
-    )
+    const existingRoleInServer = existingRoles.find((role) => role.name === nextAvailableRole.name)
     // Role has to exist on the server to be applied.
     if (existingRoleInServer) {
       const botRoleExistingInUser = getRoleFromUser(user)
@@ -38,9 +30,7 @@ export const getRoleFromUser = (user: GuildMember): Role => {
   const userRoles = user.roles.cache
 
   const botRoleExistingInUser = userRoles.filter(
-    (userRole) =>
-      Object.values(roles).find((role) => role.name === userRole.name) !==
-      undefined
+    (userRole) => Object.values(roles).find((role) => role.name === userRole.name) !== undefined
   )
 
   return botRoleExistingInUser.first()
@@ -57,9 +47,7 @@ export const getRole = (
     return null
   }
   const availableBotRoles = Object.values(roles)
-  const role = availableBotRoles.find(
-    (botRole) => botRole.name === discordRole.name
-  )
+  const role = availableBotRoles.find((botRole) => botRole.name === discordRole.name)
   return role
 }
 
@@ -91,27 +79,26 @@ export const getNextAvailableRoleFromUser = (
   return nextAvailableRole
 }
 
-export const applyRole = async (
-  role: Role,
-  previousRole: Role,
-  user: GuildMember,
-  message: Message
-) => {
+export const applyRole = async (role: Role, previousRole: Role, user: GuildMember, message: Message) => {
   try {
     if (previousRole) {
       await user.roles.remove(previousRole)
     }
     await user.roles.add(role)
+    const getNewRoleMsg = await resolveKey(message, languageKeys.rolesAssignment.userObtainsNewRole, {
+      username: user.user.username,
+      roleName: role.name,
+    })
     const embedMessage = new MessageEmbed()
       .setColor(ROLE_COLOR)
       .setImage(utilLinks.roles.upgradeRole)
-      .setDescription(
-        `Congratulations ${user}, you have obtain the '${role.name}' role!`
-      )
+      .setDescription(getNewRoleMsg)
     message.channel.send({ embeds: [embedMessage] })
   } catch (error) {
     if (error.code === 50013) {
-      const errMessage = `Failed '${role.name}' role assignation. I guess I need more permissions ):`
+      const errMessage = await resolveKey(message, languageKeys.rolesAssignment.newRoleAssignmentError, {
+        roleName: role.name,
+      })
       logger.error(errMessage, { context: CONTEXT })
       message.channel.send(errMessage)
     }
@@ -123,9 +110,7 @@ export const initRoles = async (message: Message): Promise<boolean> => {
     const { guild } = message
     const botRoles = Object.values(roles)
     const rolesBuilder = botRoles.map(async (role) => {
-      if (
-        !guild.roles.cache.find((guildRole) => guildRole.name === role.name)
-      ) {
+      if (!guild.roles.cache.find((guildRole) => guildRole.name === role.name)) {
         return guild.roles.create({
           name: role.name,
           color: ROLE_COLOR,
@@ -148,9 +133,7 @@ export const removeRoles = async (guild: Guild): Promise<boolean> => {
   try {
     const botRoles = Object.values(roles)
     const rolesRemover = botRoles.map(async (role) => {
-      const existingRole = guild.roles.cache.find(
-        (guildRole: Role) => guildRole.name === role.name
-      )
+      const existingRole = guild.roles.cache.find((guildRole: Role) => guildRole.name === role.name)
       if (existingRole) {
         return existingRole.delete('Bot fired from server')
       }
@@ -158,10 +141,9 @@ export const removeRoles = async (guild: Guild): Promise<boolean> => {
     await Promise.all(rolesRemover)
     return true
   } catch (error) {
-    logger.error(
-      `Authorization error. Does not have enough permissions on '${guild.name}' server to delete roles`,
-      { context: CONTEXT }
-    )
+    logger.error(`Authorization error. Does not have enough permissions on '${guild.name}' server to delete roles`, {
+      context: CONTEXT,
+    })
   }
   return false
 }

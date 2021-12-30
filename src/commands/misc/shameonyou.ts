@@ -1,27 +1,25 @@
-import { Args, Command } from '@sapphire/framework'
+import { Command, CommandOptionsRunTypeEnum } from '@sapphire/framework'
 import { Message, MessageEmbed } from 'discord.js'
 import { configuration } from '@/config'
-import { commandsLinks } from '@/utils'
+import { commandsLinks, languageKeys, CustomCommand, CustomArgs } from '@/utils'
 
 /**
  * Sends an embed message disrespecting certain User and a disrespectful image.
  */
-export class ShameOnYouCommand extends Command {
+export class ShameOnYouCommand extends CustomCommand {
   constructor(context: Command.Context, options: Command.Options) {
     super(context, {
       ...options,
-      name: 'shameonyou',
       aliases: ['soy'],
-      fullCategory: ['misc'],
-      description: 'Disrespects some @User.',
-      runIn: ['GUILD_ANY'],
+      description: languageKeys.commands.misc.shameonyou.description,
+      runIn: [CommandOptionsRunTypeEnum.GuildAny],
     })
   }
 
   /**
    * It executes when someone types the "shameonyou" command.
    */
-  async messageRun(message: Message, args: Args): Promise<Message> {
+  async messageRun(message: Message, args: CustomArgs): Promise<Message> {
     const disrespectedPerson = await args.pick('user')
 
     // Obtains disrespected gif's urls.
@@ -29,8 +27,10 @@ export class ShameOnYouCommand extends Command {
     const randIndex = Math.floor(Math.random() * gifs.length)
 
     const embedMessage = new MessageEmbed()
-      .setDescription(`Shame on you! ${disrespectedPerson.username} !!`)
-      .setColor(configuration.embedMessageColor)
+      .setDescription(
+        args.t(languageKeys.commands.misc.shameonyou.embedMessageDescription, { username: disrespectedPerson.username })
+      )
+      .setColor(configuration.client.embedMessageColor)
       .setImage(gifs[randIndex])
 
     try {

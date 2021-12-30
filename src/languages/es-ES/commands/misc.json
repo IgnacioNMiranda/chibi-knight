@@ -1,0 +1,24 @@
+{
+  "congratulateDescription": "Felicita a algún @Usuario.",
+  "congratulateEmbedMessageDescription": "¡¡Felicidades, {{username}}!!",
+
+  "helpDescription": "Muestra información sobre cada comando existente.",
+  "helpUnknownCommandError": "¡Comando desconocido! puedes revisar los comandos disponibles con `{{prefix}}help`",
+  "helpEveryCommandEmbedMessageDescription": ":crossed_swords: Estos son los comandos disponibles en {{appName}} n.n",
+  "helpEveryCommandEmbedMessageFooter": "Ejecuta {{prefix}}help {command} para ver información sobre un comando en específico.",
+  "helpCommandWithoutDescription": "Descripción no encontrada",
+
+  "initDescription": "Inicializa las funcionalidades del bot.",
+  "initSuccessfullyEvent": "{{appName}} ha sido inicializado satisfactoriamente :purple_heart: revisa los comandos con `{{prefix}}help` :smile:",
+  "initFailureEvent": "Ocurrió un error inesperado durante la inicialización de {{appName}} :sweat: inténtalo más tarde.",
+
+  "sayDescription": "Dice el mensaje recibido.",
+
+  "selectLanguageCommandDescription": "Permite seleccionar el lenguaje que {{appName}} utilizará.",
+  "selectLanguageMessageContent": "Selecciona el idioma:",
+  "selectLanguageIgnoreMessage": "¡Se acabó el tiempo! el idioma del servidor seguirá siendo el mismo.",
+  "selectLanguage_LanguageChangedMessage": "Ahora el idioma es **{{language}}**.",
+
+  "shameonyouDescription": "Falta el respeto a un @Usuario.",
+  "shameonyouEmbedMessageDescription": "¡Das lástima y verguenza, {{username}}!"
+}

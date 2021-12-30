@@ -1,3 +1,4 @@
+import { TFunction } from '@sapphire/plugin-i18next'
 import { CacheType, Message, MessageComponentInteraction } from 'discord.js'
 import { BotCommandsCategories } from '.'
 
@@ -30,5 +31,6 @@ export enum RolesButtonId {
 
 export type ActivateRolesResolverParams = {
   message: Message
+  t: TFunction
   interaction?: MessageComponentInteraction<CacheType>
 }

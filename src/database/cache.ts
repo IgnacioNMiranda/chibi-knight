@@ -31,12 +31,9 @@ export class Cache {
         this.instance.set(guildId, cachedGuild)
       })
     } catch (error) {
-      logger.error(
-        `MongoDB Connection error. Could not init cache from database`,
-        {
-          context: this.constructor.name,
-        }
-      )
+      logger.error(`MongoDB Connection error. Could not init cache from database`, {
+        context: this.constructor.name,
+      })
     }
     return this.instance
   }

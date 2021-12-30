@@ -6,12 +6,9 @@ export class GuildDeleteListener extends Listener<typeof Events.GuildDelete> {
   public async run(guild: Guild) {
     const { id: guildId } = guild
     try {
-      logger.info(
-        `Trying to leave '${guild.name}' server and delete from DB...`,
-        {
-          context: guild.client.constructor.name,
-        }
-      )
+      logger.info(`Trying to leave '${guild.name}' server and delete from DB...`, {
+        context: guild.client.constructor.name,
+      })
       await container.db.guildService.deleteById(guildId)
       await container.db.userService.deleteGuildDataById(guildId)
       if (guild.me.permissions.has('MANAGE_ROLES')) {
@@ -21,12 +18,9 @@ export class GuildDeleteListener extends Listener<typeof Events.GuildDelete> {
         context: container.client.constructor.name,
       })
     } catch (error) {
-      logger.error(
-        `MongoDB Connection error. Could not delete '${guild.name}' server from DB`,
-        {
-          context: container.client.constructor.name,
-        }
-      )
+      logger.error(`MongoDB Connection error. Could not delete '${guild.name}' server from DB`, {
+        context: container.client.constructor.name,
+      })
     }
   }
 }

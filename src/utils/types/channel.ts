@@ -1,14 +1,3 @@
-import {
-  DMChannel,
-  PartialDMChannel,
-  NewsChannel,
-  TextChannel,
-  ThreadChannel,
-} from 'discord.js'
+import { DMChannel, PartialDMChannel, NewsChannel, TextChannel, ThreadChannel } from 'discord.js'
 
-export type BotChannel =
-  | DMChannel
-  | PartialDMChannel
-  | NewsChannel
-  | TextChannel
-  | ThreadChannel
+export type BotChannel = DMChannel | PartialDMChannel | NewsChannel | TextChannel | ThreadChannel

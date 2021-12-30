@@ -1,0 +1,4 @@
+{
+  "userObtainsNewRole": "Congratulations {{username}}, you have obtain the '{{roleName}}' role!",
+  "newRoleAssignmentError": "Failed '{{roleName}}' role assignation. I guess I need more permissions ):"
+}
