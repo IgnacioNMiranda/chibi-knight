@@ -1,6 +1,7 @@
 import { Command, CommandOptionsRunTypeEnum } from '@sapphire/framework'
 import { CustomCommand, CustomArgs, languageKeys, languagesTypes, getButton, CustomPrecondition } from '@/utils'
 import { ButtonInteraction, Message, MessageActionRow } from 'discord.js'
+import { resolveKey } from '@sapphire/plugin-i18next'
 
 /**
  * Allows to select the guild language.
@@ -11,7 +12,7 @@ export class SelectLanguageCommand extends CustomCommand {
       ...options,
       aliases: ['sl'],
       description: languageKeys.commands.misc.selectlanguage.commandDescription,
-      preconditions: [CustomPrecondition.AdminOnly],
+      preconditions: [CustomPrecondition.AdminOnly, CustomPrecondition.BotInitializedOnly],
       runIn: [CommandOptionsRunTypeEnum.GuildAny],
     })
   }
@@ -38,10 +39,15 @@ export class SelectLanguageCommand extends CustomCommand {
         const guild = await this.container.db.guildService.getById(message.guild.id)
         guild.guildLanguage = i.customId
         await guild.save()
-        await i.update({
-          content: t(languageKeys.commands.misc.selectlanguage.languageChangedMessage, {
+        const languageChangedMessage = await resolveKey(
+          message,
+          languageKeys.commands.misc.selectlanguage.languageChangedMessage,
+          {
             language: i.component.label,
-          }),
+          }
+        )
+        await i.update({
+          content: languageChangedMessage,
           components: [],
         })
       } catch (error) {

@@ -5,11 +5,11 @@
   "activaterolesAcceptButtonLabel": "ACCEPT",
   "activaterolesRejectButtonLabel": "REJECT",
   "activaterolesUnexpectedError": "It occured an unexpected error, roles could not be created ): Try again later :sweat:",
-  "activaterolesActivateMessage": "Okay, we're working for you, meanwhile take a nap n.n",
+  "activaterolesActivateMessage": "Okay, we're working for you, meanwhile just relax n.n",
   "activaterolesRolesCreationError": "Error while trying to create roles, maybe I don't have enough permissions :sweat:",
-  "activaterolesRolesCreationSuccessful": "Roles created successfully :purple_heart: Try to see yours with **{{prefix}}myroles** command.",
-  "activaterolesRejectMessage": "Okay! we're not gonna create any role (:",
-  "activaterolesIgnoreMessage": "Time's up! Try again later ):",
+  "activaterolesRolesCreationSuccessful": "Roles created successfully :purple_heart: See yours with **{{prefix}}myroles** command.",
+  "activaterolesRejectMessage": "Okay! I'am not gonna create any role (:",
+  "activaterolesIgnoreMessage": "Time's up! roles won't be created",
 
   "myroleCommandDescription": "Shows your role and your current score.",
   "myroleEmbedMessageDescription": "{{username}}'s Role",
@@ -20,7 +20,6 @@
   "myroleCurrentScoreText": "{{points}} points",
   "myroleUndefinedScoreText": "some",
   "myroleMessageFooter": "You need {{points}} more points to get '{{role}}' role.",
-  "myroleUndefinedScore": "You need {{points}} more points to get '{{role}}' role.",
   "myroleMessageFooterMaxPoints": "You are {{maxRole}}, you have reached the absolute supremacy!!",
 
 

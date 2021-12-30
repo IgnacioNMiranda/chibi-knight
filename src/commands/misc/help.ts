@@ -98,7 +98,7 @@ export class HelpCommand extends CustomCommand {
       const commandsParsers = commands
         .filter((command) => command.category === category && command.enabled)
         .map(async (cmd) => {
-          const commandDescription = t(cmd.description) ?? t(commandWithoutDescription)
+          const commandDescription = t(cmd.description, { appName }) ?? t(commandWithoutDescription)
           return `**${configuration.client.defaultPrefix}${cmd.name}** → ${commandDescription}`
         })
       const parsedCommands = await Promise.all(commandsParsers)

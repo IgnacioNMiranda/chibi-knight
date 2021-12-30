@@ -1,12 +1,12 @@
 {
   "congratulateDescription": "Congratulates some @User.",
-  "congratulateEmbedMessageDescription": "Congratulations {{username}} !!",
+  "congratulateEmbedMessageDescription": "Congratulations, {{username}} !!",
 
   "helpDescription": "Gives information about every existing command.",
   "helpUnknownCommandError": "Unknown command!! You could check the available commands with `{{prefix}}help`",
   "helpEveryCommandEmbedMessageDescription": ":crossed_swords: These are the available commands for {{appName}} n.n",
   "helpEveryCommandEmbedMessageFooter": "Type {{prefix}}help {command} to see information about an specific command.",
-  "helpCommandWithoutDescription": "No description was provided",
+  "helpCommandWithoutDescription": "No description was provided.",
 
   "initDescription": "Initialize Chibi Knight funcionalities.",
   "initSuccessfullyEvent": "{{appName}} has been initialize successfully :purple_heart: check out the commands with **{{prefix}}help** :smile:",
@@ -14,9 +14,9 @@
 
   "sayDescription": "Replies with the received message.",
 
-  "selectLanguageCommandDescription": "Allows to select the language that {{appName}} will use",
-  "selectLanguageMessageContent": "Select your language:",
-  "selectLanguageIgnoreMessage": "Time's up! the server language remains the same",
+  "selectLanguageCommandDescription": "Allows to select the language that {{appName}} will use.",
+  "selectLanguageMessageContent": "Select the language:",
+  "selectLanguageIgnoreMessage": "Time's up! the server language remains the same.",
   "selectLanguage_LanguageChangedMessage": "Now the language is **{{language}}**",
 
   "shameonyouDescription": "Disrespects some @User.",
