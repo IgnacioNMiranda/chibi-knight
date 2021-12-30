@@ -74,7 +74,7 @@ export class TicTacToeCommand extends CustomCommand {
     } = languageKeys.commands.games.tictactoe
 
     if (isGameInstanceActive) {
-      return message.channel.send(args.t(activeGameInstance, { player1 }))
+      return message.channel.send(args.t(activeGameInstance, { username: player1.username }))
     }
     if (player1.id === player2.id) {
       return message.channel.send(args.t(challengeYourself))
@@ -92,7 +92,7 @@ export class TicTacToeCommand extends CustomCommand {
     )
 
     const actionMessage = await message.channel.send({
-      content: args.t(startGameQuestion, { player1, player2 }),
+      content: args.t(startGameQuestion, { player1Username: player1.username, player2Username: player2.username }),
       components: [buttons],
     })
 
@@ -127,7 +127,9 @@ export class TicTacToeCommand extends CustomCommand {
   }
 
   async reject({ message, player2, t }: TicTacToeMoveResolverParams) {
-    return message.channel.send(t(languageKeys.commands.games.tictactoe.ignoreChallengeMessage, { player2 }))
+    return message.channel.send(
+      t(languageKeys.commands.games.tictactoe.rejectChallengeMessage, { username: player2.username })
+    )
   }
 
   async accept({ message, player2, player1, t }: TicTacToeMoveResolverParams) {
@@ -177,7 +179,7 @@ export class TicTacToeCommand extends CustomCommand {
 
     const embedMessage = this.embedDefaultboard(player1, player2, t)
       .addField(t(instructionsTitle), t(instructionsText), false)
-      .addField(t(currentTurnTitle), t(currentTurnText))
+      .addField(t(currentTurnTitle), t(currentTurnText, { activePlayerUsername: activePlayer.username }))
 
     const firstMovesRow = new MessageActionRow().addComponents(
       availableMoves.slice(0, (availableMoves.length + 1) / 2).map(getTttMoveButton)
@@ -284,7 +286,10 @@ export class TicTacToeCommand extends CustomCommand {
         })
         newEmbedMessage.addField(t(resultText), result, false)
         if (winner && loser) {
-          newEmbedMessage.addField(t(consolationPrizeTitleOneLoser), t(consolationPrizeTextOneLoser, { loser }))
+          newEmbedMessage.addField(
+            t(consolationPrizeTitleOneLoser),
+            t(consolationPrizeTextOneLoser, { loserUsername: loser.username })
+          )
           newEmbedMessage.setImage(commandsLinks.games.tictactoe.gifs[0])
         } else if (!winner && !loser) {
           newEmbedMessage.addField(t(consolationPrizeTitleTwoLosers), t(consolationPrizeTextTwoLosers))
@@ -348,7 +353,7 @@ export class TicTacToeCommand extends CustomCommand {
       .setDescription(t(gameDescription))
       .addField(
         t(challengersTitle),
-        t(challengersText, { player1: player1.username, player2: player2.username }),
+        t(challengersText, { player1Username: player1.username, player2Username: player2.username }),
         false
       )
       .addField(
