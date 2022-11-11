@@ -22,8 +22,8 @@
   },
   "homepage": "https://github.com/IgnacioNMiranda/chibi-knight#readme",
   "engines": {
-    "node": "~16.13.1",
-    "npm": "~8.1.2"
+    "node": "~16",
+    "npm": "~8"
   },
   "private": "true",
   "dependencies": {
